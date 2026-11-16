@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// La cámara sigue al jugador con un poco de suavizado.
-    /// La posición final se redondea al píxel del juego (1/32) para que el pixel art no tiemble.
+    /// Sigue al jugador, suavizado y alineado al píxel.
     public sealed class CameraFollow : MonoBehaviour
     {
         [SerializeField] Transform target;
@@ -25,7 +24,7 @@ namespace OnLinces
                 smooth.z);
         }
 
-        /// Para mover la cámara de golpe (al empezar el piso).
+        /// Mueve la cámara sin suavizado.
         public void SnapTo(Vector3 pos)
         {
             smooth = new Vector3(pos.x, pos.y, transform.position.z);

@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Al empezar un nivel muestra su nombre en el centro ("Piso 1: Oficina") y se desvanece.
+    /// Nombre del nivel al empezar.
     [RequireComponent(typeof(CanvasGroup))]
     public sealed class LevelTitle : MonoBehaviour
     {
         [SerializeField] TMP_Text label;
-        [Tooltip("Si tiene texto, se muestra esto en vez de 'Piso N: nombre' (Lobby)")]
+        [Tooltip("Reemplaza 'Piso N: nombre'")]
         [SerializeField] string overrideText;
         [SerializeField] float holdSeconds = 2f;
         [SerializeField] float fadeSeconds = 0.8f;
@@ -30,9 +30,9 @@ namespace OnLinces
         void Update()
         {
             t += Time.deltaTime;
-            float a = t < 0.3f ? t / 0.3f                       // aparece
-                    : t < 0.3f + holdSeconds ? 1f               // se queda
-                    : 1f - (t - 0.3f - holdSeconds) / fadeSeconds; // se desvanece
+            float a = t < 0.3f ? t / 0.3f
+                    : t < 0.3f + holdSeconds ? 1f
+                    : 1f - (t - 0.3f - holdSeconds) / fadeSeconds;
             group.alpha = Mathf.Clamp01(a);
             if (a <= 0f && t > 1f) gameObject.SetActive(false);
         }

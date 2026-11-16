@@ -4,7 +4,7 @@ namespace OnLinces
 {
     public enum ChestKind { Supply, Weapon }
 
-    /// Cofre. Suministros: 3-5 monedas, a veces corazón o arma. De arma: suelta un arma.
+    /// Cofre de suministros (monedas, a veces corazón o arma) o de arma.
     public sealed class Chest : MonoBehaviour, IInteractable
     {
         [SerializeField] ChestKind kind;

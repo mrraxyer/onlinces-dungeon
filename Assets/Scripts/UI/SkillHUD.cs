@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Indicador de la habilidad (abajo a la izquierda): ícono del puesto, recarga y nombre.
+    /// Ícono, nombre y recarga de la habilidad.
     public sealed class SkillHUD : MonoBehaviour
     {
         [SerializeField] PlayerSkill skill;
         [SerializeField] Image icon;
-        [Tooltip("Image Filled (radial) que tapa el ícono mientras recarga")]
+        [Tooltip("Image Filled radial")]
         [SerializeField] Image cooldownCover;
         [SerializeField] TMP_Text nameLabel;
 

@@ -4,13 +4,12 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Muestra los corazones del jugador. Va en un objeto del Canvas con Horizontal Layout Group;
-    /// "heartTemplate" es una Image hija desactivada que se copia por cada corazón.
+    /// Corazones del jugador.
     public sealed class HeartsHUD : MonoBehaviour
     {
         [SerializeField] PlayerHealth player;
+        [Tooltip("Plantilla desactivada")]
         [SerializeField] Image heartTemplate;
-        [Tooltip("hearts_0 (lleno), hearts_1 (medio), hearts_2 (vacío)")]
         [SerializeField] Sprite full, half, empty;
 
         readonly List<Image> hearts = new();

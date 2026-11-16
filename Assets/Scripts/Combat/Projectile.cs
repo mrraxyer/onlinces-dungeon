@@ -2,14 +2,14 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Bala de código. Avanza en línea recta, desaparece al acabarse su alcance o al chocar con una pared.
+    /// Bala en línea recta.
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class Projectile : MonoBehaviour
     {
         [SerializeField] SpriteRenderer spriteRenderer;
-        [Tooltip("Capas que destruyen la bala (Walls)")]
+        [Tooltip("Capas que la destruyen")]
         [SerializeField] LayerMask destroyOn;
-        [Tooltip("Material sin iluminación para balas enemigas: brillan en el apagón")]
+        [Tooltip("Sin luz: brilla en el apagón")]
         [SerializeField] Material enemyMaterial;
 
         public float Damage { get; private set; }
@@ -23,7 +23,7 @@ namespace OnLinces
 
         void Awake() => rb = GetComponent<Rigidbody2D>();
 
-        /// Atraviesa N enemigos y los empuja más fuerte (Post viral).
+        /// Atraviesa N enemigos.
         public void SetPierce(int count, float knockMultiplier)
         {
             pierce = count;

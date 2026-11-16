@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Portal al final de cada nivel (aparece al vencer al jefe). Con E pasas al siguiente piso.
+    /// Portal al siguiente piso.
     public sealed class FloorExit : MonoBehaviour, IInteractable
     {
-        [Tooltip("A dónde lleva (se muestra en el cuadro)")]
+        [Tooltip("Se muestra en el diálogo")]
         [SerializeField] string destination = "el siguiente piso";
         [SerializeField] AudioClip enterClip;
         bool used;

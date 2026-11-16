@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Arranque para teléfono: se ejecuta solo antes de cargar la primera escena.
-    /// Fija la pantalla en horizontal a 60 fps y crea los controles táctiles (Assets/Resources/TouchControls).
+    /// Teléfono: horizontal, 60 fps y controles táctiles.
     public static class MobileSetup
     {
         const string PrefabName = "TouchControls";
@@ -21,7 +20,7 @@ namespace OnLinces
                 Screen.autorotateToLandscapeRight = true;
                 Screen.orientation = ScreenOrientation.AutoRotation;
             }
-            else if (!Application.isEditor) return; // en PC no se crea nada
+            else if (!Application.isEditor) return; // PC
 
             var prefab = Resources.Load<TouchControls>(PrefabName);
             if (prefab == null) return;

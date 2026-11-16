@@ -3,22 +3,20 @@ using UnityEngine.InputSystem;
 
 namespace OnLinces
 {
-    /// Habilidad del puesto (Espacio / Shift). Godot: _use_skill en player.gd.
-    ///  · Deploy doble (Miembro): 5 s disparando con tus dos armas a la vez.
-    ///  · Junta general (Martín): 6 s con daño x2, cadencia x2 y un bot aliado que dispara solo.
-    ///  · Suplencia (Rafa): escudo, 2.5 s invulnerable y +½ vida.
-    ///  · Firewall total (Lemus): 3 s de burbuja que destruye las balas enemigas.
+    /// Habilidad del puesto.
+    ///  · Deploy doble: dispara las dos armas.
+    ///  · Junta general: daño y cadencia x2 + torreta.
+    ///  · Suplencia: escudo, invulnerable y +½ vida.
+    ///  · Firewall total: burbuja que borra balas.
     public sealed class PlayerSkill : MonoBehaviour
     {
         [SerializeField] InputActionReference skillAction;
         [SerializeField] PlayerRole role;
 
         [Header("Junta general")]
-        [Tooltip("Bot aliado que aparece junto a ti")]
         [SerializeField] AllyTurret allyPrefab;
 
         [Header("Firewall total")]
-        [Tooltip("Burbuja que se ve mientras dura")]
         [SerializeField] GameObject firewallBubble;
         [SerializeField] float firewallRadiusPx = 42f;
 
@@ -29,7 +27,7 @@ namespace OnLinces
         SkillKind activeKind;
 
         public RoleData Role => role ? role.Current : null;
-        /// 0 = lista, 1 = recién usada
+        /// 0 lista, 1 recién usada
         public float CooldownFraction => Role && Role.cooldown > 0f ? Mathf.Clamp01(cooldownLeft / Role.cooldown) : 0f;
         public bool Ready => cooldownLeft <= 0f;
         public bool IsActive(SkillKind k) => activeLeft > 0f && activeKind == k;
@@ -49,7 +47,6 @@ namespace OnLinces
 
             if (IsActive(SkillKind.FirewallTotal))
             {
-                // destruye balas enemigas cerca
                 float r = Units.Px(firewallRadiusPx);
                 foreach (var p in FindObjectsByType<Projectile>())
                     if (!p.FromPlayer && Vector2.Distance(p.transform.position, transform.position + Vector3.up * Units.Px(12)) < r)

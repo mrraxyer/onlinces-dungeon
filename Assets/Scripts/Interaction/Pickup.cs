@@ -4,21 +4,18 @@ namespace OnLinces
 {
     public enum PickupKind { Coin, Heart, Pizza, Drink, Item, Weapon }
 
-    /// Algo que se recoge.
-    ///  · Monedas y comida gratis: al pasar encima.
-    ///  · Ítems, armas y todo lo que tiene precio (tienda): con E. Al acercarte se ve qué hace.
+    /// Recogible: lo gratis se toma al pasar; ítems, armas y tienda con E.
     [RequireComponent(typeof(Collider2D))]
     public sealed class Pickup : MonoBehaviour, IInteractable
     {
         [SerializeField] PickupKind kind;
-        [Tooltip("Nombre para el cuadro de descripción (corazón, pizza...). Ítems y armas usan el suyo.")]
+        [Tooltip("Ítems y armas usan el suyo")]
         [SerializeField] string displayName;
         [TextArea] [SerializeField] string description;
-        [Tooltip("El sprite que flota (hijo)")]
         [SerializeField] SpriteRenderer visual;
         [SerializeField] Sprite[] frames;
         [SerializeField] float framesPerSecond = 8f;
-        [Tooltip("0 = gratis. Si es mayor, es artículo de tienda y se compra con E.")]
+        [Tooltip("0 = gratis")]
         [SerializeField] int price;
         [SerializeField] TMPro.TMP_Text priceLabel;
         [SerializeField] ItemData item;
@@ -53,7 +50,7 @@ namespace OnLinces
         public void SetItem(ItemData data) { item = data; RefreshVisual(); }
         public void SetWeapon(WeaponData data) { weapon = data; RefreshVisual(); }
         public void SetPrice(int p) { price = p; RefreshVisual(); }
-        /// Salta un poco al aparecer (monedas de un cofre o enemigo).
+        /// Salta un poco al aparecer.
         public void Pop() => popVelPx = Random.insideUnitCircle.normalized * Random.Range(40f, 90f);
 
         void RefreshVisual()
@@ -64,7 +61,7 @@ namespace OnLinces
             if (priceLabel)
             {
                 priceLabel.text = price > 0 ? "$" + price : "";
-                // fondo de pergamino del precio (padre del texto), solo si hay precio
+                // fondo del precio
                 var bg = priceLabel.transform.parent != transform ? priceLabel.transform.parent : null;
                 if (bg) bg.gameObject.SetActive(price > 0);
             }
@@ -82,7 +79,7 @@ namespace OnLinces
             }
             else if (kind == PickupKind.Coin && player && t > 0.5f)
             {
-                // imán: las monedas se acercan
+                // imán de monedas
                 Vector2 d = player.position - transform.position;
                 float dpx = d.magnitude * Units.PPU;
                 if (dpx < 80f) transform.position += (Vector3)(d.normalized * Units.Px(Mathf.Min(dpx, (260f - dpx * 2f) * Time.deltaTime)));
@@ -93,7 +90,7 @@ namespace OnLinces
                 priceLabel.color = GameManager.Instance.Run.Coins >= price ? new Color(0.17f, 0.1f, 0.06f) : new Color(0.75f, 0.12f, 0.15f);
         }
 
-        // ---------- recoger al pasar encima (monedas y comida gratis) ----------
+        // ---------- al pasar encima ----------
         void OnTriggerEnter2D(Collider2D other) => TryWalkOver(other);
         void OnTriggerStay2D(Collider2D other) => TryWalkOver(other);
 
@@ -102,11 +99,11 @@ namespace OnLinces
             if (used || NeedsE) return;
             var health = other.GetComponentInParent<PlayerHealth>();
             if (health == null || health.IsDead) return;
-            if (kind is PickupKind.Heart or PickupKind.Pizza && health.Hp >= health.MaxHp) return; // no desperdiciar
+            if (kind is PickupKind.Heart or PickupKind.Pizza && health.Hp >= health.MaxHp) return; // vida llena
             Apply(health.gameObject);
         }
 
-        /// Da el efecto y desaparece (o cambia de arma).
+        /// Aplica el efecto y desaparece (o deja el arma vieja).
         void Apply(GameObject p)
         {
             var health = p.GetComponent<PlayerHealth>();
@@ -130,10 +127,10 @@ namespace OnLinces
                 case PickupKind.Weapon:
                     var dropped = p.GetComponent<PlayerWeapons>().Take(weapon);
                     HUD.Feedback("Arma: " + weapon.displayName, HUD.Info);
-                    Sfx.Play(takeClip, 0.7f);
                     if (dropped != null)
                     {
-                        // dejas la tuya en el piso (ya pagada)
+                        // la tuya queda en el piso, gratis
+                        Sfx.Play(takeClip, 0.7f);
                         weapon = dropped;
                         price = 0;
                         RefreshVisual();
@@ -146,7 +143,7 @@ namespace OnLinces
             Destroy(gameObject);
         }
 
-        // ---------- con E: ítems, armas y tienda ----------
+        // ---------- con E ----------
         string Name => kind switch
         {
             PickupKind.Item when item => item.displayName,

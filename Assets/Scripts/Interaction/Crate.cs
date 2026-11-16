@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Caja naranja: aguanta 2 golpes y explota (daña a todos cerca, también a ti).
+    /// Caja explosiva.
     public sealed class Crate : MonoBehaviour, IHittable
     {
         [SerializeField] float hp = 2f;

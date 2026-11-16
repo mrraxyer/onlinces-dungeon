@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Integrante de la mesa directiva en el Lobby. Con E tomas su puesto:
-    /// tu On/Off se pone su vestimenta y cambia tu habilidad.
+    /// Toma el puesto de un integrante de la mesa.
     public sealed class RoleStation : MonoBehaviour, IInteractable
     {
         [SerializeField] RoleData role;
@@ -23,7 +22,7 @@ namespace OnLinces
             InfoText.Section("Datos",
                 $"{InfoText.Stat("Vida", Hearts(role.maxHp))}  ·  {InfoText.Stat("Velocidad", role.speedPx.ToString("0"))}"));
 
-        /// La vida va en medios corazones: 8 → "4 corazones", 7 → "3½ corazones".
+        /// 7 → "3½ corazones"
         static string Hearts(int half) => $"{half / 2}{(half % 2 == 1 ? "½" : "")} corazones";
         public bool CanInteract => true;
         public Vector3 Position => transform.position;

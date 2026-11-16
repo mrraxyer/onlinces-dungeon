@@ -6,9 +6,10 @@ namespace OnLinces
 {
     public enum EnemyKind { Bug, Fast, Glitch, Leak, LeakSmall, CopyPaste }
 
-    /// Enemigo básico. El comportamiento depende de "kind", igual que en enemy.gd de Godot:
-    ///  Bug/Fast/Leak: te persiguen zigzagueando · Glitch: flota y dispara · Leak: al morir se parte en 2
-    ///  CopyPaste (Ctrl+V): si no lo matas en ~5 s se copia (máx. 2 generaciones).
+    /// Enemigo común.
+    ///  · Bug/Fast/Leak: persiguen en zigzag (Leak se parte al morir).
+    ///  · Glitch: flota y dispara.
+    ///  · CopyPaste: se copia cada ~5 s.
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class Enemy : MonoBehaviour, IHittable
     {
@@ -19,21 +20,19 @@ namespace OnLinces
 
         [Header("Arte")]
         [SerializeField] SpriteRenderer spriteRenderer;
-        [Tooltip("Cuadros de animación (2)")]
         [SerializeField] Sprite[] frames;
-        [Tooltip("Opcional: ropa por piso (elemento 0 = piso 1). Si está vacío usa 'frames'.")]
+        [Tooltip("Opcional, uno por piso")]
         [SerializeField] FrameSet[] floorFrames;
         [SerializeField] float framesPerSecond = 5f;
-        [Tooltip("Color base (Fast usa el sprite de Bug en rojo)")]
         [SerializeField] Color tint = Color.white;
         [SerializeField] SpriteFx deathFx;
 
-        [Header("Vida y velocidad (Godot: base + por piso)")]
+        [Header("Vida y velocidad (base + por piso)")]
         [SerializeField] float baseHp = 3f;
         [SerializeField] float hpPerFloor = 1f;
         [SerializeField] float baseSpeedPx = 48f;
         [SerializeField] float speedPerFloorPx = 4f;
-        [Tooltip("Distancia a la que te hace daño al tocarte, en píxeles")]
+        [Tooltip("px")]
         [SerializeField] float contactRadiusPx = 17f;
 
         [Header("Disparo (solo Glitch)")]
@@ -42,7 +41,7 @@ namespace OnLinces
         [SerializeField] float bulletSpeedPx = 115f;
         [SerializeField] float bulletSpeedPerFloorPx = 10f;
 
-        [Header("Leak: en qué se parte al morir")]
+        [Header("Leak: se parte en")]
         [SerializeField] Enemy splitInto;
 
         [Header("Sonidos")]
@@ -50,13 +49,10 @@ namespace OnLinces
         [SerializeField] AudioClip dieClip;
         [SerializeField] AudioClip shootClip;
         [SerializeField] AudioClip cloneClip;
-        [Tooltip("Texto que aparece al copiarse (Ctrl+V)")]
         [SerializeField] string cloneToast = "Ctrl+V";
 
         public Room Room { get; set; }
-        public bool IsAlive => !dying;
         public bool CanBeHit => spawnT <= 0f && !dying;
-        public EnemyKind Kind => kind;
 
         const float SpawnTime = 0.7f;
         const int MaxCopies = 7;
@@ -87,7 +83,7 @@ namespace OnLinces
                 ? floorFrames[i].frames : frames;
         }
 
-        /// Para que las crías de Leak y las copias aparezcan casi al instante.
+        /// Aparece casi al instante.
         public void SkipSpawn(float remaining = 0.15f) => spawnT = remaining;
         public void Knock(Vector2 px) => knockPx = px;
 
@@ -143,7 +139,7 @@ namespace OnLinces
                         TryClone();
                     }
                     break;
-                default: // Bug, Fast, Leak, LeakSmall: persiguen zigzagueando
+                default: // persiguen en zigzag
                     float wiggle = kind == EnemyKind.Leak ? 0.25f : 0.6f;
                     velPx = (dir + side * Mathf.Sin(t * 6f + seed) * wiggle).normalized * speedPx;
                     spriteRenderer.flipX = to.x < 0f;
@@ -191,6 +187,12 @@ namespace OnLinces
             knockPx = dir * 150f * (kind == EnemyKind.Leak ? 0.4f : 1f);
             Sfx.Play(hitClip, 0.5f);
             if (hp <= 0f) Die();
+        }
+
+        /// Muere aunque esté apareciendo.
+        public void Kill()
+        {
+            if (!dying) Die();
         }
 
         void Die()

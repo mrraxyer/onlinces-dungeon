@@ -3,19 +3,16 @@ using UnityEngine.InputSystem;
 
 namespace OnLinces
 {
-    /// Busca lo interactuable más cercano, muestra "E: ..." y su descripción en el HUD, y lo usa al presionar Interact.
+    /// Elige el interactuable más cercano, muestra su diálogo y lo usa.
     public sealed class PlayerInteractor : MonoBehaviour
     {
         [SerializeField] InputActionReference interact;
-        [Tooltip("Distancia máxima en píxeles")]
+        [Tooltip("px")]
         [SerializeField] float rangePx = 30f;
 
-        /// true si hay algo cerca con qué interactuar.
-        public static bool HasTarget => Current != null;
-        /// Lo que tienes cerca (en teléfono el diálogo se pone encima de esto).
         public static IInteractable Current { get; private set; }
 
-        /// En teléfono: tocar el aviso "USAR: ..." equivale a presionar E.
+        /// Toque en el aviso (teléfono) = E.
         public static void Tap() => tapRequested = true;
         static bool tapRequested;
 
@@ -37,13 +34,10 @@ namespace OnLinces
                 float d = Vector2.Distance(it.Position, transform.position);
                 if (d < bestD) { bestD = d; best = it; }
             }
-            // en pausa no hay diálogo (si no, queda encima del menú de pausa); al continuar vuelve solo
-            if (Time.timeScale == 0f) best = null;
+            if (Time.timeScale == 0f) best = null; // en pausa no hay diálogo
             current = best;
             Current = current;
 
-            // el texto puede cambiar (precio, arma que cambias), así que se refresca cada cuadro
-            // (en teléfono no hay tecla E: se usa el botón USAR, y el aviso lo nombra igual)
             var prompt = current != null ? (TouchControls.Active ? "<b>USAR:</b> " : "E: ") + current.Prompt : "";
             if (prompt != shownPrompt)
             {
@@ -57,7 +51,7 @@ namespace OnLinces
             if (current != null && (interact.action.WasPressedThisFrame() || tapped))
             {
                 current.Interact(gameObject);
-                shownPrompt = null; // fuerza a refrescar
+                shownPrompt = null; // refrescar
             }
         }
 

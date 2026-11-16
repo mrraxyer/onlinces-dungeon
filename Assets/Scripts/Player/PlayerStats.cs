@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Modificadores del jugador por ítems y efectos temporales (café). Los ítems vienen de RunState
-    /// y se vuelven a aplicar en cada piso.
+    /// Multiplicadores por mascota, ítems y café.
     public sealed class PlayerStats : MonoBehaviour
     {
         [SerializeField] PlayerHealth health;
@@ -20,23 +19,22 @@ namespace OnLinces
         void Start()
         {
             var run = GameManager.Instance.Run;
-            // ventaja de la mascota (se muestra en la pantalla de inicio). El +1 corazón de Off está en PlayerHealth.
-            if (run.Mascot == Mascot.On) { SpeedMult *= 1.1f; FireDelayMult /= 1.1f; } // +10% velocidad y cadencia
-            else DamageMult *= 1.15f;                                                     // +15% daño
+            // ventaja de mascota (el corazón de Off está en PlayerHealth)
+            if (run.Mascot == Mascot.On) { SpeedMult *= 1.1f; FireDelayMult /= 1.1f; }
+            else DamageMult *= 1.15f;
             foreach (var it in run.Items) ApplyPassive(it);
         }
 
-        /// Textos de la pantalla de inicio (apodo y ventaja de cada mascota).
         public static string MascotTitle(Mascot m) => m == Mascot.On ? "El optimista" : "El escéptico";
         public static string MascotPerk(Mascot m) => m == Mascot.On ? "+10% velocidad y cadencia" : "+15% daño y +1 corazón";
 
         void Update() => boostT -= Time.deltaTime;
 
-        /// Velocidad extra por un rato (café, bebida ON). Godot: x1.3
+        /// Velocidad x1.3 un rato.
         public void Boost(float seconds) => boostT = Mathf.Max(boostT, seconds);
         public float CurrentSpeedMult => SpeedMult * (Boosted ? 1.3f : 1f);
 
-        /// Recoger un ítem nuevo: se guarda en la partida y aplica sus efectos de una vez.
+        /// Guarda el ítem y lo aplica.
         public void Collect(ItemData item)
         {
             GameManager.Instance.Run.Items.Add(item);
@@ -57,7 +55,7 @@ namespace OnLinces
             HUD.Feedback("Nuevo ítem: " + item.displayName, HUD.Info);
         }
 
-        // Efectos que se recalculan en cada piso (valores de Godot: apply_item)
+        // se reaplican en cada piso
         void ApplyPassive(ItemData item)
         {
             switch (item.effect)
@@ -70,13 +68,11 @@ namespace OnLinces
             }
         }
 
-        /// Llamado por la sala al entrar: Firewall da un escudo por sala.
         public void OnRoomEntered()
         {
             if (HasShieldItem) health.GiveShield();
         }
 
-        /// Llamado por la sala al limpiarla.
         public void OnRoomCleared(bool tookDamage)
         {
             if (HasDebugger) health.Heal(1);

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Algo que las balas del jugador pueden golpear (enemigos, cajas).
+    /// Lo que las balas del jugador pueden golpear.
     public interface IHittable
     {
         bool CanBeHit { get; }

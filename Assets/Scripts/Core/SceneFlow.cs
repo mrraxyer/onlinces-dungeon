@@ -2,9 +2,7 @@ using UnityEngine.SceneManagement;
 
 namespace OnLinces
 {
-    /// Orden del juego: Title -> Lobby -> Floor1 -> Floor2 -> Floor3 -> End -> Title.
-    /// Cada piso es su propia escena, diseñada a mano (Assets/Scenes/Floor1..3).
-    /// Los nombres deben coincidir con los archivos y estar en Build Profiles > Scene List.
+    /// Title → Lobby → Floor1..3 → End.
     public static class SceneFlow
     {
         public const string Title = "Title", Lobby = "Lobby", End = "End";
@@ -48,7 +46,7 @@ namespace OnLinces
             SceneManager.LoadScene(End);
         }
 
-        /// Empieza otra partida con la misma mascota, puesto y dificultad (desde End o al morir).
+        /// Nueva partida con la misma mascota, puesto y dificultad.
         public static void BackToLobby()
         {
             var old = Run;

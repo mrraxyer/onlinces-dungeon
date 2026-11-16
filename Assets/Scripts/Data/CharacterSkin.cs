@@ -4,17 +4,15 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// La apariencia de On u Off con un puesto: las 3 hojas de sprites ya cortadas.
-    /// Se crea en Project: clic derecho > Create > OnLinces > Character Skin.
-    /// Solo arrastra las 3 imágenes (body, head, extra); los cuadros se llenan solos y en orden.
+    /// Hojas de sprites de On/Off con un puesto. Los cuadros se llenan solos.
     [CreateAssetMenu(menuName = "OnLinces/Character Skin", fileName = "Skin")]
     public sealed class CharacterSkin : ScriptableObject
     {
-        [Tooltip("5 x 4: filas abajo, arriba, derecha, izquierda; columnas quieto + 4 de caminar")]
+        [Tooltip("5x4: abajo, arriba, der, izq · quieto + 4 pasos")]
         [SerializeField] Texture2D bodySheet;
-        [Tooltip("3 x 4: mismas filas; columnas normal, disparando, parpadeo")]
+        [Tooltip("3x4: normal, disparo, parpadeo")]
         [SerializeField] Texture2D headSheet;
-        [Tooltip("4 x 1: poses especiales")]
+        [Tooltip("4x1: poses")]
         [SerializeField] Texture2D extraSheet;
 
         [Header("Se llenan solos")]
@@ -34,7 +32,7 @@ namespace OnLinces
             extra = Load(extraSheet);
         }
 
-        // Ordena por el número final del nombre (on_body_2 antes que on_body_10).
+        // orden numérico: _2 antes que _10
         static Sprite[] Load(Texture2D sheet)
         {
             if (sheet == null) return Array.Empty<Sprite>();

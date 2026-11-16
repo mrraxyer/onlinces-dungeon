@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Qué puede salir de enemigos, cofres y tienda. Create > OnLinces > Loot Table.
+    /// Botín de enemigos, cofres y tienda.
     [CreateAssetMenu(menuName = "OnLinces/Loot Table", fileName = "Loot")]
     public sealed class LootTable : ScriptableObject
     {
-        [Header("Prefabs de cosas que se recogen")]
+        [Header("Recogibles")]
         public Pickup coin;
         public Pickup heart;
         public Pickup pizza;
@@ -18,11 +18,11 @@ namespace OnLinces
         public Chest supplyChest;
         public Chest weaponChest;
 
-        [Header("Qué puede salir")]
+        [Header("Posibles")]
         public WeaponData[] weapons;
         public ItemData[] items;
 
-        [Header("Al morir un enemigo (Godot: on_enemy_killed)")]
+        [Header("Al morir un enemigo")]
         [Range(0, 1)] public float coinChance = 0.55f;
         [Range(0, 1)] public float heartChance = 0.035f;
         [Range(0, 1)] public float drinkChance = 0.015f;

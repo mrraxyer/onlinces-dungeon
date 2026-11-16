@@ -4,13 +4,13 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Barra de vida del jefe (arriba al centro), con su nombre y subtítulo.
+    /// Barra de vida del jefe.
     public sealed class BossBar : MonoBehaviour
     {
         [SerializeField] GameObject panel;
         [SerializeField] TMP_Text nameLabel;
         [SerializeField] TMP_Text subtitleLabel;
-        [Tooltip("Image en modo Filled (horizontal)")]
+        [Tooltip("Image Filled horizontal")]
         [SerializeField] Image fill;
 
         static BossBar instance;

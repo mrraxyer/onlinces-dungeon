@@ -5,11 +5,9 @@ namespace OnLinces
 {
     public enum BossKind { Spaghetti, Div }
 
-    /// Jefe del piso. Comportamientos tomados de boss.gd (Godot):
-    ///  · Spaghetti Code: espiral de balas, embestida, látigos (rayos con aviso) e invoca bugs (fase 2+).
-    ///  · <div> sin centrar: SOLO recibe daño cuando está en el centro de la sala (la mira +).
-    ///    Tus disparos lo empujan: ponte del lado contrario y llévalo al centro.
-    /// Tres fases: al 66% y 33% de vida se vuelve más agresivo.
+    /// Jefe con 3 fases (66% y 33% de vida).
+    ///  · Spaghetti: espiral, embestida, látigos e invoca bugs.
+    ///  · <div>: solo recibe daño centrado; los disparos lo empujan.
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class Boss : MonoBehaviour, IHittable
     {
@@ -23,20 +21,19 @@ namespace OnLinces
         [SerializeField] SpriteRenderer spriteRenderer;
         [SerializeField] Sprite[] frames;
         [SerializeField] SpriteFx deathFx;
-        [Tooltip("Solo <div>: texto CSS que flota encima")]
+        [Tooltip("Solo <div>")]
         [SerializeField] TMP_Text cssLabel;
 
         [Header("Ataques")]
         [SerializeField] Projectile projectilePrefab;
         [SerializeField] Sprite[] bulletSprites;
         [SerializeField] Telegraph telegraphPrefab;
-        [Tooltip("Bug (Spaghetti) o Glitch (div)")]
+        [Tooltip("Esbirro que invoca")]
         [SerializeField] Enemy minionPrefab;
 
         [Header("Sonidos")]
         [SerializeField] AudioClip hitClip, phaseClip, dashClip, shootClip, dieClip, centeredClip, nopeClip;
 
-        // perillas de Godot
         const float BulletSpeed = 0.8f, Rest = 1.5f;
         static readonly (string css, Vector2 dir)[] CssMoves =
         {
@@ -63,7 +60,7 @@ namespace OnLinces
         {
             room = r;
             var run = GameManager.Instance.Run;
-            maxHp *= 1f + 0.35f * (run.Floor - 1); // más vida en pisos altos (mientras llegan sus jefes propios)
+            maxHp *= 1f + 0.35f * (run.Floor - 1); // +35% por piso
             maxHp *= DifficultyInfo.BossHp(run.Difficulty);
             Hp = maxHp;
             anchor = transform.position;
@@ -77,7 +74,7 @@ namespace OnLinces
         }
 
         Vector2 Center => room ? room.Center : (Vector2)transform.position;
-        Vector2 DivGoal => Center - new Vector2(0, Units.Px(28)); // el cuerpo del div queda sobre la mira
+        Vector2 DivGoal => Center - new Vector2(0, Units.Px(28)); // cuerpo sobre la mira
 
         void Update()
         {
@@ -190,7 +187,7 @@ namespace OnLinces
 
         void OnCollisionEnter2D(Collision2D c)
         {
-            // la embestida de Spaghetti se estrella en la pared y suelta un anillo de balas
+            // embestida contra la pared: anillo de balas
             if (state != "dash" || c.gameObject.layer != LayerMask.NameToLayer("Walls")) return;
             state = "move";
             stateT = 0.9f * Rest;
@@ -234,7 +231,7 @@ namespace OnLinces
                         var mv = CssMoves[Random.Range(0, CssMoves.Length)];
                         anchor = AnchorFor(mv.dir);
                         Css(mv.css, 3f);
-                        // cada 4 ataques intenta centrarse solo (y casi lo logra)
+                        // a veces intenta centrarse solo
                         if (attackI % 4 == 0) { anchor = goal; Css("display: grid; place-items: center", 3f); }
                         else if (attackI % 4 == 2) { anchor = goal + new Vector2(Units.Px(Random.Range(-40f, 40f)), Units.Px(Random.Range(-24f, 24f))); Css("margin: 0 auto; /* casi */", 3f); }
                     }
@@ -351,7 +348,7 @@ namespace OnLinces
             if (!CanBeHit) return;
             if (kind == BossKind.Div && !centered)
             {
-                // no recibe daño, pero el golpe lo empuja (así lo centras)
+                // sin daño, solo empuje
                 knockPx = Vector2.ClampMagnitude(knockPx + dir * 80f, 220f);
                 if (nopeT <= 0f) { nopeT = 0.7f; HUD.Toast("¡No está centrado!"); Sfx.Play(nopeClip, 0.4f); }
                 return;

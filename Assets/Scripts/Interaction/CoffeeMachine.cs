@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Cafetera: pagas y te da un café (más velocidad un rato y medio corazón).
+    /// Cafetera: velocidad temporal y ½ vida.
     public sealed class CoffeeMachine : MonoBehaviour, IInteractable
     {
         [SerializeField] int price = 2;

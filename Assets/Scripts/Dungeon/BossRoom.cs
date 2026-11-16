@@ -4,19 +4,16 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Sala del jefe (la última de cada nivel). Al entrar se cierran las puertas y aparece uno de los jefes
-    /// de la lista (al azar). Al vencerlo se abren las puertas y se activa el portal al siguiente piso.
-    /// Necesita un BoxCollider2D (Is Trigger) que cubra el interior.
+    /// Sala del jefe: cierra puertas, saca un jefe al azar y al vencerlo abre el portal.
     [RequireComponent(typeof(BoxCollider2D))]
     public sealed class BossRoom : MonoBehaviour
     {
-        [Tooltip("Uno sale al azar (Piso 1 en Godot: Spaghetti Code o <div> sin centrar)")]
+        [Tooltip("Uno al azar")]
         [SerializeField] Boss[] bosses;
         [SerializeField] Transform bossSpawn;
         [SerializeField] Door[] doors;
-        [Tooltip("Se activa al vencer al jefe")]
         [SerializeField] GameObject portal;
-        [Tooltip("Mira del centro (solo para <div>)")]
+        [Tooltip("Solo <div>")]
         [SerializeField] TMP_Text crosshair;
         [SerializeField] LootTable loot;
         [SerializeField] AudioClip introClip, doorCloseClip, doorOpenClip;
@@ -29,8 +26,8 @@ namespace OnLinces
         readonly List<Enemy> minions = new();
 
         public Vector2 Center => area.bounds.center;
-        /// Zona jugable (el interior de la sala).
         public Rect PlayRect => new(area.bounds.min, area.bounds.size);
+        public bool IsFighting => started && !done;
 
         void Awake()
         {
@@ -84,7 +81,7 @@ namespace OnLinces
         {
             if (done) return;
             done = true;
-            foreach (var m in minions) if (m) m.Hit(9999f, Vector2.zero);
+            foreach (var m in minions) if (m) m.Kill();
             foreach (var d in doors) if (d) d.SetOpen(true);
             if (portal) portal.SetActive(true);
             SetCrosshair(false, false);

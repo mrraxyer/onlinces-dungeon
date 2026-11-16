@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Efecto de un solo uso: reproduce sus cuadros y se destruye (polvo, explosión...).
+    /// Animación de un solo uso.
     public sealed class SpriteFx : MonoBehaviour
     {
         [SerializeField] SpriteRenderer spriteRenderer;

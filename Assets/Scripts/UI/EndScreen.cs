@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Pantalla final: "¡GANASTE!" o "GAME OVER", tu personaje y un resumen de la partida
-    /// (puesto, dificultad, hasta dónde llegaste, monedas e ítems).
+    /// Pantalla final con resultado y resumen.
     public sealed class EndScreen : MonoBehaviour
     {
         static readonly Color WinColor = new(0.32f, 0.85f, 0.45f);
@@ -13,12 +12,11 @@ namespace OnLinces
 
         [SerializeField] TMP_Text resultLabel;
         [SerializeField] TMP_Text subtitleLabel;
-        [Tooltip("Cuadro de pergamino con el resumen")]
         [SerializeField] TMP_Text summaryLabel;
         [SerializeField] Image character;
         [SerializeField] Sprite onSprite;
         [SerializeField] Sprite offSprite;
-        [Tooltip("Pisos en orden (para escribir 'Piso 2: Sala de Servidores')")]
+        [Tooltip("En orden")]
         [SerializeField] FloorData[] floors;
 
         void Start()
@@ -33,7 +31,7 @@ namespace OnLinces
             if (character)
             {
                 character.sprite = run.Mascot == Mascot.Off ? offSprite : onSprite;
-                character.color = won ? Color.white : new Color(0.65f, 0.65f, 0.75f); // apagado si perdiste
+                character.color = won ? Color.white : new Color(0.65f, 0.65f, 0.75f);
             }
 
             string role = run.Role ? run.Role.displayName : "Miembro";

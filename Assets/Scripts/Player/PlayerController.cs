@@ -3,22 +3,22 @@ using UnityEngine.InputSystem;
 
 namespace OnLinces
 {
-    /// Lee los controles y mueve al jugador. Apunta con el ratón o con el stick derecho.
+    /// Movimiento y puntería del jugador.
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class PlayerController : MonoBehaviour
     {
-        [Header("Controles (de InputSystem_Actions > Player)")]
+        [Header("Controles")]
         [SerializeField] InputActionReference move;
         [SerializeField] InputActionReference look;
         [SerializeField] InputActionReference attack;
         [SerializeField] InputActionReference nextWeapon;
 
         [Header("Movimiento")]
-        [Tooltip("Píxeles por segundo. Godot: 115 (Miembro) x 1.6")]
+        [Tooltip("px/s sin puesto")]
         [SerializeField] float speedPx = 184f;
 
         [Header("Apuntar")]
-        [Tooltip("Punto desde donde se apunta (la mano)")]
+        [Tooltip("La mano")]
         [SerializeField] Transform aimOrigin;
         [SerializeField] Camera cam;
 
@@ -30,16 +30,15 @@ namespace OnLinces
         Rigidbody2D rb;
         PlayerStats stats;
         PlayerRole role;
-        PlayerSkill skill;
         bool usingMouse = true;
         Vector2 lastMouse;
+        Vector2 knockPx;
 
         void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
             stats = GetComponent<PlayerStats>();
             role = GetComponent<PlayerRole>();
-            skill = GetComponent<PlayerSkill>();
             if (cam == null) cam = Camera.main;
             if (aimOrigin == null) aimOrigin = transform;
         }
@@ -53,7 +52,6 @@ namespace OnLinces
         void Update()
         {
             MoveInput = move.action.ReadValue<Vector2>();
-            // en teléfono se dispara solo mientras empujas la palanca derecha
             IsShooting = attack.action.IsPressed() || TouchControls.FireHeld;
             SwitchWeaponPressed = nextWeapon != null && nextWeapon.action.WasPressedThisFrame();
             UpdateAim();
@@ -63,7 +61,7 @@ namespace OnLinces
         {
             if (TouchControls.Active)
             {
-                // palanca derecha táctil; si está suelta, miras hacia donde caminas
+                // suelta: mira hacia donde camina
                 if (TouchControls.FireHeld) Aim = TouchControls.Aim.normalized;
                 else if (MoveInput.sqrMagnitude > 0.01f) Aim = MoveInput.normalized;
                 return;
@@ -94,9 +92,7 @@ namespace OnLinces
             if (MoveInput.sqrMagnitude > 0.01f) Aim = MoveInput.normalized;
         }
 
-        Vector2 knockPx;
-
-        /// Empujón (en píxeles por segundo) que se va frenando solo.
+        /// Empujón en px/s que se frena solo.
         public void Knock(Vector2 px) => knockPx = px;
 
         void OnDisable()

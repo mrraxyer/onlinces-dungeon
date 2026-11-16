@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Encoge este RectTransform al área segura de la pantalla (sin notch ni esquinas redondas).
-    /// Va en un objeto que ocupa todo el Canvas; lo que quede adentro nunca queda tapado.
+    /// Ajusta el rect al área segura (sin notch).
     [RequireComponent(typeof(RectTransform))]
     public sealed class SafeArea : MonoBehaviour
     {
@@ -14,7 +13,7 @@ namespace OnLinces
 
         void Update()
         {
-            // cambia al girar el teléfono
+            // al girar
             if (Screen.safeArea != applied || Screen.width != appliedScreen.x || Screen.height != appliedScreen.y) Apply();
         }
 

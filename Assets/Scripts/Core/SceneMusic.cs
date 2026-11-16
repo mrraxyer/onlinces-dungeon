@@ -2,12 +2,11 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Pon esto en cada escena: al empezar suena su música.
-    /// En End elige victoria o derrota según cómo terminó la partida.
+    /// Música de la escena.
     public sealed class SceneMusic : MonoBehaviour
     {
         [SerializeField] AudioClip clip;
-        [Tooltip("Solo End: música si perdiste (si está vacío usa 'clip')")]
+        [Tooltip("Solo End: si perdiste")]
         [SerializeField] AudioClip loseClip;
         [Range(0, 1)] [SerializeField] float volume = 0.5f;
 

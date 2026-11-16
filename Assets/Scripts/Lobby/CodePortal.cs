@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Portal de código del Lobby: con E empieza la partida en el Piso 1.
+    /// Portal del Lobby al Piso 1.
     public sealed class CodePortal : MonoBehaviour, IInteractable
     {
         [SerializeField] string destination = "Piso 1: Oficina";

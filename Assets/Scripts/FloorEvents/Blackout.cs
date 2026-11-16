@@ -3,13 +3,11 @@ using UnityEngine.Rendering.Universal;
 
 namespace OnLinces
 {
-    /// Dinámica del piso 1 — Apagón: "se va la luz" y solo ves un círculo alrededor tuyo.
-    /// Las balas enemigas siguen brillando (usan material sin iluminación).
-    /// Solo corre mientras peleas en una sala. Avisa 1.6 s antes, dura 7 s, y hay 20 s de calma (Godot).
+    /// Apagón: solo se ve alrededor del jugador. Corre durante peleas.
     public sealed class Blackout : MonoBehaviour
     {
         [SerializeField] Light2D globalLight;
-        [Tooltip("Luz que lleva el jugador (se prende en el apagón)")]
+        [Tooltip("Se prende en el apagón")]
         [SerializeField] Light2D playerLight;
         [SerializeField] float calmSeconds = 20f;
         [SerializeField] float warnSeconds = 1.6f;
@@ -29,17 +27,17 @@ namespace OnLinces
             baseIntensity = globalLight ? globalLight.intensity : 1f;
             rooms = FindObjectsByType<Room>(FindObjectsInactive.Exclude);
             bossRoom = FindAnyObjectByType<BossRoom>();
-            t = calmSeconds * 0.5f; // el primero llega un poco antes
+            t = calmSeconds * 0.5f; // el primero llega antes
             if (playerLight) playerLight.enabled = false;
         }
 
         bool Fighting()
         {
             foreach (var r in rooms) if (r && r.IsFighting) return true;
-            return FindAnyObjectByType<Boss>() != null;
+            return bossRoom && bossRoom.IsFighting;
         }
 
-        /// El jefe lo dispara al cambiar de fase.
+        /// Lo llama el jefe al cambiar de fase.
         public void TriggerNow()
         {
             if (state == State.Calm) { state = State.Warn; t = warnSeconds; Warn(); }
@@ -70,7 +68,7 @@ namespace OnLinces
                     break;
             }
 
-            // parpadeo durante el aviso, oscuridad durante el apagón
+            // parpadea en el aviso, oscuro en el apagón
             float want = state == State.Active ? 1f : state == State.Warn && Mathf.Sin(Time.time * 30f) > 0.3f ? 0.5f : 0f;
             dark = Mathf.MoveTowards(dark, want, Time.deltaTime * (state == State.Warn ? 6f : 2f));
             if (globalLight) globalLight.intensity = Mathf.Lerp(baseIntensity, darkIntensity, dark);

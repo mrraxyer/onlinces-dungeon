@@ -3,8 +3,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Música de fondo: una sola pista a la vez, sigue sonando al cambiar de escena si es la misma,
-    /// y cambia con un fundido corto.
+    /// Música de fondo con fundido entre pistas.
     public static class Music
     {
         static AudioSource source;

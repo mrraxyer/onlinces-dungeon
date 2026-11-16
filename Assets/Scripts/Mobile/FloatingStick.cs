@@ -5,22 +5,18 @@ using UnityEngine.InputSystem.OnScreen;
 
 namespace OnLinces
 {
-    /// Palanca táctil flotante: va en una zona invisible de la pantalla (una Image transparente con Raycast Target).
-    /// Al tocar la zona, la base salta a donde pusiste el dedo; al soltar vuelve a su lugar.
-    /// Para el juego es el stick de un gamepad (Control Path), así que no hay que cambiar el código del jugador.
+    /// Palanca táctil que aparece donde tocas; actúa como stick de gamepad.
     public sealed class FloatingStick : OnScreenControl, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         [InputControl(layout = "Vector2")]
         [SerializeField] string m_ControlPath = "<Gamepad>/leftStick";
 
-        [Tooltip("Círculo grande (hijo de esta zona)")]
         [SerializeField] RectTransform stickBase;
-        [Tooltip("Círculo chico (hijo de la base)")]
         [SerializeField] RectTransform knob;
-        [Tooltip("Qué tanto se aleja el círculo chico del centro, en unidades del Canvas")]
+        [Tooltip("Unidades del Canvas")]
         [SerializeField] float radius = 30f;
 
-        /// Dirección actual, de -1 a 1 en cada eje. (0,0) = suelta.
+        /// -1 a 1; (0,0) = suelta.
         public Vector2 Value { get; private set; }
 
         protected override string controlPathInternal { get => m_ControlPath; set => m_ControlPath = value; }

@@ -2,12 +2,10 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Solo en teléfono (lo agrega MobileHud): pone el diálogo encima de lo que tienes cerca
-    /// (cofre, ítem, puesto, portal...) y lo sigue. Abajo va el aviso "USAR: ..." que se toca para usarlo,
-    /// y arriba de él la descripción. Nunca se sale de la pantalla.
+    /// Teléfono: el diálogo sigue al interactuable, dentro de la pantalla.
     public sealed class InteractionDialog : MonoBehaviour
     {
-        const float AboveObject = 0.95f; // unidades del mundo arriba del objeto
+        const float AboveObject = 0.95f; // unidades del mundo
         const float Gap = 3f;
         const float Margin = 6f;
 

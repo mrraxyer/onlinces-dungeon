@@ -5,30 +5,21 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Controles táctiles (prefab Assets/Resources/TouchControls). MobileSetup lo crea solo al arrancar
-    /// y vive durante todo el juego; no hay que ponerlo en ninguna escena.
-    ///  · Solo se usa en teléfono (o en el editor con "Force In Editor").
-    ///  · Solo se ve en las escenas donde hay jugador (Lobby y pisos).
-    ///  · Palanca izquierda = mover. Palanca derecha = apuntar y disparar sola mientras la empujas.
-    ///  · Los botones son botones de gamepad (OnScreenButton), los mismos que ya usa InputSystem_Actions.
-    ///  · Para usar algo (cofre, tienda, portal) se toca el aviso "USAR: ..." del diálogo (ver InteractionDialog).
+    /// Controles táctiles: mover, apuntar/disparar, habilidad, arma y pausa. Persiste entre escenas.
     public sealed class TouchControls : MonoBehaviour
     {
-        [Tooltip("Mostrar los controles en el editor para probarlos con el ratón")]
+        [Tooltip("Probar con el ratón en el editor")]
         [SerializeField] bool forceInEditor;
 
         [Header("Mientras juegas")]
-        [Tooltip("Padre de palancas y botones")]
         [SerializeField] GameObject gameplay;
         [SerializeField] FloatingStick aimStick;
-        [Tooltip("Cuánto hay que empujar la palanca derecha para apuntar y disparar (0 a 1)")]
         [SerializeField, Range(0.05f, 0.9f)] float fireThreshold = 0.3f;
-        [Tooltip("Solo se ve si tu puesto tiene habilidad; se atenúa mientras recarga")]
         [SerializeField] Image skillButton;
         [SerializeField] Button pauseButton;
 
-        [Header("HUD del juego en teléfono")]
-        [Tooltip("Alto del HUD en sus unidades (en PC es 320). Más alto = HUD más chico y más espacio para ver el juego")]
+        [Header("HUD")]
+        [Tooltip("Más alto = HUD más chico")]
         [SerializeField] float hudReferenceHeight = 360f;
 
         [Header("Pausa")]
@@ -36,11 +27,9 @@ namespace OnLinces
         [SerializeField] Button continueButton;
         [SerializeField] Button quitButton;
 
-        /// true cuando se juega con la pantalla táctil (aunque esta escena no tenga jugador).
         public static bool Active { get; private set; }
-        /// Dirección de la palanca derecha; (0,0) si no se está apuntando.
+        /// (0,0) si no apunta.
         public static Vector2 Aim { get; private set; }
-        /// true mientras la palanca derecha está empujada: el jugador dispara.
         public static bool FireHeld { get; private set; }
 
         PlayerController player;
@@ -66,7 +55,6 @@ namespace OnLinces
             if (quitButton) quitButton.onClick.AddListener(QuitToTitle);
             if (gameplay) gameplay.SetActive(false);
             if (pausePanel) pausePanel.SetActive(false);
-            // botones proporcionales a la pantalla y sin encimarse en tablets
             if (Active && TryGetComponent<CanvasScaler>(out var scaler)) MobileHud.Proportional(scaler, 320f);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
@@ -92,7 +80,6 @@ namespace OnLinces
 
             if (player == null)
             {
-                // el jugador ya está en la escena desde el inicio; se busca de vez en cuando por si acaso
                 searchT -= Time.unscaledDeltaTime;
                 if (searchT <= 0f)
                 {
@@ -117,7 +104,6 @@ namespace OnLinces
             FireHeld = aiming;
 
             if (!show) return;
-
 
             if (skillButton)
             {
@@ -155,7 +141,7 @@ namespace OnLinces
             SceneFlow.BackToTitle();
         }
 
-        // al salir de la app (llamada, botón de inicio) el juego se queda en pausa
+        // pausa al salir de la app
         void OnApplicationPause(bool pauseStatus)
         {
             if (pauseStatus) Pause();

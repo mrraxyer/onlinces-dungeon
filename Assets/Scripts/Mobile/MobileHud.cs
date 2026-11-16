@@ -4,22 +4,20 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Acomoda el HUD de cada escena cuando se juega en teléfono (lo llama TouchControls al cargar la escena).
-    /// Las escenas no cambian: en PC el HUD queda tal como se diseñó en el editor.
-    ///  · El HUD se escala por la ALTURA de la pantalla (en un teléfono alargado, por ancho salía enorme
-    ///    y los botones de abajo se salían de la pantalla).
-    ///  · Todo el HUD se mete al área segura (sin notch ni esquinas redondas).
-    ///  · El minimapa sube a la esquina de arriba a la derecha: abajo lo tapa el pulgar que apunta.
+    /// Adapta el HUD de la escena al teléfono (en PC no cambia nada).
     public static class MobileHud
     {
         const string SafeName = "SafeArea";
+        const float InfoWidth = 250f;
 
-        // posiciones desde la esquina de arriba a la derecha, en unidades del HUD (a la izquierda del botón de pausa)
+        // desde arriba a la derecha, a la izquierda del botón de pausa
         static readonly Vector2 MinimapCorner = new(-66f, -8f);
         static readonly Vector2 FeedbackCorner = new(-66f, -8f);
         static readonly Vector2 FeedbackCornerWithMinimap = new(-104f, -8f);
+        static readonly Vector2 ToastBottom = new(-55f, 12f); // hueco entre palancas
+        static readonly Color TapColor = new(1f, 0.86f, 0.5f);
 
-        /// referenceHeight: alto del HUD en sus unidades. Más alto = HUD más chico.
+        /// Más alto = HUD más chico.
         public static void Apply(float referenceHeight, Canvas touchCanvas)
         {
             foreach (var scaler in Object.FindObjectsByType<CanvasScaler>())
@@ -27,10 +25,9 @@ namespace OnLinces
                 var canvas = scaler.GetComponent<Canvas>();
                 if (canvas == null || canvas == touchCanvas || !canvas.isRootCanvas) continue;
                 if (canvas.renderMode != RenderMode.ScreenSpaceOverlay) continue;
-                if (canvas.transform.Find(SafeName) != null) continue; // ya acomodado
+                if (canvas.transform.Find(SafeName) != null) continue; // ya hecho
 
                 Proportional(scaler, referenceHeight);
-
                 var safe = WrapInSafeArea(canvas.transform);
 
                 var minimap = canvas.GetComponentInChildren<Minimap>(true);
@@ -39,7 +36,6 @@ namespace OnLinces
                 if (safe.Find("Feedback") is RectTransform feedback)
                     ToTopRight(feedback, minimap != null ? FeedbackCornerWithMinimap : FeedbackCorner);
 
-                // el diálogo va encima de lo que tienes cerca, y su aviso "USAR: ..." es el botón para usarlo
                 var prompt = safe.Find("PromptLabelPanel") as RectTransform;
                 var info = safe.Find("InfoPanel") as RectTransform;
                 if (info != null) info.sizeDelta = new Vector2(InfoWidth, info.sizeDelta.y);
@@ -49,7 +45,6 @@ namespace OnLinces
                     MakeTappable(canvas, prompt, touchCanvas);
                 }
 
-                // los mensajes cortos bajan al hueco entre las palancas
                 if (safe.Find("ToastLabelPanel") is RectTransform toast)
                 {
                     toast.anchorMin = toast.anchorMax = new Vector2(0.5f, 0f);
@@ -59,10 +54,7 @@ namespace OnLinces
             }
         }
 
-        /// Escala el Canvas con la pantalla en modo "Expand": todo (textos incluidos) crece y se encoge
-        /// en proporción, y siempre caben al menos (2 x referenceHeight) de ancho por referenceHeight de alto.
-        /// En teléfonos alargados (20:9) se ve igual que con "match height"; en 16:9 y tablets 4:3 todo
-        /// se encoge un poco para que los botones de los lados no se encimen en el centro.
+        /// Escala proporcional; siempre caben 2h x h.
         public static void Proportional(CanvasScaler scaler, float referenceHeight)
         {
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -70,11 +62,7 @@ namespace OnLinces
             scaler.referenceResolution = new Vector2(referenceHeight * 2f, referenceHeight);
         }
 
-        const float InfoWidth = 250f;
-        static readonly Color TapColor = new(1f, 0.86f, 0.5f); // pergamino dorado: se nota que se toca
-
-        /// Convierte el aviso en botón. El HUD se dibuja encima de las palancas (que ocupan toda la pantalla),
-        /// así que todo lo demás del HUD deja de recibir toques para no estorbarlas.
+        /// El aviso se vuelve botón; el resto del HUD deja pasar los toques a las palancas.
         static void MakeTappable(Canvas canvas, RectTransform prompt, Canvas touchCanvas)
         {
             if (touchCanvas != null) canvas.sortingOrder = touchCanvas.sortingOrder + 1;
@@ -90,15 +78,12 @@ namespace OnLinces
             button.colors = colors;
             button.onClick.AddListener(PlayerInteractor.Tap);
 
-            // un poco más grande para el dedo
+            // más grande para el dedo
             if (prompt.GetComponent<HorizontalLayoutGroup>() is { } layout)
                 layout.padding = new RectOffset(layout.padding.left + 6, layout.padding.right + 6, layout.padding.top + 4, layout.padding.bottom + 4);
         }
-        // el hueco libre entre palancas está un poco a la izquierda (a la derecha hay más botones)
-        static readonly Vector2 ToastBottom = new(-55f, 12f);
 
-
-        /// Crea un hijo que ocupa el área segura y le pasa todo lo que había en el Canvas.
+        /// Mete los hijos del Canvas en un área segura.
         static RectTransform WrapInSafeArea(Transform canvas)
         {
             var children = new List<Transform>();

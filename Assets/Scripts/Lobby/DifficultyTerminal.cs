@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Terminal junto al portal: con E cambias la dificultad (Fácil → Media → Difícil).
+    /// Cambia la dificultad en ciclo.
     public sealed class DifficultyTerminal : MonoBehaviour, IInteractable
     {
         [SerializeField] AudioClip clickClip;

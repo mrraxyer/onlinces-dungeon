@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Sala del tesoro: un ítem gratis en su pedestal.
+    /// Sala del tesoro: un ítem gratis.
     public sealed class TreasureRoom : MonoBehaviour
     {
         [SerializeField] LootTable loot;

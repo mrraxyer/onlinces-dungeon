@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Progreso guardado entre partidas: en qué dificultades has ganado y la última dificultad elegida.
-    /// Se guarda en Application.persistentDataPath/progreso.json
+    /// Progreso en progreso.json: victorias y última dificultad.
     public static class SaveSystem
     {
         [Serializable]
@@ -40,7 +39,7 @@ namespace OnLinces
 
         public static bool HasWon(Difficulty d) => d switch { Difficulty.Facil => Data.facil, Difficulty.Media => Data.media, _ => Data.dificil };
 
-        /// Ganar en una dificultad mayor también cuenta para las menores (como en Godot).
+        /// También cuenta para las dificultades menores.
         public static void RegisterWin(Difficulty d)
         {
             if (d >= Difficulty.Facil) Data.facil = true;

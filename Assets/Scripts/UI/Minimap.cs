@@ -4,17 +4,15 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Minimapa (abajo a la derecha): dibuja las salas del nivel como rectángulos.
-    /// Las que no has visitado se ven tenues, la actual se resalta y tú eres el punto.
+    /// Minimapa de salas.
     public sealed class Minimap : MonoBehaviour
     {
         [SerializeField] FloorLevel level;
         [SerializeField] Transform player;
-        [Tooltip("Contenedor de los rectángulos (dentro del panel)")]
         [SerializeField] RectTransform content;
         [SerializeField] Image roomTemplate;
         [SerializeField] Image playerDot;
-        [Tooltip("Píxeles de UI por tile")]
+        [Tooltip("UI por tile")]
         [SerializeField] float scale = 0.55f;
         [SerializeField] Color unknown = new(0.17f, 0.1f, 0.06f, 0.18f);
         [SerializeField] Color visited = new(0.17f, 0.1f, 0.06f, 0.55f);
@@ -23,6 +21,7 @@ namespace OnLinces
 
         readonly List<Image> boxes = new();
         readonly HashSet<int> seen = new();
+        bool[] isBoss;
         Rect worldBounds;
 
         void Start()
@@ -33,6 +32,8 @@ namespace OnLinces
             worldBounds = Bounds(rooms[0]);
             foreach (var r in rooms) { var b = Bounds(r); worldBounds = Rect.MinMaxRect(Mathf.Min(worldBounds.xMin, b.xMin), Mathf.Min(worldBounds.yMin, b.yMin), Mathf.Max(worldBounds.xMax, b.xMax), Mathf.Max(worldBounds.yMax, b.yMax)); }
             content.sizeDelta = worldBounds.size * scale;
+            isBoss = new bool[rooms.Length];
+            for (int i = 0; i < rooms.Length; i++) isBoss[i] = rooms[i].GetComponentInChildren<BossRoom>() != null;
             foreach (var r in rooms)
             {
                 var img = Instantiate(roomTemplate, content);
@@ -62,10 +63,7 @@ namespace OnLinces
             for (int i = 0; i < rooms.Length; i++)
                 if (Bounds(rooms[i]).Contains(player.position)) { cur = i; seen.Add(i); }
             for (int i = 0; i < boxes.Count; i++)
-            {
-                bool isBoss = rooms[i].GetComponentInChildren<BossRoom>() != null;
-                boxes[i].color = i == cur ? current : seen.Contains(i) ? (isBoss ? boss : visited) : (isBoss ? new Color(boss.r, boss.g, boss.b, 0.3f) : unknown);
-            }
+                boxes[i].color = i == cur ? current : seen.Contains(i) ? (isBoss[i] ? boss : visited) : (isBoss[i] ? new Color(boss.r, boss.g, boss.b, 0.3f) : unknown);
             var rt = playerDot.rectTransform;
             rt.anchorMin = rt.anchorMax = Vector2.zero;
             rt.anchoredPosition = ((Vector2)player.position - worldBounds.min) * scale;

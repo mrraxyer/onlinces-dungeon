@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Bot aliado de la Junta general: se queda donde aparece y dispara solo al enemigo más cercano.
+    /// Torreta aliada: dispara al enemigo más cercano.
     public sealed class AllyTurret : MonoBehaviour
     {
         [SerializeField] SpriteRenderer spriteRenderer;
@@ -43,7 +43,7 @@ namespace OnLinces
                 float d = Vector2.Distance(b.transform.position, transform.position);
                 if (d < bestD) { bestD = d; best = b.transform; }
             }
-            if (best == null) return;
+            if (best == null) { cooldown = 0.2f; return; } // no buscar cada cuadro
 
             cooldown = fireDelay;
             var origin = (Vector2)transform.position + Vector2.up * Units.Px(8);

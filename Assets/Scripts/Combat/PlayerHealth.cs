@@ -4,18 +4,18 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Vida del jugador en medios corazones (6 = 3 corazones). Parpadea y es invulnerable un momento tras recibir daño.
+    /// Vida en medios corazones, con invulnerabilidad breve al recibir daño.
     public sealed class PlayerHealth : MonoBehaviour
     {
-        [Tooltip("Medios corazones. Godot: Miembro = 6")]
+        [Tooltip("Medios corazones")]
         [SerializeField] int maxHp = 6;
-        [Tooltip("Off tiene +1 corazón (Godot: hp_bonus 2)")]
+        [Tooltip("Extra de Off")]
         [SerializeField] int offBonus = 2;
         [SerializeField] float invulnerableTime = 0.8f;
-        [Tooltip("Empujón al recibir daño, en píxeles por segundo")]
+        [Tooltip("px/s")]
         [SerializeField] float knockbackPx = 200f;
         [SerializeField] PlayerController controller;
-        [Tooltip("Burbuja que se ve mientras tienes escudo (ítem Firewall)")]
+        [Tooltip("Burbuja del escudo")]
         [SerializeField] GameObject shieldVisual;
         [SerializeField] AudioClip hurtClip;
         [SerializeField] AudioClip dieClip;
@@ -26,9 +26,8 @@ namespace OnLinces
         public int MaxHp { get; private set; }
         public bool IsDead { get; private set; }
         public bool HasShield { get; private set; }
-        /// Para "Commit limpio": ¿te dañaron en la sala actual?
+        /// Para "Commit limpio".
         public bool TookDamageThisRoom { get; set; }
-        /// Se dispara cuando cambia la vida (para el HUD).
         public event Action Changed;
 
         float iframes;
@@ -41,7 +40,7 @@ namespace OnLinces
             var run = GameManager.Instance.Run;
             MaxHp = ComputeMax();
             Hp = run.Hp > 0 ? Mathf.Min(run.Hp, MaxHp) : MaxHp;
-            Changed += () => run.Hp = Hp; // la vida se conserva entre pisos
+            Changed += () => run.Hp = Hp; // pasa al siguiente piso
             if (shieldVisual) shieldVisual.SetActive(false);
             var role = GetComponent<PlayerRole>();
             if (role) role.Changed += () => { MaxHp = ComputeMax(); Hp = MaxHp; Changed?.Invoke(); };
@@ -56,7 +55,7 @@ namespace OnLinces
             return baseHp + run.BonusMaxHp + (run.Mascot == Mascot.Off ? offBonus : 0) + DifficultyInfo.PlayerHp(run.Difficulty);
         }
 
-        /// La terminal de dificultad lo usa (Fácil da +1 corazón).
+        /// Recalcula al cambiar la dificultad.
         public void RefreshMax()
         {
             MaxHp = ComputeMax();
@@ -64,7 +63,7 @@ namespace OnLinces
             Changed?.Invoke();
         }
 
-        /// Invulnerable un momento (Firewall total).
+        /// Invulnerable un momento.
         public void GiveIframes(float seconds) => iframes = Mathf.Max(iframes, seconds);
 
         void Update()
@@ -102,7 +101,7 @@ namespace OnLinces
             else Sfx.Play(hurtClip);
         }
 
-        /// Cura medios corazones. Devuelve false si ya estabas lleno.
+        /// false si ya estaba lleno.
         public bool Heal(int amount)
         {
             if (IsDead || Hp >= MaxHp) return false;
@@ -114,7 +113,7 @@ namespace OnLinces
             return true;
         }
 
-        /// 1 → "½", 2 → "1", 3 → "1½"
+        /// 3 → "1½"
         static string HalfHearts(int halves) => (halves / 2 > 0 ? (halves / 2).ToString() : "") + (halves % 2 == 1 ? "½" : "");
 
         public void RaiseMax(int amount)

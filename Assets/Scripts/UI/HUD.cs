@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Textos del HUD, todos sobre paneles de pergamino:
-    ///  · monedas (arriba izquierda) · aviso "E: ..." (abajo) · cuadro de descripción (arriba del aviso)
-    ///  · mensaje central corto (Toast) · avisos que se apilan arriba a la derecha (Feedback: "+1 vida", "+$3"...)
+    /// Textos del HUD: monedas, aviso, diálogo, toast y avisos apilados.
     public sealed class HUD : MonoBehaviour
     {
         public static readonly Color Good = new(0.13f, 0.45f, 0.18f);
@@ -19,13 +17,13 @@ namespace OnLinces
         [SerializeField] TMP_Text toastLabel;
         [SerializeField] float toastSeconds = 2.5f;
 
-        [Header("Cuadro de descripción")]
+        [Header("Diálogo")]
         [SerializeField] GameObject infoPanel;
         [SerializeField] TMP_Text infoTitle;
         [SerializeField] TMP_Text infoBody;
 
-        [Header("Avisos arriba a la derecha")]
-        [Tooltip("Panel desactivado que se copia por cada aviso")]
+        [Header("Avisos")]
+        [Tooltip("Plantilla desactivada")]
         [SerializeField] TMP_Text feedbackTemplate;
         [SerializeField] float feedbackSeconds = 2f;
         [SerializeField] int maxFeedback = 5;
@@ -98,7 +96,7 @@ namespace OnLinces
             if (instance) Show(instance.promptLabel, text);
         }
 
-        /// Cuadro de descripción (qué hace un ítem/arma). title null = esconder.
+        /// title null = esconder.
         public static void SetInfo(string title, string body)
         {
             if (!instance || !instance.infoPanel) return;
@@ -117,13 +115,13 @@ namespace OnLinces
             instance.toastT = instance.toastSeconds;
         }
 
-        /// Aviso que aparece arriba a la derecha y se desvanece ("+1 vida", "Escudo", "Arma: for").
+        /// Aviso que se desvanece.
         public static void Feedback(string text, Color color)
         {
             if (instance) instance.Add(text, color, 0);
         }
 
-        /// Monedas: se juntan en un solo aviso si llegan seguidas ("+$5").
+        /// Junta monedas seguidas en un aviso.
         public static void FeedbackCoins(int n)
         {
             if (!instance) return;
@@ -144,7 +142,7 @@ namespace OnLinces
             var template = PanelOf(feedbackTemplate);
             var go = Instantiate(template, template.transform.parent);
             go.SetActive(true);
-            go.transform.SetAsFirstSibling(); // el más nuevo arriba
+            go.transform.SetAsFirstSibling(); // nuevo arriba
             var label = go.GetComponentInChildren<TMP_Text>(true);
             label.text = text;
             label.color = color;

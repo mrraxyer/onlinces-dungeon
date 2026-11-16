@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Tienda: llena sus lugares con artículos (Godot: corazón $3, pizza $5, ítem $12).
+    /// Tienda: corazón, pizza e ítem con precio.
     public sealed class ShopRoom : MonoBehaviour
     {
         [SerializeField] LootTable loot;

@@ -6,18 +6,18 @@ namespace OnLinces
 {
     public enum Mascot { On, Off }
 
-    /// Datos de la partida actual. Se reinician al empezar una partida nueva.
+    /// Datos de la partida actual.
     public sealed class RunState
     {
         public Mascot Mascot = Mascot.On;
         public int Floor = 1;
-        public bool? Won; // null = la partida sigue
-        public int Hp = -1; // vida que se lleva al siguiente piso (-1 = llena)
-        public int BonusMaxHp; // corazones extra de ítems (Unit tests)
-        public RoleData Role;  // puesto elegido en el Lobby (null = Miembro)
-        public Difficulty Difficulty = Difficulty.Media; // GameManager la carga del guardado
+        public bool? Won;       // null = en curso
+        public int Hp = -1;     // -1 = llena
+        public int BonusMaxHp;  // de ítems
+        public RoleData Role;   // null = Miembro
+        public Difficulty Difficulty = Difficulty.Media;
         public readonly List<ItemData> Items = new();
-        public readonly List<WeaponData> Weapons = new(); // armas que llevas (vacío = las iniciales)
+        public readonly List<WeaponData> Weapons = new(); // vacío = iniciales
 
         int coins;
         public int Coins => coins;
@@ -34,13 +34,12 @@ namespace OnLinces
         }
     }
 
-    /// Vive durante todo el juego (no se destruye al cambiar de escena).
-    /// Se crea solo antes de cargar la primera escena, así funciona aunque le des Play desde cualquier escena.
+    /// Persiste entre escenas; se crea solo al arrancar.
     public sealed class GameManager : MonoBehaviour
     {
         static GameManager instance;
 
-        /// Siempre devuelve un GameManager vivo (lo busca o lo crea si hace falta).
+        /// Lo busca o lo crea.
         public static GameManager Instance
         {
             get
@@ -51,13 +50,12 @@ namespace OnLinces
             }
         }
 
-        /// true si ya hay un GameManager vivo (no crea uno: úsalo en OnDestroy/OnDisable).
+        /// No lo crea (para OnDestroy).
         public static bool Exists => instance != null;
 
         public RunState Run { get; private set; } = new RunState();
 
-        // El proyecto entra a Play sin recargar el dominio (Enter Play Mode Options):
-        // las variables estáticas conservan valores de la partida anterior, así que se limpian aquí.
+        // sin recarga de dominio: limpiar estáticos
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics()
         {

@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Repite unos cuadros para siempre (vendedor, portal...).
+    /// Animación en bucle.
     public sealed class LoopAnimation : MonoBehaviour
     {
         [SerializeField] SpriteRenderer spriteRenderer;
         [SerializeField] Sprite[] frames;
         [SerializeField] float framesPerSecond = 2f;
-        [Tooltip("Grados por segundo (portal)")]
+        [Tooltip("Grados por segundo")]
         [SerializeField] float spinDegrees;
 
         float t;

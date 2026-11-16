@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Anima las capas de On/Off (cuerpo y cabeza) cambiando de cuadro, igual que en Godot.
+    /// Anima cuerpo y cabeza del jugador.
     public sealed class PlayerAnimator : MonoBehaviour
     {
         [SerializeField] PlayerController controller;
@@ -10,11 +10,11 @@ namespace OnLinces
         [SerializeField] SpriteRenderer body;
         [SerializeField] SpriteRenderer head;
 
-        [Header("Apariencia según la mascota elegida en Title")]
+        [Header("Sin puesto")]
         [SerializeField] CharacterSkin onSkin;
         [SerializeField] CharacterSkin offSkin;
 
-        // Filas de las hojas (como en Godot)
+        // filas de la hoja
         const int Down = 0, Up = 1, Right = 2, Left = 3;
 
         CharacterSkin skin;
@@ -31,7 +31,7 @@ namespace OnLinces
             if (role) role.Changed += RefreshSkin;
         }
 
-        /// La vestimenta depende de la mascota y del puesto (On/Off + Luis, Sofi, Lemus o Miembro).
+        /// Según mascota y puesto.
         void RefreshSkin()
         {
             var mascot = GameManager.Instance.Run.Mascot;
@@ -54,7 +54,7 @@ namespace OnLinces
             int walkFrame = moving ? 1 + (int)walkT % 4 : 0;
             body.sprite = skin.Body[bodyRow * 5 + walkFrame];
 
-            // Cabeza: mira hacia donde apuntas mientras disparas
+            // al disparar mira hacia donde apuntas
             int headRow = controller.IsShooting ? Row(controller.Aim) : bodyRow;
             blinkT -= Time.deltaTime;
             if (blinkT < -0.12f) blinkT = Random.Range(2f, 4.5f);
@@ -62,7 +62,7 @@ namespace OnLinces
             if (headRow == Up) expr = 0;
             head.sprite = skin.Head[headRow * 3 + expr];
 
-            // Rebote de la cabeza al caminar
+            // rebote al caminar
             bool side = bodyRow == Right || bodyRow == Left;
             int bob = side ? (walkFrame == 2 || walkFrame == 4 ? 1 : 0) : (walkFrame == 1 || walkFrame == 3 ? 1 : 0);
             head.transform.localPosition = headBase + Vector3.down * Units.Px(bob);

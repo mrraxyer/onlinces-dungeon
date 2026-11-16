@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Aviso de ataque: primero se dibuja una línea o círculo tenue (aviso) y luego "se activa" y daña.
-    /// Así el jugador siempre ve venir el golpe (regla de diseño del juego).
+    /// Ataque con aviso: parpadea y luego daña.
     [RequireComponent(typeof(LineRenderer))]
     public sealed class Telegraph : MonoBehaviour
     {
@@ -17,7 +16,7 @@ namespace OnLinces
         bool hitDone;
         PlayerHealth player;
 
-        /// Rayo de a hasta b. halfWidthPx = medio ancho en píxeles.
+        /// Rayo de a a b.
         public static Telegraph Beam(Telegraph prefab, Vector2 a, Vector2 b, float warn, float active, float halfWidthPx, Color color)
         {
             var tg = Instantiate(prefab);
@@ -25,7 +24,7 @@ namespace OnLinces
             return tg;
         }
 
-        /// Explosión circular en p.
+        /// Círculo en p.
         public static Telegraph Circle(Telegraph prefab, Vector2 p, float radiusPx, float warn, Color color)
         {
             var tg = Instantiate(prefab);

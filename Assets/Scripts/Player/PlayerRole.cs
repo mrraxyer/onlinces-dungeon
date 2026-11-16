@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// El puesto que tiene el jugador (Miembro si no ha tomado ninguno en el Lobby).
+    /// Puesto actual (Miembro por defecto).
     public sealed class PlayerRole : MonoBehaviour
     {
         [SerializeField] RoleData defaultRole;
@@ -17,7 +17,6 @@ namespace OnLinces
             }
         }
 
-        /// Se dispara al tomar un puesto nuevo (para cambiar vestimenta, vida, habilidad...).
         public event Action Changed;
 
         public void Set(RoleData role)

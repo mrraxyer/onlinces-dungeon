@@ -5,19 +5,16 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Sala de combate. Cuando entras se cierran las puertas y salen oleadas de enemigos;
-    /// al acabar con todas se abren y puede aparecer un cofre.
-    /// Necesita un BoxCollider2D (Is Trigger) que cubra el interior.
+    /// Sala de combate: cierra puertas, oleadas, y al limpiarla abre y quizá suelta un cofre.
     [RequireComponent(typeof(BoxCollider2D))]
     public sealed class Room : MonoBehaviour
     {
         [SerializeField] Door[] doors;
-        [Tooltip("Si está vacío, el FloorBuilder pone los enemigos del piso")]
         [SerializeField] EnemyChance[] enemies;
         [SerializeField] int waves = 2;
-        [Tooltip("No aparecen enemigos más cerca que esto del jugador (píxeles)")]
+        [Tooltip("px")]
         [SerializeField] float minDistanceFromPlayerPx = 110f;
-        [Tooltip("Capas donde no puede aparecer un enemigo (Walls)")]
+        [Tooltip("Donde no aparecen enemigos")]
         [SerializeField] LayerMask blockedBy;
         [SerializeField] LootTable loot;
         [SerializeField] AudioClip doorCloseClip;
@@ -36,11 +33,6 @@ namespace OnLinces
         public IReadOnlyList<Enemy> Alive => alive;
 
         void Awake() => area = GetComponent<BoxCollider2D>();
-
-        public void SetEnemies(EnemyChance[] pool)
-        {
-            if (enemies == null || enemies.Length == 0) enemies = pool;
-        }
 
         void OnTriggerEnter2D(Collider2D other)
         {
@@ -62,7 +54,7 @@ namespace OnLinces
             yield return new WaitForSeconds(delay);
             wavesLeft--;
             var b = area.bounds;
-            int tiles = Mathf.RoundToInt(b.size.x * b.size.y); // 1 unidad = 1 tile de 32 px
+            int tiles = Mathf.RoundToInt(b.size.x * b.size.y);
             int floorNum = GameManager.Instance.Run.Floor;
             float countMult = DifficultyInfo.Count(GameManager.Instance.Run.Difficulty);
             int n = Mathf.Clamp(Mathf.RoundToInt((tiles / 45f + floorNum) * countMult), 2, 11);
