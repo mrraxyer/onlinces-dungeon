@@ -168,7 +168,7 @@ namespace OnLinces
                         (weapon.count > 1 ? $" x{weapon.count}" : "") + $" · {1f / weapon.fireDelay:0.#} tiros/s",
                     _ => description,
                 };
-                return price > 0 ? $"{body}\nPrecio: ${price}  (tienes ${GameManager.Instance.Run.Coins})" : body;
+                return price > 0 ? $"{body}" : body;
             }
         }
         public bool CanInteract => !used && NeedsE && Name != null;

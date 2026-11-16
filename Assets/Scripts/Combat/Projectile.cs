@@ -9,6 +9,8 @@ namespace OnLinces
         [SerializeField] SpriteRenderer spriteRenderer;
         [Tooltip("Capas que destruyen la bala (Walls)")]
         [SerializeField] LayerMask destroyOn;
+        [Tooltip("Material sin iluminación para balas enemigas: brillan en el apagón")]
+        [SerializeField] Material enemyMaterial;
 
         public float Damage { get; private set; }
         public bool FromPlayer { get; private set; }
@@ -21,6 +23,7 @@ namespace OnLinces
         public void Launch(Sprite sprite, Vector2 velocity, float damage, float lifeSeconds, bool fromPlayer)
         {
             if (sprite != null) spriteRenderer.sprite = sprite;
+            if (!fromPlayer && enemyMaterial != null) spriteRenderer.sharedMaterial = enemyMaterial;
             rb.linearVelocity = velocity;
             Damage = damage;
             life = lifeSeconds;

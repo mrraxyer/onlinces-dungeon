@@ -15,7 +15,7 @@ namespace OnLinces
 
         public string Prompt => $"Café (${price})";
         public string InfoTitle => "Cafetera";
-        public string InfoBody => $"Un café recién hecho: +velocidad por {boostSeconds:0} s y +½ vida.\nPrecio: ${price}  (tienes ${GameManager.Instance.Run.Coins})";
+        public string InfoBody => $"Un café recién hecho: +velocidad por {boostSeconds:0} s y +½ vida.";
         public bool CanInteract => true;
         public Vector3 Position => transform.position;
 

@@ -32,6 +32,7 @@ namespace OnLinces
 
         public event Action Cleared;
         public bool IsCleared => state == State.Cleared;
+        public bool IsFighting => state == State.Fighting;
         public IReadOnlyList<Enemy> Alive => alive;
 
         void Awake() => area = GetComponent<BoxCollider2D>();

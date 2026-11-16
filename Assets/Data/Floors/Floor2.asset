@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fac9e8bfb105a354594c4a0bd91dc6fe, type: 3}
   m_Name: Floor2
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.FloorData
-  displayName: Data center / Lab Cisco
+  displayName: Sala de Servidores
   tiles:
   - {fileID: 11400000, guid: f9d138ffaa74a514e8d078d10a9e616f, type: 2}
   - {fileID: 11400000, guid: 8efbb21bc57298d40a81a797a95497b8, type: 2}

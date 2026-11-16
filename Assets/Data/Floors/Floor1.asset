@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fac9e8bfb105a354594c4a0bd91dc6fe, type: 3}
   m_Name: Floor1
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.FloorData
-  displayName: "Laboratorio de c\xF3mputo"
+  displayName: Oficina
   tiles:
   - {fileID: 11400000, guid: 1fa1364f7fa23a341a3e0b66c490dc60, type: 2}
   - {fileID: 11400000, guid: 75ecea1f618c54641b2b05f1b2a84fe1, type: 2}
