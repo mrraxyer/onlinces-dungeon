@@ -10,6 +10,7 @@ namespace OnLinces
         public Mascot Mascot = Mascot.On;
         public int Floor = 1;
         public bool? Won; // null = la partida sigue
+        public int Hp = -1; // vida que se lleva al siguiente piso (-1 = llena)
     }
 
     /// Vive durante todo el juego (no se destruye al cambiar de escena).

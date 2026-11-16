@@ -35,7 +35,30 @@ namespace OnLinces
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            if ((destroyOn.value & (1 << other.gameObject.layer)) != 0) Destroy(gameObject);
+            if ((destroyOn.value & (1 << other.gameObject.layer)) != 0)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            if (FromPlayer)
+            {
+                var enemy = other.GetComponentInParent<Enemy>();
+                if (enemy != null && enemy.IsAlive)
+                {
+                    enemy.Hit(Damage, rb.linearVelocity.normalized);
+                    Destroy(gameObject);
+                }
+            }
+            else
+            {
+                var player = other.GetComponentInParent<PlayerHealth>();
+                if (player != null)
+                {
+                    player.Hurt(Mathf.Max(1, Mathf.RoundToInt(Damage)), transform.position);
+                    Destroy(gameObject);
+                }
+            }
         }
     }
 }

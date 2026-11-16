@@ -79,9 +79,22 @@ namespace OnLinces
             if (MoveInput.sqrMagnitude > 0.01f) Aim = MoveInput.normalized;
         }
 
+        Vector2 knockPx;
+
+        /// Empujón (en píxeles por segundo) que se va frenando solo.
+        public void Knock(Vector2 px) => knockPx = px;
+
+        void OnDisable()
+        {
+            MoveInput = Vector2.zero;
+            IsShooting = false;
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+        }
+
         void FixedUpdate()
         {
-            rb.linearVelocity = MoveInput * Units.Px(speedPx);
+            rb.linearVelocity = MoveInput * Units.Px(speedPx) + knockPx / Units.PPU;
+            knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 700f * Time.fixedDeltaTime);
         }
     }
 }

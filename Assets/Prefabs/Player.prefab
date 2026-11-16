@@ -509,7 +509,8 @@ GameObject:
   - component: {fileID: 741403423706493860}
   - component: {fileID: 6167130988707112799}
   - component: {fileID: 6651623252626382245}
-  m_Layer: 0
+  - component: {fileID: 233763646994767630}
+  m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -773,3 +774,22 @@ MonoBehaviour:
   head: {fileID: 2910154587484714579}
   onSkin: {fileID: 11400000, guid: a3bd1b773df193f49b484e2a8efcb424, type: 2}
   offSkin: {fileID: 11400000, guid: edae7e245c970d74abab0b7561f4f23b, type: 2}
+--- !u!114 &233763646994767630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9167526737599398022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d5e56fbb35f40746abbc6cbaa8ce95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.PlayerHealth
+  maxHp: 6
+  offBonus: 2
+  invulnerableTime: 0.8
+  knockbackPx: 200
+  controller: {fileID: 741403423706493860}
+  hurtClip: {fileID: 8300000, guid: bab9df9d448fd37449003a598bc62786, type: 3}
+  dieClip: {fileID: 8300000, guid: efbe5fe36c29dee40af0e60f02d80d50, type: 3}
