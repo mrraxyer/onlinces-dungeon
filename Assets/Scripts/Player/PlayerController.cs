@@ -53,13 +53,22 @@ namespace OnLinces
         void Update()
         {
             MoveInput = move.action.ReadValue<Vector2>();
-            IsShooting = attack.action.IsPressed();
+            // en teléfono se dispara solo mientras empujas la palanca derecha
+            IsShooting = attack.action.IsPressed() || TouchControls.FireHeld;
             SwitchWeaponPressed = nextWeapon != null && nextWeapon.action.WasPressedThisFrame();
             UpdateAim();
         }
 
         void UpdateAim()
         {
+            if (TouchControls.Active)
+            {
+                // palanca derecha táctil; si está suelta, miras hacia donde caminas
+                if (TouchControls.FireHeld) Aim = TouchControls.Aim.normalized;
+                else if (MoveInput.sqrMagnitude > 0.01f) Aim = MoveInput.normalized;
+                return;
+            }
+
             var stick = Gamepad.current != null ? Gamepad.current.rightStick.ReadValue() : Vector2.zero;
             if (stick.sqrMagnitude > 0.09f)
             {

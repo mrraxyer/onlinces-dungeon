@@ -20,7 +20,8 @@ namespace OnLinces
             if (r == null) return;
             if (icon.sprite != r.icon) icon.sprite = r.icon;
             cooldownCover.fillAmount = skill.CooldownFraction;
-            nameLabel.text = skill.Ready ? $"{r.skillName}  [Espacio]" : $"{r.skillName}  ({Mathf.CeilToInt(skill.CooldownFraction * r.cooldown)} s)";
+            string key = TouchControls.Active ? "" : "  [Espacio]";
+            nameLabel.text = skill.Ready ? r.skillName + key : $"{r.skillName}  ({Mathf.CeilToInt(skill.CooldownFraction * r.cooldown)} s)";
         }
     }
 }

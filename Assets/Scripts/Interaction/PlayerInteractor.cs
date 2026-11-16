@@ -10,6 +10,9 @@ namespace OnLinces
         [Tooltip("Distancia máxima en píxeles")]
         [SerializeField] float rangePx = 30f;
 
+        /// true si hay algo cerca con qué interactuar (los controles táctiles muestran su botón).
+        public static bool HasTarget { get; private set; }
+
         IInteractable current;
         string shownPrompt;
 
@@ -26,9 +29,11 @@ namespace OnLinces
                 if (d < bestD) { bestD = d; best = it; }
             }
             current = best;
+            HasTarget = current != null;
 
             // el texto puede cambiar (precio, arma que cambias), así que se refresca cada cuadro
-            var prompt = current != null ? "E: " + current.Prompt : "";
+            // (en teléfono no hay tecla E: se usa el botón USAR)
+            var prompt = current != null ? (TouchControls.Active ? "" : "E: ") + current.Prompt : "";
             if (prompt != shownPrompt)
             {
                 shownPrompt = prompt;
@@ -45,6 +50,7 @@ namespace OnLinces
 
         void OnDisable()
         {
+            HasTarget = false;
             HUD.SetPrompt("");
             HUD.SetInfo(null, null);
             shownPrompt = null;
