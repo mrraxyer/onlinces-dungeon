@@ -17,8 +17,7 @@ namespace OnLinces
         public string InfoTitle => "Cafetera";
         public string InfoBody => InfoText.Join(
             "Un café recién hecho.",
-            InfoText.Section("Efecto", $"+velocidad por {boostSeconds:0} s\n+½ vida"),
-            InfoText.Section("Precio", InfoText.Price(price)));
+            InfoText.Section("Efecto", $"+velocidad por {boostSeconds:0} s\n+½ vida"));
         public bool CanInteract => true;
         public Vector3 Position => transform.position;
 

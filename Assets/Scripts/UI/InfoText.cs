@@ -7,7 +7,6 @@ namespace OnLinces
     {
         const string HeaderColor = "#8A5A2B";
         const string LabelColor = "#6B4A2B";
-        const string PriceColor = "#8C5A00";
 
         /// Encabezado y contenido.
         public static string Section(string header, string body) =>
@@ -21,7 +20,5 @@ namespace OnLinces
         public static string Stat(string label, string value) => $"<color={LabelColor}>{label}:</color> {value}";
 
         public static string Strong(string text) => $"<b>{text}</b>";
-
-        public static string Price(int price) => $"<size=115%><color={PriceColor}><b>${price}</b></color></size>";
     }
 }

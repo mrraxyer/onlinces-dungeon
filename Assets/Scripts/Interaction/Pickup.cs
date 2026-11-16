@@ -165,12 +165,11 @@ namespace OnLinces
                 };
                 string stats = kind == PickupKind.Weapon && weapon
                     ? InfoText.Section("Datos",
-                        $"{InfoText.Stat("Rareza", RarityName(weapon.rarity))}\n" +
+                        $"{InfoText.Stat("Rareza", WeaponData.RarityName(weapon.rarity))}\n" +
                         $"{InfoText.Stat("Daño", weapon.damage.ToString("0.#") + (weapon.count > 1 ? $" x{weapon.count}" : ""))}  ·  " +
                         InfoText.Stat("Cadencia", $"{1f / weapon.fireDelay:0.#} tiros/s"))
                     : null;
-                string cost = price > 0 ? InfoText.Section("Precio", InfoText.Price(price)) : null;
-                return InfoText.Join(desc, stats, cost);
+                return InfoText.Join(desc, stats);
             }
         }
         public bool CanInteract => !used && NeedsE && Name != null;
@@ -198,14 +197,5 @@ namespace OnLinces
             Sfx.Play(deniedClip);
             HUD.Toast(why);
         }
-
-        static string RarityName(Rarity r) => r switch
-        {
-            Rarity.Comun => "Común",
-            Rarity.PocoComun => "Poco común",
-            Rarity.Rara => "Rara",
-            Rarity.Epica => "Épica",
-            _ => "Legendaria",
-        };
     }
 }
