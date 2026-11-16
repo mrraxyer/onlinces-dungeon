@@ -1,5 +1,8 @@
 # Guía paso a paso — qué importar y cuándo
 
+> **Actualización:** ya se importó todo el arte a `Assets/Art` (incluido el audio en `Assets/Art/Audio`) y
+> `ArtSource/` ya no existe. Las tablas siguen sirviendo para saber **qué cortar en cada paso** y con qué cuadrícula.
+
 Todo el arte y audio vive en **`ArtSource/`** (fuera de `Assets/`, Unity no lo ve). En cada paso se arrastra a la
 ventana **Project** solo lo que ese paso usa, a la carpeta indicada de `Assets/`. El preset `PixelSprite`
 configura solo los sprites nuevos (Point, sin compresión, 32 PPU). Después solo hay que **cortar** las hojas.
@@ -35,9 +38,9 @@ botones "Jugar con On" / "Jugar con Off".
 
 | Archivo (de `ArtSource/Sprites`) | Carpeta en Assets | Cortar | Pivot |
 |---|---|---|---|
-| `Weapons/weapons.png` | `Art/Sprites/Weapons` | 15 × 1 | Left |
+| `Weapons/weapons.png` | `Art/Sprites/Weapons` | 15 × 1 | Center |
 | `UI/tokens.png` (balas de código) | `Art/Sprites/UI` | 63 × 1 | Center |
-| `FX/muzzle.png` | `Art/Sprites/FX` | 3 × 1 | Left |
+| `FX/muzzle.png` | `Art/Sprites/FX` | 3 × 1 | Center |
 | `Tiles/floor.png`, `Tiles/wall.png` | `Art/Sprites/Tiles` | floor 6 × 1, wall — | Center |
 | `Audio/Sfx/shoot_on.wav`, `shoot_off.wav` | `Audio/Sfx` | — | — |
 

@@ -1,0 +1,66 @@
+using UnityEngine;
+
+namespace OnLinces
+{
+    /// Anima las capas de On/Off (cuerpo y cabeza) cambiando de cuadro, igual que en Godot.
+    public sealed class PlayerAnimator : MonoBehaviour
+    {
+        [SerializeField] PlayerController controller;
+        [SerializeField] PlayerWeapons weapons;
+        [SerializeField] SpriteRenderer body;
+        [SerializeField] SpriteRenderer head;
+
+        [Header("Apariencia según la mascota elegida en Title")]
+        [SerializeField] CharacterSkin onSkin;
+        [SerializeField] CharacterSkin offSkin;
+
+        // Filas de las hojas (como en Godot)
+        const int Down = 0, Up = 1, Right = 2, Left = 3;
+
+        CharacterSkin skin;
+        int bodyRow = Down;
+        float walkT;
+        float blinkT = 3f;
+        Vector3 headBase;
+
+        void Start()
+        {
+            skin = GameManager.Instance.Run.Mascot == Mascot.Off ? offSkin : onSkin;
+            headBase = head.transform.localPosition;
+        }
+
+        void Update()
+        {
+            var mv = controller.MoveInput;
+            bool moving = mv.sqrMagnitude > 0.01f;
+            if (moving)
+            {
+                bodyRow = Row(mv);
+                walkT += Time.deltaTime * 9f;
+            }
+            else walkT = 0f;
+
+            int walkFrame = moving ? 1 + (int)walkT % 4 : 0;
+            body.sprite = skin.Body[bodyRow * 5 + walkFrame];
+
+            // Cabeza: mira hacia donde apuntas mientras disparas
+            int headRow = controller.IsShooting ? Row(controller.Aim) : bodyRow;
+            blinkT -= Time.deltaTime;
+            if (blinkT < -0.12f) blinkT = Random.Range(2f, 4.5f);
+            int expr = weapons != null && weapons.JustShot ? 1 : blinkT < 0f ? 2 : 0;
+            if (headRow == Up) expr = 0;
+            head.sprite = skin.Head[headRow * 3 + expr];
+
+            // Rebote de la cabeza al caminar
+            bool side = bodyRow == Right || bodyRow == Left;
+            int bob = side ? (walkFrame == 2 || walkFrame == 4 ? 1 : 0) : (walkFrame == 1 || walkFrame == 3 ? 1 : 0);
+            head.transform.localPosition = headBase + Vector3.down * Units.Px(bob);
+        }
+
+        static int Row(Vector2 v)
+        {
+            if (Mathf.Abs(v.x) > Mathf.Abs(v.y)) return v.x > 0 ? Right : Left;
+            return v.y < 0 ? Down : Up;
+        }
+    }
+}
