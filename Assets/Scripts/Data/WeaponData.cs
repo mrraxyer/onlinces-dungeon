@@ -34,5 +34,23 @@ namespace OnLinces
         public float range = 0.7f;
         [Tooltip("Sin usar")]
         public int energyCost;
+
+        public static string RarityName(Rarity r) => r switch
+        {
+            Rarity.Comun => "Común",
+            Rarity.PocoComun => "Poco común",
+            Rarity.Rara => "Rara",
+            Rarity.Epica => "Épica",
+            _ => "Legendaria",
+        };
+
+        public static Color RarityColor(Rarity r) => r switch
+        {
+            Rarity.Comun => new Color32(0xe8, 0xe6, 0xf5, 255),
+            Rarity.PocoComun => new Color32(0x4a, 0xde, 0x80, 255),
+            Rarity.Rara => new Color32(0x3b, 0x8c, 0xff, 255),
+            Rarity.Epica => new Color32(0xb4, 0x8c, 0xff, 255),
+            _ => new Color32(0xff, 0x9a, 0x3c, 255),
+        };
     }
 }

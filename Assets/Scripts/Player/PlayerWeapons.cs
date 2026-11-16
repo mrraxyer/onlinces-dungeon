@@ -37,6 +37,8 @@ namespace OnLinces
         PlayerSkill skill;
 
         public WeaponData Current => slots.Count > 0 ? slots[current] : null;
+        /// La que no tienes en la mano.
+        public WeaponData Other => slots.Count > 1 ? slots[1 - current] : null;
         public bool JustShot => shootAnim > 0f;
 
         void Start()

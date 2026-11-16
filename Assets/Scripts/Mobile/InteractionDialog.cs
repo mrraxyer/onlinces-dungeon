@@ -2,28 +2,23 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Teléfono: el diálogo sigue al interactuable, dentro de la pantalla.
+    /// El diálogo sigue al interactuable, dentro de la pantalla. El aviso es el botón para usarlo.
     public sealed class InteractionDialog : MonoBehaviour
     {
         const float AboveObject = 0.95f; // unidades del mundo
         const float Gap = 3f;
         const float Margin = 6f;
 
-        RectTransform area, prompt, info;
+        [SerializeField] RectTransform prompt;
+        [SerializeField] RectTransform info;
+
+        RectTransform area;
         Camera cam;
 
-        public void Init(RectTransform prompt, RectTransform info)
-        {
-            area = (RectTransform)transform;
-            this.prompt = prompt;
-            this.info = info;
-            foreach (var rt in new[] { prompt, info })
-            {
-                if (rt == null) continue;
-                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.pivot = new Vector2(0.5f, 0f);
-            }
-        }
+        void Awake() => area = (RectTransform)transform;
+
+        /// Botón del aviso.
+        public void Use() => PlayerInteractor.Tap();
 
         void LateUpdate()
         {

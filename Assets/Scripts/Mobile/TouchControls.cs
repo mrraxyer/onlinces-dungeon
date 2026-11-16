@@ -18,10 +18,6 @@ namespace OnLinces
         [SerializeField] Image skillButton;
         [SerializeField] Button pauseButton;
 
-        [Header("HUD")]
-        [Tooltip("Más alto = HUD más chico")]
-        [SerializeField] float hudReferenceHeight = 360f;
-
         [Header("Pausa")]
         [SerializeField] GameObject pausePanel;
         [SerializeField] Button continueButton;
@@ -55,7 +51,6 @@ namespace OnLinces
             if (quitButton) quitButton.onClick.AddListener(QuitToTitle);
             if (gameplay) gameplay.SetActive(false);
             if (pausePanel) pausePanel.SetActive(false);
-            if (Active && TryGetComponent<CanvasScaler>(out var scaler)) MobileHud.Proportional(scaler, 320f);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
@@ -71,7 +66,6 @@ namespace OnLinces
             Resume();
             player = null;
             searchT = 0f;
-            if (Active) MobileHud.Apply(hudReferenceHeight, GetComponent<Canvas>());
         }
 
         void Update()

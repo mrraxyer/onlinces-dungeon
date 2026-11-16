@@ -80,8 +80,8 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 32
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 480, y: 320}
-  m_ScreenMatchMode: 0
+  m_ReferenceResolution: {x: 640, y: 320}
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -123,7 +123,6 @@ MonoBehaviour:
   fireThreshold: 0.3
   skillButton: {fileID: 1049}
   pauseButton: {fileID: 1068}
-  hudReferenceHeight: 360
   pausePanel: {fileID: 1073}
   continueButton: {fileID: 1089}
   quitButton: {fileID: 1098}
