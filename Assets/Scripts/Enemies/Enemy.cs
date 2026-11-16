@@ -1,20 +1,28 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace OnLinces
 {
-    public enum EnemyKind { Bug, Fast, Glitch, Leak, LeakSmall }
+    public enum EnemyKind { Bug, Fast, Glitch, Leak, LeakSmall, CopyPaste }
 
     /// Enemigo básico. El comportamiento depende de "kind", igual que en enemy.gd de Godot:
-    ///  Bug/Fast/Leak: te persiguen zigzagueando · Glitch: flota y dispara · Leak: al morir se parte en 2.
+    ///  Bug/Fast/Leak: te persiguen zigzagueando · Glitch: flota y dispara · Leak: al morir se parte en 2
+    ///  CopyPaste (Ctrl+V): si no lo matas en ~5 s se copia (máx. 2 generaciones).
     [RequireComponent(typeof(Rigidbody2D))]
-    public sealed class Enemy : MonoBehaviour
+    public sealed class Enemy : MonoBehaviour, IHittable
     {
+        [Serializable]
+        public struct FrameSet { public Sprite[] frames; }
+
         [SerializeField] EnemyKind kind = EnemyKind.Bug;
 
         [Header("Arte")]
         [SerializeField] SpriteRenderer spriteRenderer;
         [Tooltip("Cuadros de animación (2)")]
         [SerializeField] Sprite[] frames;
+        [Tooltip("Opcional: ropa por piso (elemento 0 = piso 1). Si está vacío usa 'frames'.")]
+        [SerializeField] FrameSet[] floorFrames;
         [SerializeField] float framesPerSecond = 5f;
         [Tooltip("Color base (Fast usa el sprite de Bug en rojo)")]
         [SerializeField] Color tint = Color.white;
@@ -41,40 +49,53 @@ namespace OnLinces
         [SerializeField] AudioClip hitClip;
         [SerializeField] AudioClip dieClip;
         [SerializeField] AudioClip shootClip;
+        [SerializeField] AudioClip cloneClip;
+        [Tooltip("Texto que aparece al copiarse (Ctrl+V)")]
+        [SerializeField] string cloneToast = "Ctrl+V";
 
         public Room Room { get; set; }
         public bool IsAlive => !dying;
+        public bool CanBeHit => spawnT <= 0f && !dying;
+        public EnemyKind Kind => kind;
 
         const float SpawnTime = 0.7f;
+        const int MaxCopies = 7;
         Rigidbody2D rb;
         PlayerHealth player;
-        float hp, speedPx, t, spawnT = SpawnTime, shootT = 1.6f, flash, seed;
+        float hp, speedPx, t, spawnT = SpawnTime, shootT = 1.6f, flash, seed, cloneT;
         Vector2 knockPx;
         bool dying;
-        int floorNum;
+        int floorNum, generation;
+        float? presetHp;
+        Sprite[] activeFrames;
 
         void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
             seed = Random.Range(0f, 10f);
+            cloneT = Random.Range(4.5f, 5.5f);
         }
 
         void Start()
         {
             floorNum = GameManager.Instance.Run.Floor;
-            hp = baseHp + hpPerFloor * floorNum;
+            hp = presetHp ?? baseHp + hpPerFloor * floorNum;
             speedPx = baseSpeedPx + speedPerFloorPx * floorNum;
             player = FindAnyObjectByType<PlayerHealth>();
+            int i = floorNum - 1;
+            activeFrames = floorFrames != null && i >= 0 && i < floorFrames.Length && floorFrames[i].frames is { Length: > 0 }
+                ? floorFrames[i].frames : frames;
         }
 
-        /// Para que las crías de Leak aparezcan casi al instante.
+        /// Para que las crías de Leak y las copias aparezcan casi al instante.
         public void SkipSpawn(float remaining = 0.15f) => spawnT = remaining;
         public void Knock(Vector2 px) => knockPx = px;
 
         void Update()
         {
             t += Time.deltaTime;
-            if (frames.Length > 0) spriteRenderer.sprite = frames[(int)(t * framesPerSecond) % frames.Length];
+            if (activeFrames != null && activeFrames.Length > 0)
+                spriteRenderer.sprite = activeFrames[(int)(t * framesPerSecond) % activeFrames.Length];
             flash -= Time.deltaTime;
             var c = flash > 0f ? new Color(1f, 0.55f, 0.55f) : tint;
             c.a = spawnT > 0f ? 1f - Mathf.Clamp01(spawnT / SpawnTime) : 1f;
@@ -99,6 +120,7 @@ namespace OnLinces
 
             Vector2 to = player.transform.position - transform.position;
             Vector2 dir = to.normalized;
+            Vector2 side = new(-dir.y, dir.x);
             Vector2 velPx;
             switch (kind)
             {
@@ -111,10 +133,19 @@ namespace OnLinces
                         shootT = Random.Range(1.6f, 2.4f);
                     }
                     break;
+                case EnemyKind.CopyPaste:
+                    velPx = (dir + side * Mathf.Sin(t * 3f + seed) * 0.4f).normalized * speedPx;
+                    spriteRenderer.flipX = to.x < 0f;
+                    cloneT -= dt;
+                    if (cloneT <= 0f)
+                    {
+                        cloneT = Random.Range(4.5f, 5.5f);
+                        TryClone();
+                    }
+                    break;
                 default: // Bug, Fast, Leak, LeakSmall: persiguen zigzagueando
                     float wiggle = kind == EnemyKind.Leak ? 0.25f : 0.6f;
-                    var side = new Vector2(-dir.y, dir.x) * Mathf.Sin(t * 6f + seed) * wiggle;
-                    velPx = (dir + side).normalized * speedPx;
+                    velPx = (dir + side * Mathf.Sin(t * 6f + seed) * wiggle).normalized * speedPx;
                     spriteRenderer.flipX = to.x < 0f;
                     break;
             }
@@ -123,6 +154,22 @@ namespace OnLinces
             knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 700f * dt);
 
             if (to.magnitude < Units.Px(contactRadiusPx)) player.Hurt(1, transform.position);
+        }
+
+        void TryClone()
+        {
+            if (generation >= 2 || Room == null) return;
+            int copies = 0;
+            foreach (var e in Room.Alive) if (e.kind == EnemyKind.CopyPaste) copies++;
+            if (copies >= MaxCopies) return;
+            var pos = (Vector2)transform.position + Random.insideUnitCircle.normalized * Units.Px(18);
+            var copy = Instantiate(this, pos, Quaternion.identity);
+            copy.generation = generation + 1;
+            copy.presetHp = Mathf.Max(2f, hp * 0.8f);
+            copy.SkipSpawn(0.3f);
+            Room.Register(copy);
+            Sfx.Play(cloneClip, 0.5f);
+            if (!string.IsNullOrEmpty(cloneToast)) HUD.Toast(cloneToast);
         }
 
         void Fire(Vector2 dir)
@@ -137,7 +184,7 @@ namespace OnLinces
 
         public void Hit(float damage, Vector2 dir)
         {
-            if (spawnT > 0f || dying) return;
+            if (!CanBeHit) return;
             hp -= damage;
             flash = 0.08f;
             knockPx = dir * 150f * (kind == EnemyKind.Leak ? 0.4f : 1f);

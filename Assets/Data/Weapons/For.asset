@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: For
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.WeaponData
   displayName: for (i++) escopeta
+  description: '5 iteraciones por disparo: escopeta de corto alcance.'
   rarity: 1
   kind: 0
   icon: {fileID: -1353264969, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}

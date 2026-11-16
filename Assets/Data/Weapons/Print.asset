@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Print
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.WeaponData
   displayName: print()
+  description: Confiable. Nunca te falla.
   rarity: 0
   kind: 0
   icon: {fileID: -1989490958, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fcfbdf58eecd2041a5ccc5511214c3f, type: 3}
+  m_Name: GitPush
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.ItemData
+  displayName: git push --force
+  description: "+da\xF1o"
+  icon: {fileID: -1304216539, guid: 572bd223b6419c74d862fadfbb151055, type: 3}
+  effect: 2

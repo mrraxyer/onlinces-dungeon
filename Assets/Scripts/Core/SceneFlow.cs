@@ -2,12 +2,15 @@ using UnityEngine.SceneManagement;
 
 namespace OnLinces
 {
-    /// Orden del juego: Title -> Lobby -> Floor (pisos 1, 2 y 3) -> End -> Title.
-    /// Los nombres deben coincidir con los archivos de Assets/Scenes y estar en Build Profiles > Scene List.
+    /// Orden del juego: Title -> Lobby -> Floor1 -> Floor2 -> Floor3 -> End -> Title.
+    /// Cada piso es su propia escena, diseñada a mano (Assets/Scenes/Floor1..3).
+    /// Los nombres deben coincidir con los archivos y estar en Build Profiles > Scene List.
     public static class SceneFlow
     {
-        public const string Title = "Title", Lobby = "Lobby", Floor = "Floor", End = "End";
+        public const string Title = "Title", Lobby = "Lobby", End = "End";
         public const int LastFloor = 3;
+
+        public static string FloorScene(int floor) => "Floor" + floor;
 
         static RunState Run => GameManager.Instance.Run;
 
@@ -21,7 +24,7 @@ namespace OnLinces
         public static void EnterDungeon()
         {
             Run.Floor = 1;
-            SceneManager.LoadScene(Floor);
+            SceneManager.LoadScene(FloorScene(1));
         }
 
         public static void CompleteFloor()
@@ -29,7 +32,7 @@ namespace OnLinces
             if (Run.Floor < LastFloor)
             {
                 Run.Floor++;
-                SceneManager.LoadScene(Floor);
+                SceneManager.LoadScene(FloorScene(Run.Floor));
             }
             else
             {

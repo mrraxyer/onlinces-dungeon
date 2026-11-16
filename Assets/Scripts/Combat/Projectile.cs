@@ -43,10 +43,10 @@ namespace OnLinces
 
             if (FromPlayer)
             {
-                var enemy = other.GetComponentInParent<Enemy>();
-                if (enemy != null && enemy.IsAlive)
+                var target = other.GetComponentInParent<IHittable>();
+                if (target != null && target.CanBeHit)
                 {
-                    enemy.Hit(Damage, rb.linearVelocity.normalized);
+                    target.Hit(Damage, rb.linearVelocity.normalized);
                     Destroy(gameObject);
                 }
             }

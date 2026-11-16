@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d778aa7fb15b75a4aa6f3067e6c6210b, type: 3}
+  m_Name: Loot
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.LootTable
+  coin: {fileID: 6088207097559585575, guid: d8423280b04223e42b4d99e4a7250d70, type: 3}
+  heart: {fileID: 1151649483192871167, guid: 27ec1bc58231b5842a1b1805e2cc34b0, type: 3}
+  pizza: {fileID: 815185392870939370, guid: 7818057847f94874b8fba47a33af3040, type: 3}
+  drink: {fileID: 2449785191468813635, guid: ee7c420bf4a8ca54385bd5c341932a5c, type: 3}
+  itemPickup: {fileID: 2753756037582952594, guid: 350d6083cc5bf264aa241dab189c9a3c, type: 3}
+  weaponPickup: {fileID: 705614797446872866, guid: 3eefcf5fd2b2e5b43abc32153a9814ce, type: 3}
+  supplyChest: {fileID: 9196941358020500813, guid: 65d668586e237a7429a7a8d74904d313, type: 3}
+  weaponChest: {fileID: 4776616461707125166, guid: c52bdc3f96900e7429492077d0054f2c, type: 3}
+  weapons:
+  - {fileID: 11400000, guid: b0d9c4a956a98114792ceb9ab7b34cb5, type: 2}
+  - {fileID: 11400000, guid: 78885b8dd05db774c9a2c184f66cfaa1, type: 2}
+  - {fileID: 11400000, guid: b21a81df95689984abb8aff261f75bae, type: 2}
+  items:
+  - {fileID: 11400000, guid: 6e0849e1ae1d0da4a991e379c7e136f5, type: 2}
+  - {fileID: 11400000, guid: 7343672b276d1fa47bd84db8b5d32f5f, type: 2}
+  - {fileID: 11400000, guid: 97c05ada6fa4b7748a50c2cc2a9669d0, type: 2}
+  - {fileID: 11400000, guid: 69c884da63907ff4aa317fbc2197da7f, type: 2}
+  - {fileID: 11400000, guid: e63069201e6394c47b234a44a7fef806, type: 2}
+  - {fileID: 11400000, guid: 39db3e0b103e78a4b94474773b64fc84, type: 2}
+  coinChance: 0.55
+  heartChance: 0.035
+  drinkChance: 0.015
+  pizzaChance: 0.01
+  chestChance: 0.65
+  weaponChestShare: 0.4

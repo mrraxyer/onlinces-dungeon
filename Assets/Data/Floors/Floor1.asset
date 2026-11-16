@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fac9e8bfb105a354594c4a0bd91dc6fe, type: 3}
+  m_Name: Floor1
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.FloorData
+  displayName: "Laboratorio de c\xF3mputo"
+  tiles:
+  - {fileID: 11400000, guid: 1fa1364f7fa23a341a3e0b66c490dc60, type: 2}
+  - {fileID: 11400000, guid: 75ecea1f618c54641b2b05f1b2a84fe1, type: 2}
+  - {fileID: 11400000, guid: 89ce7f66bfc20c24cb381f80addb73e6, type: 2}
+  - {fileID: 11400000, guid: ef42317071a76834da34401279c51123, type: 2}
+  - {fileID: 11400000, guid: d7b5541ff641a0e44adad3b116eed664, type: 2}
+  - {fileID: 11400000, guid: 0c1b33bff43850f4f9eba5c2a07a3019, type: 2}
+  - {fileID: 11400000, guid: 8e145a80e463d944faaf2e5231988f91, type: 2}
+  - {fileID: 11400000, guid: 00d8ffd4eb1ab8446baa195a9d57b550, type: 2}
+  background: {r: 0.047, g: 0.039, b: 0.07, a: 1}
+  enemies:
+  - prefab: {fileID: 5010065238079441237, guid: 9bff856829f9e4a49853439ede49b2dc, type: 3}
+    weight: 5
+  - prefab: {fileID: 5202037451850702344, guid: 03912992b30c5ad4eb84bc680f848c9f, type: 3}
+    weight: 1
+  - prefab: {fileID: 4816253942107323965, guid: 3467ad91f23e73446bb7b4ebbbb328c4, type: 3}
+    weight: 2
+  - prefab: {fileID: 5321659957119331487, guid: 8e99d725091efc44a876bfb21075a84c, type: 3}
+    weight: 2
+  - prefab: {fileID: 3413123383585152175, guid: abd5488512ac806478189acb0ab8efad, type: 3}
+    weight: 2

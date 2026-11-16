@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fac9e8bfb105a354594c4a0bd91dc6fe, type: 3}
+  m_Name: Floor2
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.FloorData
+  displayName: Data center / Lab Cisco
+  tiles:
+  - {fileID: 11400000, guid: f9d138ffaa74a514e8d078d10a9e616f, type: 2}
+  - {fileID: 11400000, guid: 8efbb21bc57298d40a81a797a95497b8, type: 2}
+  - {fileID: 11400000, guid: 1670737754be20f4f807f6cbabb35df3, type: 2}
+  - {fileID: 11400000, guid: 860c3a001a45b3448b157455ebb7d1f8, type: 2}
+  - {fileID: 11400000, guid: eb03d4914918930468def2912f2ffb89, type: 2}
+  - {fileID: 11400000, guid: a511d995cb56ede4abaa79c3b91ab739, type: 2}
+  - {fileID: 11400000, guid: f879269dbb10db0439d12381ca5dd956, type: 2}
+  - {fileID: 11400000, guid: e52a9642fa637ec41bd25dd10fce8a93, type: 2}
+  background: {r: 0.047, g: 0.039, b: 0.07, a: 1}
+  enemies:
+  - prefab: {fileID: 5010065238079441237, guid: 9bff856829f9e4a49853439ede49b2dc, type: 3}
+    weight: 5
+  - prefab: {fileID: 5202037451850702344, guid: 03912992b30c5ad4eb84bc680f848c9f, type: 3}
+    weight: 1
+  - prefab: {fileID: 4816253942107323965, guid: 3467ad91f23e73446bb7b4ebbbb328c4, type: 3}
+    weight: 2
+  - prefab: {fileID: 5321659957119331487, guid: 8e99d725091efc44a876bfb21075a84c, type: 3}
+    weight: 2
+  - prefab: {fileID: 3413123383585152175, guid: abd5488512ac806478189acb0ab8efad, type: 3}
+    weight: 2

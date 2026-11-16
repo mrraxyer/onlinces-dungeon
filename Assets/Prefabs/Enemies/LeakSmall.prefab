@@ -176,6 +176,10 @@ MonoBehaviour:
   frames:
   - {fileID: -1425224373, guid: 8d78ac9c8283ef54e9c6297595ef5c76, type: 3}
   - {fileID: 1541877618, guid: 8d78ac9c8283ef54e9c6297595ef5c76, type: 3}
+  floorFrames:
+  - frames:
+    - {fileID: -66219216, guid: d40dd4fd881527d4e9f0b2632a32e234, type: 3}
+    - {fileID: -1361020518, guid: d40dd4fd881527d4e9f0b2632a32e234, type: 3}
   framesPerSecond: 5
   tint: {r: 1, g: 1, b: 1, a: 1}
   deathFx: {fileID: 5514636719276217152, guid: c102002ccc22d3c4a8cf108b3b7a563a, type: 3}
@@ -192,6 +196,8 @@ MonoBehaviour:
   hitClip: {fileID: 8300000, guid: 286bde7eb380b9b4fa64f4d26f8d6996, type: 3}
   dieClip: {fileID: 8300000, guid: 2ffa224a1cd42dc469e89a13ddf05f74, type: 3}
   shootClip: {fileID: 0}
+  cloneClip: {fileID: 0}
+  cloneToast: Ctrl+V
 --- !u!1 &7757095135128749411
 GameObject:
   m_ObjectHideFlags: 0

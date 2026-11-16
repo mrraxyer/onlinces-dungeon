@@ -36,7 +36,30 @@ namespace OnLinces
         public WeaponData Current => slots.Count > 0 ? slots[current] : null;
         public bool JustShot => shootAnim > 0f;
 
-        void Start() => RefreshWeaponSprite();
+        PlayerStats stats;
+
+        void Start()
+        {
+            stats = GetComponent<PlayerStats>();
+            // Las armas se conservan entre pisos
+            var run = GameManager.Instance.Run;
+            if (run.Weapons.Count > 0) { slots.Clear(); slots.AddRange(run.Weapons); }
+            else run.Weapons.AddRange(slots);
+            RefreshWeaponSprite();
+        }
+
+        /// Tomar un arma del piso. Si ya llevas 2, suelta la que tienes en la mano y la devuelve.
+        public WeaponData Take(WeaponData weapon)
+        {
+            WeaponData dropped = null;
+            if (slots.Count < 2) { slots.Add(weapon); current = slots.Count - 1; }
+            else { dropped = slots[current]; slots[current] = weapon; }
+            var run = GameManager.Instance.Run;
+            run.Weapons.Clear();
+            run.Weapons.AddRange(slots);
+            RefreshWeaponSprite();
+            return dropped;
+        }
 
         void Update()
         {
@@ -69,7 +92,8 @@ namespace OnLinces
 
         void Fire(WeaponData w, Vector2 aim)
         {
-            cooldown = w.fireDelay;
+            cooldown = w.fireDelay * (stats ? stats.FireDelayMult : 1f);
+            float damage = w.damage * (stats ? stats.DamageMult : 1f);
             shootAnim = ShootAnimTime;
 
             Vector2 origin = (Vector2)hand.position + aim * Units.Px(muzzleDistancePx);
@@ -85,7 +109,7 @@ namespace OnLinces
                 var sprite = w.projectileSprites.Length > 0 ? w.projectileSprites[Random.Range(0, w.projectileSprites.Length)] : null;
 
                 var p = Instantiate(projectilePrefab, origin, Quaternion.identity);
-                p.Launch(sprite, dir * Units.Px(w.projectileSpeedPx), w.damage, w.range, fromPlayer: true);
+                p.Launch(sprite, dir * Units.Px(w.projectileSpeedPx), damage, w.range, fromPlayer: true);
             }
 
             if (audioSource != null)

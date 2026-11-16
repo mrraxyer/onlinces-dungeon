@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fac9e8bfb105a354594c4a0bd91dc6fe, type: 3}
+  m_Name: Floor3
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.FloorData
+  displayName: La nube (us-celaya-1)
+  tiles:
+  - {fileID: 11400000, guid: faa8d38ea0f9a144aa6aef15ce6f01dc, type: 2}
+  - {fileID: 11400000, guid: 6248578324f2b7a4c953f9e8008ec7be, type: 2}
+  - {fileID: 11400000, guid: e16aeb2a13a8de142a63e4da706c1da9, type: 2}
+  - {fileID: 11400000, guid: 9e2ab371f5752694d80938123825f3b6, type: 2}
+  - {fileID: 11400000, guid: 4cf5111300058ca43b924cbde881da55, type: 2}
+  - {fileID: 11400000, guid: f2ed8231cce74b34d85b1badf7a3cdc5, type: 2}
+  - {fileID: 11400000, guid: 8e0b595509ae6ca409542baad1c23c4b, type: 2}
+  - {fileID: 11400000, guid: dadcb3ffe8d51554ea49901a11ff5ed9, type: 2}
+  background: {r: 0.918, g: 0.945, b: 0.992, a: 1}
+  enemies:
+  - prefab: {fileID: 5010065238079441237, guid: 9bff856829f9e4a49853439ede49b2dc, type: 3}
+    weight: 5
+  - prefab: {fileID: 5202037451850702344, guid: 03912992b30c5ad4eb84bc680f848c9f, type: 3}
+    weight: 1
+  - prefab: {fileID: 4816253942107323965, guid: 3467ad91f23e73446bb7b4ebbbb328c4, type: 3}
+    weight: 2
+  - prefab: {fileID: 5321659957119331487, guid: 8e99d725091efc44a876bfb21075a84c, type: 3}
+    weight: 2
+  - prefab: {fileID: 3413123383585152175, guid: abd5488512ac806478189acb0ab8efad, type: 3}
+    weight: 2

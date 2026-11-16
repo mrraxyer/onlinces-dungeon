@@ -28,12 +28,14 @@ namespace OnLinces
         public bool SwitchWeaponPressed { get; private set; }
 
         Rigidbody2D rb;
+        PlayerStats stats;
         bool usingMouse = true;
         Vector2 lastMouse;
 
         void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
+            stats = GetComponent<PlayerStats>();
             if (cam == null) cam = Camera.main;
             if (aimOrigin == null) aimOrigin = transform;
         }
@@ -93,7 +95,8 @@ namespace OnLinces
 
         void FixedUpdate()
         {
-            rb.linearVelocity = MoveInput * Units.Px(speedPx) + knockPx / Units.PPU;
+            float mult = stats ? stats.CurrentSpeedMult : 1f;
+            rb.linearVelocity = MoveInput * Units.Px(speedPx) * mult + knockPx / Units.PPU;
             knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 700f * Time.fixedDeltaTime);
         }
     }

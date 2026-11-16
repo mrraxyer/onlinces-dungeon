@@ -11,6 +11,7 @@ namespace OnLinces
     public sealed class WeaponData : ScriptableObject
     {
         public string displayName = "print()";
+        [TextArea] public string description = "Confiable. Nunca te falla.";
         public Rarity rarity = Rarity.Comun;
         [Tooltip("Por ahora solo se implementa Gun (disparo).")]
         public WeaponKind kind = WeaponKind.Gun;
