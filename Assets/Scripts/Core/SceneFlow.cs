@@ -37,6 +37,7 @@ namespace OnLinces
             else
             {
                 Run.Won = true;
+                SaveSystem.RegisterWin(Run.Difficulty);
                 SceneManager.LoadScene(End);
             }
         }
@@ -45,6 +46,15 @@ namespace OnLinces
         {
             Run.Won = false;
             SceneManager.LoadScene(End);
+        }
+
+        /// Empieza otra partida con la misma mascota, puesto y dificultad (desde End o al morir).
+        public static void BackToLobby()
+        {
+            var old = Run;
+            GameManager.Instance.ResetRun();
+            Run.Mascot = old.Mascot; Run.Role = old.Role; Run.Difficulty = old.Difficulty;
+            SceneManager.LoadScene(Lobby);
         }
 
         public static void BackToTitle()

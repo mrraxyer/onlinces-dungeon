@@ -17,8 +17,18 @@ namespace OnLinces
 
         Rigidbody2D rb;
         float life;
+        int pierce;
+        float knock = 1f;
+        readonly System.Collections.Generic.HashSet<IHittable> alreadyHit = new();
 
         void Awake() => rb = GetComponent<Rigidbody2D>();
+
+        /// Atraviesa N enemigos y los empuja más fuerte (Post viral).
+        public void SetPierce(int count, float knockMultiplier)
+        {
+            pierce = count;
+            knock = knockMultiplier;
+        }
 
         public void Launch(Sprite sprite, Vector2 velocity, float damage, float lifeSeconds, bool fromPlayer)
         {
@@ -47,10 +57,10 @@ namespace OnLinces
             if (FromPlayer)
             {
                 var target = other.GetComponentInParent<IHittable>();
-                if (target != null && target.CanBeHit)
+                if (target != null && target.CanBeHit && alreadyHit.Add(target))
                 {
-                    target.Hit(Damage, rb.linearVelocity.normalized);
-                    Destroy(gameObject);
+                    target.Hit(Damage, rb.linearVelocity.normalized * knock);
+                    if (pierce-- <= 0) Destroy(gameObject);
                 }
             }
             else

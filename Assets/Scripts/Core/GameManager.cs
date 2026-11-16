@@ -14,6 +14,8 @@ namespace OnLinces
         public bool? Won; // null = la partida sigue
         public int Hp = -1; // vida que se lleva al siguiente piso (-1 = llena)
         public int BonusMaxHp; // corazones extra de ítems (Unit tests)
+        public RoleData Role;  // puesto elegido en el Lobby (null = Miembro)
+        public Difficulty Difficulty = Difficulty.Media; // GameManager la carga del guardado
         public readonly List<ItemData> Items = new();
         public readonly List<WeaponData> Weapons = new(); // armas que llevas (vacío = las iniciales)
 
@@ -76,8 +78,9 @@ namespace OnLinces
         {
             if (instance != null && instance != this) { Destroy(gameObject); return; }
             instance = this;
+            Run.Difficulty = (Difficulty)SaveSystem.Data.lastDifficulty;
         }
 
-        public void ResetRun() => Run = new RunState();
+        public void ResetRun() => Run = new RunState { Difficulty = (Difficulty)SaveSystem.Data.lastDifficulty };
     }
 }

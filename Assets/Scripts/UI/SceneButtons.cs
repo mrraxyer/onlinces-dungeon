@@ -28,6 +28,7 @@ namespace OnLinces
         public void CompleteFloor() => SceneFlow.CompleteFloor();
         public void Die() => SceneFlow.Die();
         public void BackToTitle() => SceneFlow.BackToTitle();
+        public void PlayAgain() => SceneFlow.BackToLobby();
         public void Quit() => Application.Quit();
     }
 }

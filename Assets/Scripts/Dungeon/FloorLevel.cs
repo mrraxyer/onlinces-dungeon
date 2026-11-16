@@ -19,7 +19,7 @@ namespace OnLinces
         void Awake()
         {
             // Si entras directo a esta escena (Play en el editor), el piso queda bien
-            GameManager.Instance.Run.Floor = floorNumber;
+            if (floorNumber > 0) GameManager.Instance.Run.Floor = floorNumber;
         }
     }
 }

@@ -41,6 +41,7 @@ namespace OnLinces
         void Start()
         {
             stats = GetComponent<PlayerStats>();
+            skill = GetComponent<PlayerSkill>();
             // Las armas se conservan entre pisos
             var run = GameManager.Instance.Run;
             if (run.Weapons.Count > 0) { slots.Clear(); slots.AddRange(run.Weapons); }
@@ -63,7 +64,9 @@ namespace OnLinces
 
         void Update()
         {
-            cooldown -= Time.deltaTime;
+            bool junta = skill && skill.IsActive(SkillKind.JuntaGeneral);
+            cooldown -= Time.deltaTime * (junta ? 2f : 1f); // Junta general: doble cadencia
+            cooldown2 -= Time.deltaTime;
             shootAnim -= Time.deltaTime;
 
             if (controller.SwitchWeaponPressed && slots.Count > 1)
@@ -87,13 +90,27 @@ namespace OnLinces
             }
 
             if (controller.IsShooting && cooldown <= 0f && Current != null)
+            {
+                cooldown = Current.fireDelay * (stats ? stats.FireDelayMult : 1f);
                 Fire(Current, aim);
+            }
+            // Deploy doble: la otra arma también dispara
+            if (controller.IsShooting && skill && skill.IsActive(SkillKind.DeployDoble) && slots.Count > 1 && cooldown2 <= 0f)
+            {
+                var other = slots[1 - current];
+                cooldown2 = other.fireDelay * (stats ? stats.FireDelayMult : 1f);
+                float r = 0.12f;
+                Fire(other, new Vector2(aim.x * Mathf.Cos(r) - aim.y * Mathf.Sin(r), aim.x * Mathf.Sin(r) + aim.y * Mathf.Cos(r)));
+            }
         }
+
+        float cooldown2;
+        PlayerSkill skill;
 
         void Fire(WeaponData w, Vector2 aim)
         {
-            cooldown = w.fireDelay * (stats ? stats.FireDelayMult : 1f);
             float damage = w.damage * (stats ? stats.DamageMult : 1f);
+            if (skill && skill.IsActive(SkillKind.JuntaGeneral)) damage *= 2f; // Junta general: daño x2
             shootAnim = ShootAnimTime;
 
             Vector2 origin = (Vector2)hand.position + aim * Units.Px(muzzleDistancePx);

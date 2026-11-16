@@ -79,7 +79,7 @@ namespace OnLinces
         void Start()
         {
             floorNum = GameManager.Instance.Run.Floor;
-            hp = presetHp ?? baseHp + hpPerFloor * floorNum;
+            hp = presetHp ?? (baseHp + hpPerFloor * floorNum) * DifficultyInfo.EnemyHp(GameManager.Instance.Run.Difficulty);
             speedPx = baseSpeedPx + speedPerFloorPx * floorNum;
             player = FindAnyObjectByType<PlayerHealth>();
             int i = floorNum - 1;
@@ -178,7 +178,8 @@ namespace OnLinces
             var origin = (Vector2)transform.position + Vector2.up * Units.Px(12) + dir * Units.Px(12);
             var p = Instantiate(projectilePrefab, origin, Quaternion.identity);
             var s = bulletSprites.Length > 0 ? bulletSprites[Random.Range(0, bulletSprites.Length)] : null;
-            p.Launch(s, dir * Units.Px(bulletSpeedPx + bulletSpeedPerFloorPx * floorNum), 1f, 3f, fromPlayer: false);
+            float bullet = DifficultyInfo.Bullet(GameManager.Instance.Run.Difficulty);
+            p.Launch(s, dir * Units.Px((bulletSpeedPx + bulletSpeedPerFloorPx * floorNum) * bullet), 1f, 3f, fromPlayer: false);
             Sfx.Play(shootClip, 0.6f);
         }
 

@@ -25,8 +25,19 @@ namespace OnLinces
 
         void Start()
         {
-            skin = GameManager.Instance.Run.Mascot == Mascot.Off ? offSkin : onSkin;
             headBase = head.transform.localPosition;
+            RefreshSkin();
+            var role = GetComponent<PlayerRole>();
+            if (role) role.Changed += RefreshSkin;
+        }
+
+        /// La vestimenta depende de la mascota y del puesto (On/Off + Luis, Sofi, Lemus o Miembro).
+        void RefreshSkin()
+        {
+            var mascot = GameManager.Instance.Run.Mascot;
+            var role = GetComponent<PlayerRole>();
+            var roleSkin = role && role.Current ? role.Current.SkinFor(mascot) : null;
+            skin = roleSkin != null ? roleSkin : (mascot == Mascot.Off ? offSkin : onSkin);
         }
 
         void Update()

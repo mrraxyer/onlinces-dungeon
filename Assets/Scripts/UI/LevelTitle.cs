@@ -8,6 +8,8 @@ namespace OnLinces
     public sealed class LevelTitle : MonoBehaviour
     {
         [SerializeField] TMP_Text label;
+        [Tooltip("Si tiene texto, se muestra esto en vez de 'Piso N: nombre' (Lobby)")]
+        [SerializeField] string overrideText;
         [SerializeField] float holdSeconds = 2f;
         [SerializeField] float fadeSeconds = 0.8f;
 
@@ -20,7 +22,8 @@ namespace OnLinces
             var level = FindAnyObjectByType<FloorLevel>();
             int n = level ? level.FloorNumber : GameManager.Instance.Run.Floor;
             string name = level && level.Data ? level.Data.displayName : "";
-            label.text = string.IsNullOrEmpty(name) ? $"Piso {n}" : $"Piso {n}: {name}";
+            label.text = !string.IsNullOrEmpty(overrideText) ? overrideText
+                       : string.IsNullOrEmpty(name) ? $"Piso {n}" : $"Piso {n}: {name}";
             group.alpha = 0f;
         }
 

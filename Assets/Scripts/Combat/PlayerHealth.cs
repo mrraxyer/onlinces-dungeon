@@ -39,12 +39,33 @@ namespace OnLinces
         void Start()
         {
             var run = GameManager.Instance.Run;
-            MaxHp = maxHp + run.BonusMaxHp + (run.Mascot == Mascot.Off ? offBonus : 0);
+            MaxHp = ComputeMax();
             Hp = run.Hp > 0 ? Mathf.Min(run.Hp, MaxHp) : MaxHp;
             Changed += () => run.Hp = Hp; // la vida se conserva entre pisos
             if (shieldVisual) shieldVisual.SetActive(false);
+            var role = GetComponent<PlayerRole>();
+            if (role) role.Changed += () => { MaxHp = ComputeMax(); Hp = MaxHp; Changed?.Invoke(); };
             Changed?.Invoke();
         }
+
+        int ComputeMax()
+        {
+            var run = GameManager.Instance.Run;
+            var role = GetComponent<PlayerRole>();
+            int baseHp = role && role.Current ? role.Current.maxHp : maxHp;
+            return baseHp + run.BonusMaxHp + (run.Mascot == Mascot.Off ? offBonus : 0) + DifficultyInfo.PlayerHp(run.Difficulty);
+        }
+
+        /// La terminal de dificultad lo usa (Fácil da +1 corazón).
+        public void RefreshMax()
+        {
+            MaxHp = ComputeMax();
+            Hp = MaxHp;
+            Changed?.Invoke();
+        }
+
+        /// Invulnerable un momento (Firewall total).
+        public void GiveIframes(float seconds) => iframes = Mathf.Max(iframes, seconds);
 
         void Update()
         {

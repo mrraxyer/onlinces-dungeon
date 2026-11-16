@@ -64,6 +64,7 @@ namespace OnLinces
             room = r;
             var run = GameManager.Instance.Run;
             maxHp *= 1f + 0.35f * (run.Floor - 1); // más vida en pisos altos (mientras llegan sus jefes propios)
+            maxHp *= DifficultyInfo.BossHp(run.Difficulty);
             Hp = maxHp;
             anchor = transform.position;
         }
@@ -335,7 +336,7 @@ namespace OnLinces
             var origin = (Vector2)transform.position + Vector2.up * Units.Px(26) + dir * Units.Px(28);
             var p = Instantiate(projectilePrefab, origin, Quaternion.identity);
             var s = bulletSprites.Length > 0 ? bulletSprites[Random.Range(0, bulletSprites.Length)] : null;
-            p.Launch(s, dir * Units.Px(speedPx * BulletSpeed), 1f, 4f, fromPlayer: false);
+            p.Launch(s, dir * Units.Px(speedPx * BulletSpeed * DifficultyInfo.Bullet(GameManager.Instance.Run.Difficulty)), 1f, 4f, fromPlayer: false);
             Sfx.Play(shootClip, 0.35f);
         }
 

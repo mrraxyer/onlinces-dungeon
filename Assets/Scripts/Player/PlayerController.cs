@@ -29,6 +29,8 @@ namespace OnLinces
 
         Rigidbody2D rb;
         PlayerStats stats;
+        PlayerRole role;
+        PlayerSkill skill;
         bool usingMouse = true;
         Vector2 lastMouse;
 
@@ -36,6 +38,8 @@ namespace OnLinces
         {
             rb = GetComponent<Rigidbody2D>();
             stats = GetComponent<PlayerStats>();
+            role = GetComponent<PlayerRole>();
+            skill = GetComponent<PlayerSkill>();
             if (cam == null) cam = Camera.main;
             if (aimOrigin == null) aimOrigin = transform;
         }
@@ -96,7 +100,8 @@ namespace OnLinces
         void FixedUpdate()
         {
             float mult = stats ? stats.CurrentSpeedMult : 1f;
-            rb.linearVelocity = MoveInput * Units.Px(speedPx) * mult + knockPx / Units.PPU;
+            float baseSpeed = role && role.Current ? role.Current.speedPx : speedPx;
+            rb.linearVelocity = MoveInput * Units.Px(baseSpeed) * mult + knockPx / Units.PPU;
             knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 700f * Time.fixedDeltaTime);
         }
     }

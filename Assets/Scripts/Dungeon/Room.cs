@@ -64,7 +64,8 @@ namespace OnLinces
             var b = area.bounds;
             int tiles = Mathf.RoundToInt(b.size.x * b.size.y); // 1 unidad = 1 tile de 32 px
             int floorNum = GameManager.Instance.Run.Floor;
-            int n = Mathf.Clamp(Mathf.RoundToInt(tiles / 45f + floorNum), 2, 11);
+            float countMult = DifficultyInfo.Count(GameManager.Instance.Run.Difficulty);
+            int n = Mathf.Clamp(Mathf.RoundToInt((tiles / 45f + floorNum) * countMult), 2, 11);
 
             int placed = 0;
             for (int tries = 0; placed < n && tries < 200; tries++)
