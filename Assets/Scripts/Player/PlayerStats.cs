@@ -19,8 +19,16 @@ namespace OnLinces
 
         void Start()
         {
-            foreach (var it in GameManager.Instance.Run.Items) ApplyPassive(it);
+            var run = GameManager.Instance.Run;
+            // ventaja de la mascota (se muestra en la pantalla de inicio). El +1 corazón de Off está en PlayerHealth.
+            if (run.Mascot == Mascot.On) { SpeedMult *= 1.1f; FireDelayMult /= 1.1f; } // +10% velocidad y cadencia
+            else DamageMult *= 1.15f;                                                     // +15% daño
+            foreach (var it in run.Items) ApplyPassive(it);
         }
+
+        /// Textos de la pantalla de inicio (apodo y ventaja de cada mascota).
+        public static string MascotTitle(Mascot m) => m == Mascot.On ? "El optimista" : "El escéptico";
+        public static string MascotPerk(Mascot m) => m == Mascot.On ? "+10% velocidad y cadencia" : "+15% daño y +1 corazón";
 
         void Update() => boostT -= Time.deltaTime;
 
