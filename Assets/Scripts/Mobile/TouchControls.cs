@@ -11,6 +11,7 @@ namespace OnLinces
     ///  · Solo se ve en las escenas donde hay jugador (Lobby y pisos).
     ///  · Palanca izquierda = mover. Palanca derecha = apuntar y disparar sola mientras la empujas.
     ///  · Los botones son botones de gamepad (OnScreenButton), los mismos que ya usa InputSystem_Actions.
+    ///  · Para usar algo (cofre, tienda, portal) se toca el aviso "USAR: ..." del diálogo (ver InteractionDialog).
     public sealed class TouchControls : MonoBehaviour
     {
         [Tooltip("Mostrar los controles en el editor para probarlos con el ratón")]
@@ -22,11 +23,13 @@ namespace OnLinces
         [SerializeField] FloatingStick aimStick;
         [Tooltip("Cuánto hay que empujar la palanca derecha para apuntar y disparar (0 a 1)")]
         [SerializeField, Range(0.05f, 0.9f)] float fireThreshold = 0.3f;
-        [Tooltip("Solo se ve cuando hay algo con qué interactuar")]
-        [SerializeField] GameObject interactButton;
         [Tooltip("Solo se ve si tu puesto tiene habilidad; se atenúa mientras recarga")]
         [SerializeField] Image skillButton;
         [SerializeField] Button pauseButton;
+
+        [Header("HUD del juego en teléfono")]
+        [Tooltip("Alto del HUD en sus unidades (en PC es 320). Más alto = HUD más chico y más espacio para ver el juego")]
+        [SerializeField] float hudReferenceHeight = 360f;
 
         [Header("Pausa")]
         [SerializeField] GameObject pausePanel;
@@ -63,6 +66,8 @@ namespace OnLinces
             if (quitButton) quitButton.onClick.AddListener(QuitToTitle);
             if (gameplay) gameplay.SetActive(false);
             if (pausePanel) pausePanel.SetActive(false);
+            // botones proporcionales a la pantalla y sin encimarse en tablets
+            if (Active && TryGetComponent<CanvasScaler>(out var scaler)) MobileHud.Proportional(scaler, 320f);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
@@ -78,6 +83,7 @@ namespace OnLinces
             Resume();
             player = null;
             searchT = 0f;
+            if (Active) MobileHud.Apply(hudReferenceHeight, GetComponent<Canvas>());
         }
 
         void Update()
@@ -112,8 +118,6 @@ namespace OnLinces
 
             if (!show) return;
 
-            if (interactButton && interactButton.activeSelf != PlayerInteractor.HasTarget)
-                interactButton.SetActive(PlayerInteractor.HasTarget);
 
             if (skillButton)
             {
