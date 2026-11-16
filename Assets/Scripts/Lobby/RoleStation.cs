@@ -16,7 +16,15 @@ namespace OnLinces
 
         public string Prompt => IsMine ? $"Ya tienes el puesto de {role.displayName}" : $"Tomar el puesto: {role.displayName}";
         public string InfoTitle => string.IsNullOrEmpty(role.person) ? role.displayName : $"{role.person} — {role.displayName}";
-        public string InfoBody => $"{role.description}\nHabilidad: {role.skillName} — {role.skillDescription}";
+        public string InfoBody => InfoText.Join(
+            role.description,
+            InfoText.Section("Habilidad",
+                $"{InfoText.Strong(role.skillName)}  ·  {InfoText.Stat("recarga", $"{role.cooldown:0.#} s")}\n{role.skillDescription}"),
+            InfoText.Section("Datos",
+                $"{InfoText.Stat("Vida", Hearts(role.maxHp))}  ·  {InfoText.Stat("Velocidad", role.speedPx.ToString("0"))}"));
+
+        /// La vida va en medios corazones: 8 → "4 corazones", 7 → "3½ corazones".
+        static string Hearts(int half) => $"{half / 2}{(half % 2 == 1 ? "½" : "")} corazones";
         public bool CanInteract => true;
         public Vector3 Position => transform.position;
 

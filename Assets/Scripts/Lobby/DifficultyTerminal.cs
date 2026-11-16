@@ -14,7 +14,9 @@ namespace OnLinces
 
         public string Prompt => $"Dificultad: {DifficultyInfo.Name(Current)}  (cambiar)";
         public string InfoTitle => "Dificultad: " + DifficultyInfo.Name(Current) + (SaveSystem.HasWon(Current) ? "  (ya la ganaste)" : "");
-        public string InfoBody => DifficultyInfo.Summary(Current);
+        public string InfoBody => InfoText.Join(
+            InfoText.Section("Efectos", DifficultyInfo.Summary(Current)),
+            InfoText.Section("Cambiar", "Con E pasas a la siguiente: Fácil → Media → Difícil."));
         public bool CanInteract => true;
         public Vector3 Position => transform.position;
 

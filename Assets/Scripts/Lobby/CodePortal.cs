@@ -20,7 +20,10 @@ namespace OnLinces
             {
                 var run = GameManager.Instance.Run;
                 var role = run.Role ? run.Role.displayName : "Miembro";
-                return $"Te lleva a {destination}.\nPuesto: {role} · Dificultad: {DifficultyInfo.Name(run.Difficulty)}";
+                return InfoText.Join(
+                    InfoText.Section("Destino", destination),
+                    InfoText.Section("Tu partida",
+                        $"{InfoText.Stat("Puesto", role)}\n{InfoText.Stat("Dificultad", DifficultyInfo.Name(run.Difficulty))}"));
             }
         }
         public bool CanInteract => !used;

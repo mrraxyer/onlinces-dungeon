@@ -160,15 +160,20 @@ namespace OnLinces
         {
             get
             {
-                string body = kind switch
+                string desc = kind switch
                 {
                     PickupKind.Item when item => item.description,
-                    PickupKind.Weapon when weapon =>
-                        $"{weapon.description}\n{RarityName(weapon.rarity)} · daño {weapon.damage:0.#}" +
-                        (weapon.count > 1 ? $" x{weapon.count}" : "") + $" · {1f / weapon.fireDelay:0.#} tiros/s",
+                    PickupKind.Weapon when weapon => weapon.description,
                     _ => description,
                 };
-                return price > 0 ? $"{body}" : body;
+                string stats = kind == PickupKind.Weapon && weapon
+                    ? InfoText.Section("Datos",
+                        $"{InfoText.Stat("Rareza", RarityName(weapon.rarity))}\n" +
+                        $"{InfoText.Stat("Daño", weapon.damage.ToString("0.#") + (weapon.count > 1 ? $" x{weapon.count}" : ""))}  ·  " +
+                        InfoText.Stat("Cadencia", $"{1f / weapon.fireDelay:0.#} tiros/s"))
+                    : null;
+                string cost = price > 0 ? InfoText.Section("Precio", InfoText.Price(price)) : null;
+                return InfoText.Join(desc, stats, cost);
             }
         }
         public bool CanInteract => !used && NeedsE && Name != null;

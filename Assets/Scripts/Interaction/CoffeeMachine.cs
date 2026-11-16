@@ -15,7 +15,10 @@ namespace OnLinces
 
         public string Prompt => $"Café (${price})";
         public string InfoTitle => "Cafetera";
-        public string InfoBody => $"Un café recién hecho: +velocidad por {boostSeconds:0} s y +½ vida.";
+        public string InfoBody => InfoText.Join(
+            "Un café recién hecho.",
+            InfoText.Section("Efecto", $"+velocidad por {boostSeconds:0} s\n+½ vida"),
+            InfoText.Section("Precio", InfoText.Price(price)));
         public bool CanInteract => true;
         public Vector3 Position => transform.position;
 

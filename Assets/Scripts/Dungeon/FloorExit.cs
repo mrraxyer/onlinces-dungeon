@@ -17,7 +17,11 @@ namespace OnLinces
 
         public string Prompt => IsLast ? "Salir del calabozo" : "Entrar al portal";
         public string InfoTitle => "Portal";
-        public string InfoBody => IsLast ? "¡Venciste los 3 pisos! Sal a celebrar." : $"Te lleva a {destination}.\nTu vida, monedas, ítems y armas se quedan contigo.";
+        public string InfoBody => IsLast
+            ? InfoText.Join("¡Venciste los 3 pisos!", InfoText.Section("Destino", "La salida: sal a celebrar."))
+            : InfoText.Join(
+                InfoText.Section("Destino", destination),
+                InfoText.Section("Conservas", "Vida, monedas, ítems y armas."));
         public bool CanInteract => !used;
         public Vector3 Position => transform.position;
 
