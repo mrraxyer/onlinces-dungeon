@@ -22,13 +22,10 @@ namespace OnLinces
 
         public void Interact(GameObject player)
         {
-            var run = GameManager.Instance.Run;
-            run.Difficulty = (Difficulty)(((int)run.Difficulty + 1) % 3);
-            SaveSystem.Data.lastDifficulty = (int)run.Difficulty;
-            SaveSystem.Save();
+            var d = DifficultyInfo.Cycle();
             player.GetComponent<PlayerHealth>()?.RefreshMax();
             Sfx.Play(clickClip);
-            HUD.Feedback("Dificultad: " + DifficultyInfo.Name(run.Difficulty), HUD.Info);
+            HUD.Feedback("Dificultad: " + DifficultyInfo.Name(d), HUD.Info);
         }
     }
 }

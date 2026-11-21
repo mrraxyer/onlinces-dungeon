@@ -19,5 +19,15 @@ namespace OnLinces
             Difficulty.Media => "La experiencia normal.",
             _ => "Enemigos con 135% de vida, balas más rápidas y 30% más enemigos.",
         };
+
+        /// Pasa a la siguiente dificultad de la partida y la guarda.
+        public static Difficulty Cycle()
+        {
+            var run = GameManager.Instance.Run;
+            run.Difficulty = (Difficulty)(((int)run.Difficulty + 1) % 3);
+            SaveSystem.Data.lastDifficulty = (int)run.Difficulty;
+            SaveSystem.Save();
+            return run.Difficulty;
+        }
     }
 }
