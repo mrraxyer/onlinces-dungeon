@@ -330,7 +330,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 8, y: -30}
+  m_AnchoredPosition: {x: 8, y: -54}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &85200884
@@ -787,7 +787,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 8, y: -86}
+  m_AnchoredPosition: {x: 8, y: -116}
   m_SizeDelta: {x: 140, y: 36}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &308116818
@@ -2676,7 +2676,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff9de5f33d0fd6f41915cec8a4ffdc1d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.HeartsHUD
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.StatsHUD
   player: {fileID: 5120177569778215688}
   heartTemplate: {fileID: 1788886821}
   full: {fileID: -399515336, guid: 5455a73cefe6f784e9456b206784af89, type: 3}
@@ -4939,7 +4939,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 8, y: -56}
+  m_AnchoredPosition: {x: 8, y: -86}
   m_SizeDelta: {x: 170, y: 26}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1772589556
@@ -4978,8 +4978,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d689da24bc347864ea8903968559ca23, type: 3}
-  m_Type: 2
+  m_Sprite: {fileID: 21300000, guid: b32bc6ee99c070642a1d1bd68520f047, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4

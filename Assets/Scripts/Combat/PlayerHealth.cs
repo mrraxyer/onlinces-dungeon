@@ -17,6 +17,8 @@ namespace OnLinces
         [SerializeField] PlayerController controller;
         [Tooltip("Burbuja del escudo")]
         [SerializeField] GameObject shieldVisual;
+        [Tooltip("Medios corazones que absorbe")]
+        [SerializeField] int shieldPoints = 2;
         [SerializeField] AudioClip hurtClip;
         [SerializeField] AudioClip dieClip;
         [SerializeField] AudioClip healClip;
@@ -25,7 +27,9 @@ namespace OnLinces
         public int Hp { get; private set; }
         public int MaxHp { get; private set; }
         public bool IsDead { get; private set; }
-        public bool HasShield { get; private set; }
+        public int Shield { get; private set; }
+        public int MaxShield => shieldPoints;
+        public bool HasShield => Shield > 0;
         /// Para "Commit limpio".
         public bool TookDamageThisRoom { get; set; }
         public event Action Changed;
@@ -85,10 +89,15 @@ namespace OnLinces
 
             if (HasShield)
             {
-                HasShield = false;
-                if (shieldVisual) shieldVisual.SetActive(false);
-                HUD.Feedback("Escudo roto", HUD.Bad);
-                Sfx.Play(shieldBreakClip);
+                // absorbe el golpe completo aunque no le alcancen los puntos
+                Shield = Mathf.Max(0, Shield - amount);
+                if (!HasShield)
+                {
+                    if (shieldVisual) shieldVisual.SetActive(false);
+                    HUD.Feedback("Escudo roto", HUD.Bad);
+                    Sfx.Play(shieldBreakClip);
+                }
+                Changed?.Invoke();
                 return;
             }
 
@@ -127,8 +136,9 @@ namespace OnLinces
         public void GiveShield()
         {
             if (!HasShield) HUD.Feedback("Escudo activado", HUD.Info);
-            HasShield = true;
+            Shield = shieldPoints;
             if (shieldVisual) shieldVisual.SetActive(true);
+            Changed?.Invoke();
         }
 
         IEnumerator Die()

@@ -28,11 +28,14 @@ namespace OnLinces
         [SerializeField] AudioClip shootOn;
         [SerializeField] AudioClip shootOff;
 
+        [Header("Energía (se llena en cada piso)")]
+        [SerializeField] int maxEnergy = 140;
+
         const float ShootAnimTime = 0.14f;
         const float DoubleAngle = 0.12f; // radianes
 
         int current;
-        float cooldown, cooldown2, shootAnim;
+        float cooldown, cooldown2, shootAnim, noEnergyWarn;
         PlayerStats stats;
         PlayerSkill skill;
 
@@ -40,9 +43,14 @@ namespace OnLinces
         /// La que no tienes en la mano.
         public WeaponData Other => slots.Count > 1 ? slots[1 - current] : null;
         public bool JustShot => shootAnim > 0f;
+        public int Energy { get; private set; }
+        public int MaxEnergy => maxEnergy;
+
+        public void AddEnergy(int amount) => Energy = Mathf.Min(maxEnergy, Energy + amount);
 
         void Start()
         {
+            Energy = maxEnergy;
             stats = GetComponent<PlayerStats>();
             skill = GetComponent<PlayerSkill>();
             // se conservan entre pisos
@@ -71,6 +79,7 @@ namespace OnLinces
             cooldown -= Time.deltaTime * (junta ? 2f : 1f);
             cooldown2 -= Time.deltaTime;
             shootAnim -= Time.deltaTime;
+            noEnergyWarn -= Time.deltaTime;
 
             if (controller.SwitchWeaponPressed && slots.Count > 1)
             {
@@ -96,7 +105,16 @@ namespace OnLinces
             if (cooldown <= 0f && Current != null)
             {
                 cooldown = Current.fireDelay * delayMult;
-                Fire(Current, aim);
+                if (Energy >= Current.energyCost)
+                {
+                    Energy -= Current.energyCost;
+                    Fire(Current, aim);
+                }
+                else if (noEnergyWarn <= 0f)
+                {
+                    noEnergyWarn = 1.5f;
+                    HUD.Feedback("Sin energía", HUD.Bad);
+                }
             }
             // Deploy doble: también la otra arma
             if (skill && skill.IsActive(SkillKind.DeployDoble) && slots.Count > 1 && cooldown2 <= 0f)

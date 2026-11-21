@@ -119,7 +119,8 @@ namespace OnLinces
                 case PickupKind.Drink:
                     health.Heal(1);
                     stats.Boost(6f);
-                    HUD.Feedback("+velocidad", HUD.Good);
+                    p.GetComponent<PlayerWeapons>().AddEnergy(40);
+                    HUD.Feedback("+velocidad +40 energía", HUD.Good);
                     break;
                 case PickupKind.Item:
                     if (item) stats.Collect(item);

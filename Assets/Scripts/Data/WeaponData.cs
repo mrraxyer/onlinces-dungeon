@@ -32,7 +32,7 @@ namespace OnLinces
         public int count = 1;
         [Tooltip("Vida de la bala en s")]
         public float range = 0.7f;
-        [Tooltip("Sin usar")]
+        [Tooltip("Energía por disparo")]
         public int energyCost;
 
         public static string RarityName(Rarity r) => r switch
