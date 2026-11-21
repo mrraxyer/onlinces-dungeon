@@ -60,6 +60,7 @@ namespace OnLinces
         {
             room = r;
             var run = GameManager.Instance.Run;
+            maxHp *= 1.5f; // más aguante en todos los bosses
             maxHp *= 1f + 0.35f * (run.Floor - 1); // +35% por piso
             maxHp *= DifficultyInfo.BossHp(run.Difficulty);
             Hp = maxHp;

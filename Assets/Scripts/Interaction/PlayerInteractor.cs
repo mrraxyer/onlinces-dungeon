@@ -51,6 +51,9 @@ namespace OnLinces
             if (current != null && (interact.action.WasPressedThisFrame() || tapped))
             {
                 current.Interact(gameObject);
+                // puede haberse destruido; Destroy ocurre antes de LateUpdate (InteractionDialog)
+                current = null;
+                Current = null;
                 shownPrompt = null; // refrescar
             }
         }
