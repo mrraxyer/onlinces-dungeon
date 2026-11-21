@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Controles táctiles: mover, apuntar/disparar, habilidad, arma y pausa. Persiste entre escenas.
+    /// Controles táctiles (mover, apuntar/disparar, habilidad, arma) y menú de pausa (también en PC con Esc). Persiste entre escenas.
     public sealed class TouchControls : MonoBehaviour
     {
         [Tooltip("Probar con el ratón en el editor")]
@@ -70,8 +70,6 @@ namespace OnLinces
 
         void Update()
         {
-            if (!Active) return;
-
             if (player == null)
             {
                 searchT -= Time.unscaledDeltaTime;
@@ -83,11 +81,13 @@ namespace OnLinces
                 }
             }
 
-            // botón "atrás" de Android
+            // Esc en PC, botón "atrás" en Android
             if (player != null && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 if (paused) Resume(); else Pause();
             }
+
+            if (!Active) return; // PC: solo pausa
 
             bool show = player != null && !paused;
             if (gameplay && gameplay.activeSelf != show) gameplay.SetActive(show);
@@ -114,7 +114,7 @@ namespace OnLinces
 
         public void Pause()
         {
-            if (!Active || paused || player == null) return;
+            if (paused || player == null) return;
             paused = true;
             Time.timeScale = 0f;
             if (gameplay) gameplay.SetActive(false);

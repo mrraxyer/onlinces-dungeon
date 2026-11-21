@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Teléfono: horizontal, 60 fps y controles táctiles.
+    /// Teléfono: horizontal y 60 fps. Siempre crea TouchControls (en PC solo aporta el menú de pausa).
     public static class MobileSetup
     {
         const string PrefabName = "TouchControls";
@@ -20,7 +20,6 @@ namespace OnLinces
                 Screen.autorotateToLandscapeRight = true;
                 Screen.orientation = ScreenOrientation.AutoRotation;
             }
-            else if (!Application.isEditor) return; // PC
 
             var prefab = Resources.Load<TouchControls>(PrefabName);
             if (prefab == null) return;
