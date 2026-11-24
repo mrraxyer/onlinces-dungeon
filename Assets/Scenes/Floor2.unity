@@ -1260,6 +1260,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3533580762544006447, guid: 29a0288f1ca18894f8199d4b63aa771b, type: 3}
   m_PrefabInstance: {fileID: 331349899}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &356202267
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 356202268}
+  m_Layer: 0
+  m_Name: DrinkSlot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &356202268
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356202267}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1, y: 4.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4772293822916663672}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &368618745
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3818,10 +3849,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.StatsHUD
   player: {fileID: 5120177569778215688}
-  heartTemplate: {fileID: 1788886821}
-  full: {fileID: -399515336, guid: 5455a73cefe6f784e9456b206784af89, type: 3}
-  half: {fileID: 750894918, guid: 5455a73cefe6f784e9456b206784af89, type: 3}
-  empty: {fileID: 436961921, guid: 5455a73cefe6f784e9456b206784af89, type: 3}
 --- !u!114 &952759416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5481,6 +5508,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.SceneButtons
   floorLabel: {fileID: 0}
   mascotLabel: {fileID: 0}
+  difficultyLabel: {fileID: 0}
+  clickClip: {fileID: 0}
 --- !u!1001 &1605919376
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6621,7 +6650,7 @@ Transform:
   m_GameObject: {fileID: 4633341652284805014}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.5, y: 4.5, z: 0}
+  m_LocalPosition: {x: -4, y: 4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17287,7 +17316,7 @@ Transform:
   m_GameObject: {fileID: 2135239688973319539}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.5, y: 4.5, z: 0}
+  m_LocalPosition: {x: 5, y: 4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17521,6 +17550,7 @@ Transform:
   - {fileID: 3016880717059629037}
   - {fileID: 3440783816727345906}
   - {fileID: 157006693251984664}
+  - {fileID: 356202268}
   - {fileID: 8418560594806086175}
   - {fileID: 3945376374337201148}
   - {fileID: 3368729157884659064}
@@ -18485,10 +18515,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.ShopRoom
   loot: {fileID: 11400000, guid: 50db5bc0f79bef5468f3a62f0921ac15, type: 2}
   heartSlot: {fileID: 157006693251984664}
+  drinkSlot: {fileID: 356202268}
   pizzaSlot: {fileID: 8418560594806086175}
   itemSlot: {fileID: 3945376374337201148}
   heartPrice: 3
   pizzaPrice: 5
+  drinkPrice: 3
   itemPrice: 12
 --- !u!4 &6027852404076664316
 Transform:
@@ -26089,7 +26121,7 @@ Transform:
   m_GameObject: {fileID: 1262332158044117440}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 4.5, z: 0}
+  m_LocalPosition: {x: 2, y: 4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

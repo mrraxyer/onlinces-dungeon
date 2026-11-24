@@ -33,7 +33,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 39db3e0b103e78a4b94474773b64fc84, type: 2}
   coinChance: 0.55
   heartChance: 0.035
-  drinkChance: 0.015
+  drinkChance: 0.06
   pizzaChance: 0.01
   chestChance: 0.65
   weaponChestShare: 0.4

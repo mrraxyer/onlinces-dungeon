@@ -2,21 +2,24 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Tienda: corazón, pizza e ítem con precio.
+    /// Tienda: corazón, bebida, pizza e ítem con precio.
     public sealed class ShopRoom : MonoBehaviour
     {
         [SerializeField] LootTable loot;
         [SerializeField] Transform heartSlot;
+        [SerializeField] Transform drinkSlot;
         [SerializeField] Transform pizzaSlot;
         [SerializeField] Transform itemSlot;
         [SerializeField] int heartPrice = 3;
         [SerializeField] int pizzaPrice = 5;
+        [SerializeField] int drinkPrice = 3;
         [SerializeField] int itemPrice = 12;
 
         void Start()
         {
             Place(loot.heart, heartSlot, heartPrice);
             Place(loot.pizza, pizzaSlot, pizzaPrice);
+            Place(loot.drink, drinkSlot, drinkPrice);
             var item = Place(loot.itemPickup, itemSlot, itemPrice);
             if (item) item.SetItem(loot.RandomItem());
         }

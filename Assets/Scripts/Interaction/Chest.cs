@@ -45,6 +45,9 @@ namespace OnLinces
             spriteRenderer.sprite = openSprite;
             spriteRenderer.color = Color.white;
             Sfx.Play(openClip);
+            int energy = kind == ChestKind.Weapon ? 20 : 40;
+            player.GetComponent<PlayerWeapons>().AddEnergy(energy);
+            HUD.Feedback($"+{energy} energía", HUD.Good);
             var below = transform.position + Vector3.down * Units.Px(26);
             if (kind == ChestKind.Weapon)
             {

@@ -25,7 +25,7 @@ namespace OnLinces
         [Header("Al morir un enemigo")]
         [Range(0, 1)] public float coinChance = 0.55f;
         [Range(0, 1)] public float heartChance = 0.035f;
-        [Range(0, 1)] public float drinkChance = 0.015f;
+        [Range(0, 1)] public float drinkChance = 0.06f;
         [Range(0, 1)] public float pizzaChance = 0.01f;
 
         [Header("Al limpiar una sala")]

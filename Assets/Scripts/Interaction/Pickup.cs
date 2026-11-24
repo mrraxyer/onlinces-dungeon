@@ -99,8 +99,16 @@ namespace OnLinces
             if (used || NeedsE) return;
             var health = other.GetComponentInParent<PlayerHealth>();
             if (health == null || health.IsDead) return;
-            if (kind is PickupKind.Heart or PickupKind.Pizza && health.Hp >= health.MaxHp) return; // vida llena
+            if (IsUseless(health)) return;
             Apply(health.gameObject);
+        }
+
+        bool IsUseless(PlayerHealth health)
+        {
+            bool hpFull = health.Hp >= health.MaxHp;
+            if (kind == PickupKind.Heart) return hpFull;
+            if (kind == PickupKind.Pizza) { var w = health.GetComponent<PlayerWeapons>(); return hpFull && w.Energy >= w.MaxEnergy; }
+            return false;
         }
 
         /// Aplica el efecto y desaparece (o deja el arma vieja).
@@ -115,7 +123,11 @@ namespace OnLinces
                     HUD.FeedbackCoins(1);
                     break;
                 case PickupKind.Heart: health.Heal(2); break;
-                case PickupKind.Pizza: health.Heal(4); break;
+                case PickupKind.Pizza:
+                    health.Heal(4);
+                    p.GetComponent<PlayerWeapons>().AddEnergy(30);
+                    HUD.Feedback("+30 energía", HUD.Good);
+                    break;
                 case PickupKind.Drink:
                     health.Heal(1);
                     stats.Boost(6f);
@@ -178,10 +190,9 @@ namespace OnLinces
 
         public void Interact(GameObject p)
         {
-            var health = p.GetComponent<PlayerHealth>();
-            if (kind is PickupKind.Heart or PickupKind.Pizza && health.Hp >= health.MaxHp)
+            if (IsUseless(p.GetComponent<PlayerHealth>()))
             {
-                Deny("Ya tienes la vida llena");
+                Deny(kind == PickupKind.Pizza ? "Ya tienes vida y energía llenas" : "Ya tienes la vida llena");
                 return;
             }
             if (price > 0 && !GameManager.Instance.Run.TrySpend(price))

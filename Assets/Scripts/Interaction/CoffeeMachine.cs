@@ -2,11 +2,12 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Cafetera: velocidad temporal y ½ vida.
+    /// Cafetera: velocidad temporal, ½ vida y energía.
     public sealed class CoffeeMachine : MonoBehaviour, IInteractable
     {
         [SerializeField] int price = 2;
         [SerializeField] float boostSeconds = 6f;
+        [SerializeField] int energy = 25;
         [SerializeField] AudioClip buyClip;
         [SerializeField] AudioClip deniedClip;
 
@@ -17,7 +18,7 @@ namespace OnLinces
         public string InfoTitle => "Cafetera";
         public string InfoBody => InfoText.Join(
             "Un café recién hecho.",
-            InfoText.Section("Efecto", $"+velocidad por {boostSeconds:0} s\n+½ vida"));
+            InfoText.Section("Efecto", $"+velocidad por {boostSeconds:0} s\n+½ vida\n+{energy} energía"));
         public bool CanInteract => true;
         public Vector3 Position => transform.position;
 
@@ -32,7 +33,8 @@ namespace OnLinces
             HUD.Feedback($"-${price}", HUD.Bad);
             player.GetComponent<PlayerStats>().Boost(boostSeconds);
             player.GetComponent<PlayerHealth>().Heal(1);
-            HUD.Feedback("+velocidad", HUD.Good);
+            player.GetComponent<PlayerWeapons>().AddEnergy(energy);
+            HUD.Feedback($"+velocidad +{energy} energía", HUD.Good);
             Sfx.Play(buyClip);
         }
     }
