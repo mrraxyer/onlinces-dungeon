@@ -13,6 +13,9 @@ namespace OnLinces
         [SerializeField] string displayName;
         [TextArea] [SerializeField] string description;
         [SerializeField] SpriteRenderer visual;
+        [Tooltip("Sólido; se muestra en la tienda y en ítems/armas")]
+        [SerializeField] GameObject pedestal;
+        [SerializeField] float pedestalLiftPx = 14f;
         [SerializeField] Sprite[] frames;
         [SerializeField] float framesPerSecond = 8f;
         [Tooltip("0 = gratis")]
@@ -23,7 +26,7 @@ namespace OnLinces
         [SerializeField] AudioClip takeClip;
         [SerializeField] AudioClip deniedClip;
 
-        float t, baseY;
+        float t, baseY, groundY;
         Vector2 popVelPx;
         bool used;
         Transform player;
@@ -34,7 +37,7 @@ namespace OnLinces
         void Awake()
         {
             t = Random.value * 3f;
-            if (visual) baseY = visual.transform.localPosition.y;
+            if (visual) groundY = baseY = visual.transform.localPosition.y;
         }
 
         void OnEnable() => Interactables.All.Add(this);
@@ -55,7 +58,9 @@ namespace OnLinces
 
         void RefreshVisual()
         {
+            if (pedestal) pedestal.SetActive(NeedsE);
             if (visual == null) return;
+            baseY = groundY + (pedestal && NeedsE ? Units.Px(pedestalLiftPx) : 0f);
             if (kind == PickupKind.Item && item) visual.sprite = item.icon;
             if (kind == PickupKind.Weapon && weapon) visual.sprite = weapon.icon;
             if (priceLabel)

@@ -19,7 +19,7 @@ public static class UiLayout
     static readonly Vector2 MinimapCorner = new(-66f, -8f);
     static readonly Vector2 FeedbackCorner = new(-66f, -8f);
     static readonly Vector2 FeedbackCornerWithMinimap = new(-104f, -8f);
-    static readonly Vector2 ToastBottom = new(-55f, 12f); // hueco entre palancas
+    static readonly Vector2 ToastBottom = new(0f, 12f);
     static readonly Vector2 WeaponTopLeft = new(8f, -116f); // bajo la habilidad
     static readonly Color TapColor = new(1f, 0.86f, 0.5f);
 

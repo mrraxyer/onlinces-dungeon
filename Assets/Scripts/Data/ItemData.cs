@@ -8,7 +8,7 @@ namespace OnLinces
     [CreateAssetMenu(menuName = "OnLinces/Item", fileName = "Item")]
     public sealed class ItemData : ScriptableObject
     {
-        public string displayName = "Café de las 3 a.m.";
+        public string displayName = "Café madrugador";
         [TextArea] public string description = "+velocidad  +cadencia";
         public Sprite icon;
         public ItemEffect effect;
