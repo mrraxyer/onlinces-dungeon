@@ -83,8 +83,8 @@ namespace OnLinces
             shootAnim -= Time.deltaTime;
             noEnergyWarn -= Time.deltaTime;
 
-            // sin energía para disparar: recarga lenta para no quedarse atorado
-            if (Energy == 0 || (Current != null && Energy < Current.energyCost))
+            // recarga lenta mientras no esté al máximo
+            if (Energy < maxEnergy)
             {
                 regenTimer += Time.deltaTime;
                 if (regenTimer >= EmptyRegenSeconds) { regenTimer -= EmptyRegenSeconds; AddEnergy(1); }
