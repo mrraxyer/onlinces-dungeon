@@ -21,6 +21,8 @@ namespace OnLinces
         [Header("Fogonazo")]
         [SerializeField] SpriteRenderer muzzle;
         [SerializeField] Sprite[] muzzleFrames;
+        [SerializeField] UnityEngine.Rendering.Universal.Light2D muzzleLight;
+        [SerializeField] float muzzleLightIntensity = 1.6f;
 
         [Header("Disparo")]
         [SerializeField] Projectile projectilePrefab;
@@ -101,6 +103,13 @@ namespace OnLinces
             hand.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(aim.y, aim.x) * Mathf.Rad2Deg);
             weaponRenderer.flipY = aim.x < 0;
             weaponRenderer.sortingOrder = aim.y > 0.3f ? -1 : 3; // detrás del cuerpo al apuntar arriba
+
+            if (muzzleLight)
+            {
+                // destello que se apaga junto con el disparo
+                muzzleLight.enabled = shootAnim > 0f;
+                muzzleLight.intensity = Mathf.Clamp01(shootAnim / ShootAnimTime) * muzzleLightIntensity;
+            }
 
             if (muzzle != null)
             {

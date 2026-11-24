@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace OnLinces
 {
@@ -9,10 +10,16 @@ namespace OnLinces
         [SerializeField] float enemyDamage = 6f;
         [SerializeField] int playerDamage = 1;
         [SerializeField] AudioClip clip;
+        [Tooltip("Destello que se desvanece")]
+        [SerializeField] Light2D flash;
+        [SerializeField] float flashSeconds = 0.35f;
+
+        float flashStart, t;
 
         void Start()
         {
             Sfx.Play(clip);
+            if (flash) flashStart = flash.intensity;
             float r = Units.Px(radiusPx);
             var hit = new System.Collections.Generic.HashSet<IHittable>(); // un golpe por objetivo
             foreach (var col in Physics2D.OverlapCircleAll(transform.position, r))
@@ -23,6 +30,14 @@ namespace OnLinces
                 var player = col.GetComponentInParent<PlayerHealth>();
                 if (player != null && playerDamage > 0) player.Hurt(playerDamage, transform.position);
             }
+        }
+
+        void Update()
+        {
+            if (!flash) return;
+            t += Time.deltaTime;
+            flash.intensity = flashStart * Mathf.Clamp01(1f - t / flashSeconds);
+            flash.enabled = flash.intensity > 0f;
         }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace OnLinces
 {
@@ -11,6 +12,10 @@ namespace OnLinces
         [SerializeField] LayerMask destroyOn;
         [Tooltip("Sin luz: brilla en el apagón")]
         [SerializeField] Material enemyMaterial;
+        [Tooltip("Luz pequeña que viaja con la bala")]
+        [SerializeField] Light2D glow;
+        [SerializeField] Color playerGlow = new(1f, 0.85f, 0.45f);
+        [SerializeField] Color enemyGlow = new(1f, 0.3f, 0.45f);
 
         public float Damage { get; private set; }
         public bool FromPlayer { get; private set; }
@@ -38,6 +43,7 @@ namespace OnLinces
             Damage = damage;
             life = lifeSeconds;
             FromPlayer = fromPlayer;
+            if (glow) glow.color = fromPlayer ? playerGlow : enemyGlow;
         }
 
         void Update()
