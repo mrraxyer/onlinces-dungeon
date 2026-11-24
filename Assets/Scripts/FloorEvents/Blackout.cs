@@ -3,7 +3,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace OnLinces
 {
-    /// Apagón: solo se ve alrededor del jugador. Corre durante peleas.
+    /// Apagón: solo se ve (nítido) alrededor del jugador. Corre durante peleas.
     public sealed class Blackout : MonoBehaviour
     {
         [SerializeField] Light2D globalLight;
@@ -14,6 +14,15 @@ namespace OnLinces
         [SerializeField] float activeSeconds = 7f;
         [Range(0, 1)] [SerializeField] float darkIntensity = 0.06f;
         [SerializeField] AudioClip warnClip;
+        [Tooltip("Full Screen Pass del Renderer2D que desenfoca fuera de la luz")]
+        [SerializeField] ScriptableRendererFeature blurFeature;
+        [Tooltip("Radio del desenfoque, en alturas de pantalla")]
+        [SerializeField] float blurSize = 0.02f;
+
+        static readonly int CenterId = Shader.PropertyToID("_BlackoutCenter");
+        static readonly int RadiiId = Shader.PropertyToID("_BlackoutRadii");
+        static readonly int BlurId = Shader.PropertyToID("_BlackoutBlur");
+        static readonly int BlurSizeId = Shader.PropertyToID("_BlurSize");
 
         enum State { Calm, Warn, Active }
         State state;
@@ -29,6 +38,23 @@ namespace OnLinces
             bossRoom = FindAnyObjectByType<BossRoom>();
             t = calmSeconds * 0.5f; // el primero llega antes
             if (playerLight) playerLight.enabled = false;
+            SetBlur(0f);
+        }
+
+        // el feature vive en un asset: apagarlo al salir para no dejarlo prendido
+        void OnDisable() => SetBlur(0f);
+
+        void SetBlur(float amount)
+        {
+            if (blurFeature) blurFeature.SetActive(amount > 0.01f);
+            Shader.SetGlobalFloat(BlurId, amount);
+            if (amount <= 0.01f || !playerLight) return;
+            var cam = Camera.main;
+            if (!cam) return;
+            float h = cam.orthographicSize * 2f;
+            Shader.SetGlobalVector(CenterId, cam.WorldToViewportPoint(playerLight.transform.position));
+            Shader.SetGlobalVector(RadiiId, new Vector4(playerLight.pointLightInnerRadius / h, playerLight.pointLightOuterRadius / h));
+            Shader.SetGlobalFloat(BlurSizeId, blurSize);
         }
 
         bool Fighting()
@@ -77,6 +103,7 @@ namespace OnLinces
                 playerLight.enabled = dark > 0.01f;
                 playerLight.intensity = dark * 1.2f;
             }
+            SetBlur(dark);
         }
     }
 }
