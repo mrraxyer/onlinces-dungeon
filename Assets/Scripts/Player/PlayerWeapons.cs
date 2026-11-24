@@ -35,7 +35,9 @@ namespace OnLinces
         const float DoubleAngle = 0.12f; // radianes
 
         int current;
-        float cooldown, cooldown2, shootAnim, noEnergyWarn;
+        const float EmptyRegenSeconds = 2f;
+
+        float cooldown, cooldown2, shootAnim, noEnergyWarn, regenTimer;
         PlayerStats stats;
         PlayerSkill skill;
 
@@ -80,6 +82,14 @@ namespace OnLinces
             cooldown2 -= Time.deltaTime;
             shootAnim -= Time.deltaTime;
             noEnergyWarn -= Time.deltaTime;
+
+            // sin energía para disparar: recarga lenta para no quedarse atorado
+            if (Energy == 0 || (Current != null && Energy < Current.energyCost))
+            {
+                regenTimer += Time.deltaTime;
+                if (regenTimer >= EmptyRegenSeconds) { regenTimer -= EmptyRegenSeconds; AddEnergy(1); }
+            }
+            else regenTimer = 0f;
 
             if (controller.SwitchWeaponPressed && slots.Count > 1)
             {
