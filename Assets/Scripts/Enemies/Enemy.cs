@@ -17,6 +17,8 @@ namespace OnLinces
         public struct FrameSet { public Sprite[] frames; }
 
         [SerializeField] EnemyKind kind = EnemyKind.Bug;
+        [Tooltip("Campo de tiro: no se mueve, no daña y reaparece al morir")]
+        [SerializeField] bool dummy;
 
         [Header("Arte")]
         [SerializeField] SpriteRenderer spriteRenderer;
@@ -58,12 +60,13 @@ namespace OnLinces
         const int MaxCopies = 7;
         Rigidbody2D rb;
         PlayerHealth player;
-        float hp, speedPx, t, spawnT = SpawnTime, shootT = 1.6f, flash, seed, cloneT;
+        float hp, fullHp, speedPx, t, spawnT = SpawnTime, shootT = 1.6f, flash, seed, cloneT;
         Vector2 knockPx;
         bool dying;
         int floorNum, generation;
         float? presetHp;
         Sprite[] activeFrames;
+        Vector2 home;
 
         void Awake()
         {
@@ -76,6 +79,8 @@ namespace OnLinces
         {
             floorNum = GameManager.Instance.Run.Floor;
             hp = presetHp ?? (baseHp + hpPerFloor * floorNum) * DifficultyInfo.EnemyHp(GameManager.Instance.Run.Difficulty);
+            fullHp = hp;
+            home = transform.position;
             speedPx = baseSpeedPx + speedPerFloorPx * floorNum;
             player = FindAnyObjectByType<PlayerHealth>();
             int i = floorNum - 1;
@@ -105,6 +110,13 @@ namespace OnLinces
             {
                 spawnT -= dt;
                 rb.linearVelocity = knockPx / Units.PPU;
+                knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 700f * dt);
+                return;
+            }
+            if (dummy)
+            {
+                // solo retrocede por el golpe y vuelve a su lugar
+                rb.linearVelocity = knockPx / Units.PPU + (home - rb.position) * 6f;
                 knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 700f * dt);
                 return;
             }
@@ -200,6 +212,17 @@ namespace OnLinces
             dying = true;
             Sfx.Play(dieClip, 0.7f);
             if (deathFx != null) Instantiate(deathFx, transform.position + Vector3.up * Units.Px(10), Quaternion.identity);
+
+            if (dummy)
+            {
+                // reaparece en su lugar
+                dying = false;
+                hp = fullHp;
+                knockPx = Vector2.zero;
+                rb.position = home;
+                spawnT = SpawnTime;
+                return;
+            }
 
             if (splitInto != null)
             {

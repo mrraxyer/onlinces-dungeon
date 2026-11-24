@@ -2,10 +2,13 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Portal del Lobby al Piso 1.
+    /// Portal del Lobby al Piso 1, o a otra escena (campo de tiro y regreso).
     public sealed class CodePortal : MonoBehaviour, IInteractable
     {
         [SerializeField] string destination = "Piso 1: Oficina";
+        [Tooltip("Vacío = calabozo. \"Lobby\" reinicia la partida (armas de prueba fuera)")]
+        [SerializeField] string sceneName;
+        [SerializeField] string title = "Portal de código";
         [SerializeField] AudioClip enterClip;
         bool used;
 
@@ -13,11 +16,12 @@ namespace OnLinces
         void OnDisable() => Interactables.All.Remove(this);
 
         public string Prompt => "Entrar al portal";
-        public string InfoTitle => "Portal de código";
+        public string InfoTitle => title;
         public string InfoBody
         {
             get
             {
+                if (!string.IsNullOrEmpty(sceneName)) return InfoText.Section("Destino", destination);
                 var run = GameManager.Instance.Run;
                 var role = run.Role ? run.Role.displayName : "Miembro";
                 return InfoText.Join(
@@ -33,7 +37,9 @@ namespace OnLinces
         {
             used = true;
             Sfx.Play(enterClip);
-            SceneFlow.EnterDungeon();
+            if (string.IsNullOrEmpty(sceneName)) SceneFlow.EnterDungeon();
+            else if (sceneName == SceneFlow.Lobby) SceneFlow.BackToLobby();
+            else UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace OnLinces
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics() { Current = null; tapRequested = false; }
 
-        IInteractable current;
+        IInteractable current, shownTarget;
         string shownPrompt;
 
         void OnEnable() { if (interact) interact.action.Enable(); }
@@ -38,17 +38,19 @@ namespace OnLinces
             current = best;
             Current = current;
 
-            var prompt = current != null ? (TouchControls.Active ? "<b>USAR:</b> " : "E: ") + current.Prompt : "";
-            if (prompt != shownPrompt)
+            // sin Prompt (carteles): solo el diálogo, sin botón
+            var prompt = current != null && !string.IsNullOrEmpty(current.Prompt) ? (TouchControls.Active ? "<b>USAR:</b> " : "E: ") + current.Prompt : "";
+            if (prompt != shownPrompt || current != shownTarget)
             {
                 shownPrompt = prompt;
+                shownTarget = current;
                 HUD.SetPrompt(prompt);
                 HUD.SetInfo(current?.InfoTitle, current?.InfoBody);
             }
 
             bool tapped = tapRequested && Time.timeScale > 0f; // en pausa no cuenta
             tapRequested = false;
-            if (current != null && (interact.action.WasPressedThisFrame() || tapped))
+            if (current != null && !string.IsNullOrEmpty(current.Prompt) && (interact.action.WasPressedThisFrame() || tapped))
             {
                 current.Interact(gameObject);
                 // puede haberse destruido; Destroy ocurre antes de LateUpdate (InteractionDialog)
@@ -64,6 +66,7 @@ namespace OnLinces
             HUD.SetPrompt("");
             HUD.SetInfo(null, null);
             shownPrompt = null;
+            shownTarget = null;
         }
     }
 }
