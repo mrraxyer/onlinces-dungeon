@@ -67,6 +67,7 @@ namespace OnLinces
         {
             var w = Instantiate(loot.weaponPickup, pos, Quaternion.identity);
             w.SetWeapon(loot.RandomWeapon());
+            w.NoPedestal();
         }
     }
 }

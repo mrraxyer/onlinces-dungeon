@@ -28,7 +28,7 @@ namespace OnLinces
 
         float t, baseY, groundY;
         Vector2 popVelPx;
-        bool used;
+        bool used, noPedestal;
         Transform player;
 
         public int Price => price;
@@ -53,14 +53,17 @@ namespace OnLinces
         public void SetItem(ItemData data) { item = data; RefreshVisual(); }
         public void SetWeapon(WeaponData data) { weapon = data; RefreshVisual(); }
         public void SetPrice(int p) { price = p; RefreshVisual(); }
+        /// Lo que suelta un cofre queda en el suelo.
+        public void NoPedestal() { noPedestal = true; RefreshVisual(); }
         /// Salta un poco al aparecer.
         public void Pop() => popVelPx = Random.insideUnitCircle.normalized * Random.Range(40f, 90f);
 
         void RefreshVisual()
         {
-            if (pedestal) pedestal.SetActive(NeedsE);
+            bool onPedestal = pedestal && NeedsE && !noPedestal;
+            if (pedestal) pedestal.SetActive(onPedestal);
             if (visual == null) return;
-            baseY = groundY + (pedestal && NeedsE ? Units.Px(pedestalLiftPx) : 0f);
+            baseY = groundY + (onPedestal ? Units.Px(pedestalLiftPx) : 0f);
             if (kind == PickupKind.Item && item) visual.sprite = item.icon;
             if (kind == PickupKind.Weapon && weapon) visual.sprite = weapon.icon;
             if (priceLabel)
