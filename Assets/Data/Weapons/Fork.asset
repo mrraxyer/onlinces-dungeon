@@ -22,7 +22,8 @@ MonoBehaviour:
   damage: 1.1
   fireDelay: 0.13
   projectileSpeedPx: 280
-  spreadDegrees: 24
+  spreadDegrees: 20
   count: 2
   range: 0.8
   energyCost: 2
+  pierce: 0
