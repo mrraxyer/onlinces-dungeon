@@ -106,7 +106,8 @@ namespace OnLinces
             Hp = Mathf.Max(0, Hp - amount);
             HUD.Feedback("-" + HalfHearts(lost) + " vida", HUD.Bad);
             Changed?.Invoke();
-            if (Hp == 0) StartCoroutine(Die());
+            if (Hp == 0 && BossRoom.TryRescue(this)) Sfx.Play(hurtClip);
+            else if (Hp == 0) StartCoroutine(Die());
             else Sfx.Play(hurtClip);
         }
 

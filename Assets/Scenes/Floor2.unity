@@ -26724,8 +26724,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.BossRoom
   bosses:
-  - {fileID: 1344860420717132654, guid: 102b102f4932c0d409beb9d58663afaf, type: 3}
-  - {fileID: 7957773091316047191, guid: dd8e0db11052179408cbdc2d6d2afce8, type: 3}
+  - {fileID: 7957773091316047191, guid: c88ff36d5a6351d4ab1b36d1d3db1de1, type: 3}
   bossSpawn: {fileID: 7581976857632551416}
   doors:
   - {fileID: 3853968880851828447}
@@ -26738,6 +26737,7 @@ MonoBehaviour:
   bossMusic: {fileID: 8300000, guid: a9753c51834091242a3115bc8c7fca63, type: 3}
   floorMusic: {fileID: 8300000, guid: 37e4b5ae82e6c554e87e7b3178bf14ba, type: 3}
   maxMinions: 3
+  practice: 0
 --- !u!4 &3096744989126933322
 Transform:
   m_ObjectHideFlags: 0

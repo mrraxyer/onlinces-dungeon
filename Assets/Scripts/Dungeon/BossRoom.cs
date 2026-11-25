@@ -20,9 +20,16 @@ namespace OnLinces
         [SerializeField] AudioClip bossMusic;
         [SerializeField] AudioClip floorMusic;
         [SerializeField] int maxMinions = 3;
+        [Tooltip("Campo de tiro: el jefe lo elige una terminal y perder no termina la partida")]
+        [SerializeField] bool practice;
 
         BoxCollider2D area;
         bool started, done;
+        Boss current;
+        static BossRoom practiceFight;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() => practiceFight = null;
         readonly List<Enemy> minions = new();
 
         public Vector2 Center => area.bounds.center;
@@ -44,18 +51,26 @@ namespace OnLinces
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            if (started) return;
+            if (started || practice) return;
             var ph = other.GetComponentInParent<PlayerHealth>();
             if (ph == null || ph.gameObject.scene != gameObject.scene) return;
+            StartFight(bosses[Random.Range(0, bosses.Length)]);
+        }
+
+        public bool CanStartPractice => practice && !started;
+
+        public void StartFight(Boss prefab)
+        {
             started = true;
+            done = false;
+            if (practice) practiceFight = this;
             foreach (var d in doors) if (d) d.SetOpen(false);
             Sfx.Play(doorCloseClip);
             Sfx.Play(introClip);
             Music.Play(bossMusic);
-            var prefab = bosses[Random.Range(0, bosses.Length)];
-            var boss = Instantiate(prefab, bossSpawn.position, Quaternion.identity);
-            boss.Init(this);
-            BossBar.Show(boss);
+            current = Instantiate(prefab, bossSpawn.position, Quaternion.identity);
+            current.Init(this);
+            BossBar.Show(current);
         }
 
         public void SpawnMinions(Enemy prefab, int n, Vector2 near)
@@ -83,6 +98,11 @@ namespace OnLinces
             done = true;
             foreach (var m in minions) if (m) m.Kill();
             foreach (var d in doors) if (d) d.SetOpen(true);
+            if (practice)
+            {
+                EndPractice("¡Jefe derrotado!");
+                return;
+            }
             if (portal) portal.SetActive(true);
             SetCrosshair(false, false);
             BossBar.Hide();
@@ -96,6 +116,31 @@ namespace OnLinces
                 loot.Spawn(loot.heart, boss.transform.position);
             }
             FindAnyObjectByType<PlayerHealth>()?.Heal(2);
+        }
+
+        /// Práctica: en vez de morir, se cura y termina la pelea.
+        public static bool TryRescue(PlayerHealth player)
+        {
+            if (practiceFight == null) return false;
+            var room = practiceFight;
+            if (room.current) Destroy(room.current.gameObject);
+            foreach (var m in room.minions) if (m) m.Kill();
+            foreach (var d in room.doors) if (d) d.SetOpen(true);
+            room.EndPractice("Perdiste: inténtalo otra vez");
+            return true;
+        }
+
+        void EndPractice(string toast)
+        {
+            practiceFight = null;
+            started = false;
+            minions.Clear();
+            SetCrosshair(false, false);
+            BossBar.Hide();
+            Sfx.Play(doorOpenClip);
+            Music.Play(floorMusic);
+            HUD.Toast(toast);
+            FindAnyObjectByType<PlayerHealth>()?.Heal(99);
         }
     }
 }

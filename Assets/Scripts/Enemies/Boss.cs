@@ -3,25 +3,25 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    public enum BossKind { Spaghetti, Div }
+    public enum BossKind { Spaghetti, Div, Kernel }
 
-    /// Jefe con 3 fases (66% y 33% de vida).
+    /// Jefe con 3 fases (66% y 33% de vida). Entre fases: 3 s inmune con animación.
     ///  · Spaghetti: espiral, embestida, látigos e invoca bugs.
     ///  · <div>: solo recibe daño centrado; los disparos lo empujan.
+    ///  · Kernel Panic: láser con carga, volcado de memoria, ping y reinicio (se teletransporta).
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class Boss : MonoBehaviour, IHittable
     {
         [SerializeField] BossKind kind;
         public string displayName = "SPAGHETTI CODE";
         public string subtitle = "Sin documentar desde 2009";
-        [SerializeField] float maxHp = 42f;
         [SerializeField] float contactRadiusPx = 30f;
 
         [Header("Arte")]
         [SerializeField] SpriteRenderer spriteRenderer;
         [SerializeField] Sprite[] frames;
         [SerializeField] SpriteFx deathFx;
-        [Tooltip("Solo <div>")]
+        [Tooltip("<div>: CSS; Kernel: mensajes del sistema")]
         [SerializeField] TMP_Text cssLabel;
 
         [Header("Ataques")]
@@ -33,8 +33,17 @@ namespace OnLinces
 
         [Header("Sonidos")]
         [SerializeField] AudioClip hitClip, phaseClip, dashClip, shootClip, dieClip, centeredClip, nopeClip;
+        [Tooltip("Solo Kernel")]
+        [SerializeField] AudioClip laserChargeClip, laserFireClip;
 
-        const float BulletSpeed = 0.8f, Rest = 1.5f;
+        [Header("Cambio de fase")]
+        [Tooltip("Escudo animado mientras es inmune")]
+        [SerializeField] Sprite[] shieldFrames;
+        [SerializeField] AudioClip transitionClip;
+
+        const float BulletSpeed = 0.8f, PhaseTransition = 3f, Windup = 0.4f;
+        // pausa entre ataques: más corta en cada fase
+        float Rest => phase == 1 ? 0.9f : phase == 2 ? 0.75f : 0.6f;
         static readonly (string css, Vector2 dir)[] CssMoves =
         {
             ("justify-content: flex-start", new(-1, 0.6f)), ("justify-content: flex-end", new(1, 0.6f)),
@@ -45,13 +54,18 @@ namespace OnLinces
 
         public float Hp { get; private set; }
         public float MaxHp => maxHp;
-        public bool CanBeHit => intro <= 0f && !dying;
+        public bool CanBeHit => intro <= 0f && !dying && transitionT <= 0f;
+        public int Phase => phase;
+        public int NextPhase => nextPhase;
+        public bool InTransition => transitionT > 0f;
 
         BossRoom room;
         Rigidbody2D rb;
         PlayerHealth player;
-        float t, intro = 1.6f, flash, stateT = 1.2f, subT, spiralA, cssT, nopeT, lockT;
-        int phase = 1, attackI, subN;
+        float maxHp, t, intro = 1.6f, flash, stateT = 1.2f, subT, spiralA, cssT, nopeT, lockT;
+        int phase = 1, nextPhase = 1, attackI, subN;
+        float transitionT, windupT;
+        SpriteRenderer shield;
         string state = "move";
         Vector2 knockPx, dashDir, anchor;
         bool dying, centered;
@@ -60,8 +74,10 @@ namespace OnLinces
         {
             room = r;
             var run = GameManager.Instance.Run;
-            maxHp *= 1.5f; // más aguante en todos los bosses
-            maxHp *= 1f + 0.35f * (run.Floor - 1); // +35% por piso
+            // valores en Assets/Data/Resources/Difficulty.asset
+            var cfg = DifficultySettings.Current;
+            maxHp = cfg.bossHearts * DifficultySettings.HpPerHeart;
+            maxHp *= 1f + cfg.bossHpPerFloor * (run.Floor - 1);
             maxHp *= DifficultyInfo.BossHp(run.Difficulty);
             Hp = maxHp;
             anchor = transform.position;
@@ -71,7 +87,18 @@ namespace OnLinces
         {
             rb = GetComponent<Rigidbody2D>();
             player = FindAnyObjectByType<PlayerHealth>();
-            if (Hp <= 0f) Hp = maxHp;
+            if (shieldFrames is { Length: > 0 })
+            {
+                // burbuja del tamaño del jefe, centrada en el cuerpo
+                shield = new GameObject("Shield").AddComponent<SpriteRenderer>();
+                shield.transform.SetParent(transform, false);
+                var body = spriteRenderer.sprite.bounds;
+                shield.transform.localPosition = spriteRenderer.transform.localPosition + body.center;
+                shield.transform.localScale = Vector3.one * (Mathf.Max(body.size.x, body.size.y) * 1.25f / shieldFrames[0].bounds.size.x);
+                shield.sharedMaterial = spriteRenderer.sharedMaterial;
+                shield.sortingOrder = spriteRenderer.sortingOrder + 2;
+                shield.enabled = false;
+            }
         }
 
         Vector2 Center => room ? room.Center : (Vector2)transform.position;
@@ -80,13 +107,37 @@ namespace OnLinces
         void Update()
         {
             t += Time.deltaTime;
-            if (frames.Length > 0) spriteRenderer.sprite = frames[(int)(t * (phase < 3 ? 6 : 9)) % frames.Length];
+            if (kind == BossKind.Kernel && frames.Length > 1)
+                spriteRenderer.sprite = frames[state == "laser" || (phase == 3 && (int)(t * 4f) % 2 == 0) ? 1 : 0]; // cara roja al cargar
+            else if (frames.Length > 0) spriteRenderer.sprite = frames[(int)(t * (phase < 3 ? 6 : 9)) % frames.Length];
             flash -= Time.deltaTime;
             cssT -= Time.deltaTime;
             Color c = flash > 0f ? new Color(1f, 0.55f, 0.55f) : Color.white;
             if (phase == 3 && flash <= 0f) c = new Color(1f, 0.75f + 0.25f * Mathf.Sin(t * 8f), 0.75f + 0.25f * Mathf.Sin(t * 8f));
             if (kind == BossKind.Div && intro <= 0f && flash <= 0f) c = centered ? new Color(0.75f, 1f, 0.8f) : new Color(1, 1, 1, 0.85f);
             if (intro > 0f) c.a = 1f - intro / 1.6f;
+            if (transitionT > 0f)
+            {
+                // tiembla cada vez más y destella con el color de la fase siguiente
+                float k = 1f - transitionT / PhaseTransition;
+                var lp = spriteRenderer.transform.localPosition;
+                spriteRenderer.transform.localPosition = new Vector3(Mathf.Sin(t * 70f) * Units.Px(1f + 2f * k), lp.y, lp.z);
+                c = Color.Lerp(Color.white, BossBar.PhaseColor(nextPhase), 0.5f + 0.5f * Mathf.Sin(t * (8f + 24f * k)));
+                if (shield)
+                {
+                    shield.enabled = true;
+                    shield.sprite = shieldFrames[(int)(t * 8f) % shieldFrames.Length];
+                    shield.color = new Color(1f, 1f, 1f, 0.55f + 0.3f * Mathf.Sin(t * 12f));
+                }
+            }
+            if (windupT > 0f)
+            {
+                // aviso de ataque: se infla y brilla con el color de la fase
+                windupT -= Time.deltaTime;
+                float k = Mathf.Sin(Mathf.Clamp01(windupT / Windup) * Mathf.PI);
+                spriteRenderer.transform.localScale = Vector3.one * (1f + 0.22f * k);
+                c = Color.Lerp(c, BossBar.PhaseColor(phase), 0.8f * k);
+            }
             spriteRenderer.color = c;
             if (cssLabel) cssLabel.alpha = Mathf.Clamp01(cssT / 0.4f);
             if (room) room.SetCrosshair(kind == BossKind.Div && !dying, centered);
@@ -99,24 +150,55 @@ namespace OnLinces
             if (intro > 0f) { intro -= dt; rb.linearVelocity = Vector2.zero; return; }
             if (player == null || player.IsDead) { rb.linearVelocity = Vector2.zero; return; }
 
-            int newPhase = Hp > maxHp * 0.66f ? 1 : Hp > maxHp * 0.33f ? 2 : 3;
-            if (newPhase != phase)
+            if (transitionT > 0f)
             {
-                if (kind == BossKind.Div) Uncenter();
-                phase = newPhase;
-                Sfx.Play(phaseClip);
-                HUD.Toast("FASE " + phase);
-                FindAnyObjectByType<Blackout>()?.TriggerNow();
-                state = "move";
-                stateT = 0.8f * Rest;
+                transitionT -= dt;
+                rb.linearVelocity = Vector2.zero;
+                if (transitionT <= 0f) EnterPhase();
+                return;
             }
 
-            Vector2 velPx = kind == BossKind.Spaghetti ? Spaghetti(dt) : Div(dt);
+            int newPhase = Hp > maxHp * 0.66f ? 1 : Hp > maxHp * 0.33f ? 2 : 3;
+            if (newPhase > phase)
+            {
+                nextPhase = newPhase;
+                transitionT = PhaseTransition;
+                knockPx = Vector2.zero;
+                if (centered) { centered = false; lockT = 1.6f; } // <div> deja de estar centrado sin disparar
+                Css("", 0f);
+                Sfx.Play(transitionClip);
+                rb.linearVelocity = Vector2.zero;
+                return;
+            }
+
+            Vector2 velPx = kind switch { BossKind.Spaghetti => Spaghetti(dt), BossKind.Div => Div(dt), _ => Kernel(dt) };
             rb.linearVelocity = (velPx + knockPx) / Units.PPU;
             knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 300f * dt);
 
             if (Vector2.Distance(player.transform.position, transform.position) < Units.Px(contactRadiusPx))
                 player.Hurt(1, transform.position);
+        }
+
+        /// Aviso visible de que empieza un ataque (texto opcional sobre el jefe).
+        void Announce(string text)
+        {
+            windupT = Windup;
+            if (text != null) Css(text, 1.6f);
+        }
+
+        // la fase nueva se anuncia al terminar la animación
+        void EnterPhase()
+        {
+            phase = nextPhase;
+            var lp = spriteRenderer.transform.localPosition;
+            spriteRenderer.transform.localPosition = new Vector3(0f, lp.y, lp.z);
+            if (shield) shield.enabled = false;
+            Sfx.Play(phaseClip);
+            HUD.Toast("FASE " + phase);
+            FindAnyObjectByType<Blackout>()?.TriggerNow();
+            Ring(8 + phase * 2, 90f); // onda al despertar
+            state = "move";
+            stateT = 0.8f * Rest;
         }
 
         // ---------------- Spaghetti Code ----------------
@@ -133,6 +215,13 @@ namespace OnLinces
                         string[] attacks = phase >= 2 ? new[] { "spiral", "dash", "whips", "summon" } : new[] { "spiral", "dash", "whips" };
                         state = attacks[attackI++ % attacks.Length];
                         stateT = 2.2f; subT = 0f; subN = 0;
+                        Announce(state switch
+                        {
+                            "spiral" => "while (true) disparar();",
+                            "dash" => "goto jugador;",
+                            "whips" => "callback(callback(callback()))",
+                            _ => "import bugs",
+                        });
                         if (state == "dash") { state = "dash_aim"; stateT = 0.9f; }
                     }
                     return to.normalized * 28f * spd;
@@ -228,6 +317,7 @@ namespace OnLinces
                     {
                         string[] attacks = phase >= 2 ? new[] { "float", "flex", "margin", "zindex", "span" } : new[] { "float", "flex", "margin", "zindex" };
                         state = attacks[attackI++ % attacks.Length];
+                        Announce(null);
                         stateT = 1.8f; subT = 0f; subN = 0;
                         var mv = CssMoves[Random.Range(0, CssMoves.Length)];
                         anchor = AnchorFor(mv.dir);
@@ -296,6 +386,91 @@ namespace OnLinces
             return velPx;
         }
 
+        // ---------------- Kernel Panic ----------------
+        Vector2 Kernel(float dt)
+        {
+            stateT -= dt; subT -= dt;
+            Vector2 to = (Vector2)(player.transform.position - transform.position);
+            Vector2 eyes = (Vector2)transform.position + Vector2.up * Units.Px(46);
+            switch (state)
+            {
+                case "move":
+                    if (stateT <= 0f)
+                    {
+                        string[] attacks = phase >= 2 ? new[] { "laser", "dump", "ping", "reboot", "fork" } : new[] { "laser", "dump", "ping" };
+                        state = attacks[attackI++ % attacks.Length];
+                        Announce(null);
+                        stateT = 2f; subT = 0f; subN = 0;
+                    }
+                    // se arrastra despacio hacia el jugador
+                    return to.normalized * (14f + phase * 4f);
+                case "laser":
+                    if (subN == 0)
+                    {
+                        subN = 1;
+                        subT = 1.25f; // aviso de Telegraph (0.95 + 0.3)
+                        Sfx.Play(laserChargeClip, 0.8f);
+                        Css("kernel: panic - not syncing", 2f);
+                        int n = phase < 2 ? 1 : 3;
+                        float spread = phase < 3 ? 0.35f : 0.5f;
+                        for (int i = 0; i < n; i++)
+                        {
+                            var d = Rotate(to.normalized, (i - (n - 1) / 2f) * spread);
+                            Telegraph.Beam(telegraphPrefab, eyes, eyes + d * Units.Px(400), 0.95f, 0.35f, 7f, new Color(1f, 0.3f, 0.4f));
+                        }
+                    }
+                    if (subN == 1 && subT <= 0f) { subN = 2; Sfx.Play(laserFireClip); }
+                    if (stateT <= 0f) { state = "move"; stateT = 1f * Rest; }
+                    return Vector2.zero;
+                case "dump":
+                    if (subT <= 0f && subN < 3)
+                    {
+                        subT = 0.4f; subN++;
+                        Ring(phase < 3 ? 10 : 14, 80f, subN * 0.2f);
+                        Css("Segmentation fault (core dumped)", 1.5f);
+                    }
+                    if (stateT <= 0f) { state = "move"; stateT = 1f * Rest; }
+                    return Vector2.zero;
+                case "ping":
+                    if (subT <= 0f && subN < 3 + phase)
+                    {
+                        subT = 0.3f; subN++;
+                        Fire(to.normalized, 135f);
+                        Css("ping -c " + (3 + phase) + " 127.0.0.1", 1.2f);
+                    }
+                    if (stateT <= 0f) { state = "move"; stateT = 0.9f * Rest; }
+                    return to.normalized * 10f;
+                case "reboot":
+                    if (subN == 0)
+                    {
+                        subN = 1;
+                        Css("sudo reboot now", 1.5f);
+                        Sfx.Play(dashClip);
+                        var r = room ? room.PlayRect : new Rect((Vector2)transform.position - Vector2.one * 3f, Vector2.one * 6f);
+                        // lejos del jugador
+                        for (int i = 0; i < 8; i++)
+                        {
+                            var p = new Vector2(Random.Range(r.xMin + 1.5f, r.xMax - 1.5f), Random.Range(r.yMin + 1f, r.yMax - 2.5f));
+                            if (Vector2.Distance(p, player.transform.position) > 3f || i == 7) { rb.position = p; break; }
+                        }
+                        intro = 0.6f; // reaparece con fundido, sin recibir daño
+                    }
+                    if (subN == 1 && stateT <= 1.2f) { subN = 2; Ring(8 + phase * 2, 90f); }
+                    if (stateT <= 0.6f) { state = "move"; stateT = 0.8f * Rest; }
+                    return Vector2.zero;
+                case "fork":
+                    if (subN == 0)
+                    {
+                        subN = 1;
+                        if (room) room.SpawnMinions(minionPrefab, phase < 3 ? 1 : 2, transform.position);
+                        Css("fork() bomb", 1.5f);
+                    }
+                    if (stateT <= 1f) { state = "move"; stateT = 1f * Rest; }
+                    return Vector2.zero;
+            }
+            return Vector2.zero;
+        }
+
         Vector2 AnchorFor(Vector2 dir)
         {
             var r = room.PlayRect;
@@ -355,7 +530,10 @@ namespace OnLinces
                 return;
             }
             if (kind == BossKind.Div) damage *= 1.25f;
-            Hp -= damage;
+            // no se puede saltar una fase: el daño se corta en el umbral (66% / 33%)
+            // (un poco abajo del umbral: con el valor exacto, la comparación de fase puede fallar por redondeo)
+            float floorHp = phase == 1 ? maxHp * 0.66f - 0.01f : phase == 2 ? maxHp * 0.33f - 0.01f : 0f;
+            Hp = Mathf.Max(floorHp, Hp - damage);
             flash = 0.06f;
             Sfx.Play(hitClip, 0.5f);
             if (Hp <= 0f) Die();
