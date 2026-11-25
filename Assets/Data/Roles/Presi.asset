@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Presi
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.RoleData
   displayName: Presidente
-  person: "Mart\xEDn"
   description: "Dirige al club: aguanta m\xE1s (+1 coraz\xF3n) y corre r\xE1pido."
   icon: {fileID: -1704342749, guid: 7e073bdf7896f9b46ac1fab6ce02c9cf, type: 3}
   onSkin: {fileID: 11400000, guid: a2feddf4644650044bdec22f36048407, type: 2}

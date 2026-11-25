@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Miembro
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.RoleData
   displayName: Miembro
-  person: 
   description: Integrante del club. Un poco de todo.
   icon: {fileID: -1732067743, guid: 7e073bdf7896f9b46ac1fab6ce02c9cf, type: 3}
   onSkin: {fileID: 11400000, guid: a3bd1b773df193f49b484e2a8efcb424, type: 2}

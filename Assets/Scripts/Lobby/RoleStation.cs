@@ -14,7 +14,7 @@ namespace OnLinces
         bool IsMine => GameManager.Instance.Run.Role == role;
 
         public string Prompt => IsMine ? $"Ya tienes el puesto de {role.displayName}" : $"Tomar el puesto: {role.displayName}";
-        public string InfoTitle => string.IsNullOrEmpty(role.person) ? role.displayName : $"{role.person} — {role.displayName}";
+        public string InfoTitle => role.displayName;
         public string InfoBody => InfoText.Join(
             role.description,
             InfoText.Section("Habilidad",

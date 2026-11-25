@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Vice
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.RoleData
   displayName: Vicepresidente
-  person: Rafa
   description: "Siempre listo para suplir: aguanta y no se rinde (+1 coraz\xF3n)."
   icon: {fileID: -1732067743, guid: 7e073bdf7896f9b46ac1fab6ce02c9cf, type: 3}
   onSkin: {fileID: 11400000, guid: 163dc2657b2be664cb0580ec19476084, type: 2}

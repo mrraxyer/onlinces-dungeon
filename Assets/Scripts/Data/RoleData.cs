@@ -10,8 +10,6 @@ namespace OnLinces
     {
         [Header("Puesto")]
         public string displayName = "Miembro";
-        [Tooltip("Quién lo tiene")]
-        public string person;
         [TextArea] public string description;
         public Sprite icon;
 

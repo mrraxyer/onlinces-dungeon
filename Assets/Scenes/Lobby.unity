@@ -2809,7 +2809,7 @@ GameObject:
   - component: {fileID: 491800365}
   - component: {fileID: 491800364}
   m_Layer: 0
-  m_Name: Martin
+  m_Name: Presidente
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7055,7 +7055,7 @@ GameObject:
   - component: {fileID: 1323035575}
   - component: {fileID: 1323035574}
   m_Layer: 0
-  m_Name: Lemus
+  m_Name: LiderCiberseguridad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11790,7 +11790,7 @@ GameObject:
   - component: {fileID: 1680669685}
   - component: {fileID: 1680669684}
   m_Layer: 0
-  m_Name: Rafa
+  m_Name: Vicepresidente
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
