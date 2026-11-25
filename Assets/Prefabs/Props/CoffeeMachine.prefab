@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 1718700317230849506}
   - component: {fileID: 4075090141811487213}
   - component: {fileID: 7900928756596795084}
-  - component: {fileID: 3065405797603985883}
+  - component: {fileID: 2374697008247825119}
   m_Layer: 0
   m_Name: CoffeeMachine
   m_TagString: Untagged
@@ -163,7 +163,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.2}
+  m_Offset: {x: 0, y: 0.6375}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -173,7 +173,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.8, y: 0.4}
+  m_Size: {x: 0.8, y: 1.275}
   m_EdgeRadius: 0
 --- !u!114 &7900928756596795084
 MonoBehaviour:
@@ -192,7 +192,7 @@ MonoBehaviour:
   energy: 25
   buyClip: {fileID: 8300000, guid: 201f599a0d6d96f4288660a50b0842ba, type: 3}
   deniedClip: {fileID: 8300000, guid: 6f2d2eede49c3e34395624286b1e5b85, type: 3}
---- !u!114 &3065405797603985883
+--- !u!114 &2374697008247825119
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -222,24 +222,24 @@ MonoBehaviour:
   m_InstanceId: 0
   m_ShadowShape2DComponent: {fileID: 4075090141811487213}
   m_ShadowShape2DProvider:
-    rid: 2390524585586458746
+    rid: 2390524585586458918
   m_ShadowCastingSource: 2
   m_ShadowMesh:
-    rid: 2390524585586458744
+    rid: 2390524585586458916
   m_CastingOption: 1
   m_PreviousTrimEdge: 0
-  m_PreviousEdgeProcessing: -1
-  m_PreviousShadowCastingSource: -1
+  m_PreviousEdgeProcessing: 0
+  m_PreviousShadowCastingSource: 0
   m_PreviousShadowShape2DSource: {fileID: 0}
   m_PreviousShadowShape2DProviderHash: 0
   m_SelectionSources:
-    rid: 2390524585586458745
+    rid: 2390524585586458917
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 2390524585586458744
+    - rid: 2390524585586458916
       type: {class: ShadowMesh2D, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
       data:
         m_Vertices: []
@@ -253,7 +253,7 @@ MonoBehaviour:
         m_FlipX: 0
         m_FlipY: 0
         m_InitialTrim: 0
-    - rid: 2390524585586458745
+    - rid: 2390524585586458917
       type: {class: Shadow2DProviderSources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
       data:
         m_SelectedHashCode: 0
@@ -261,7 +261,7 @@ MonoBehaviour:
           rid: -2
         m_Provider2DCache:
           rid: -2
-    - rid: 2390524585586458746
+    - rid: 2390524585586458918
       type: {class: ShadowShape2DProvider_Collider2D, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
       data: 
 --- !u!1 &1335365564916442107
