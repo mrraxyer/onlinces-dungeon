@@ -167,6 +167,7 @@ namespace OnLinces
 
                 var p = Instantiate(projectilePrefab, origin, Quaternion.identity);
                 p.Launch(sprite, dir * Units.Px(w.projectileSpeedPx), damage, w.range, fromPlayer: true);
+                if (w.pierce > 0) p.SetPierce(w.pierce, 1f);
             }
 
             if (audioSource != null)
