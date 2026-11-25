@@ -29,6 +29,8 @@ namespace OnLinces
         [Header("Botones")]
         [SerializeField] Button onButton;
         [SerializeField] Button offButton;
+        [Tooltip("Al cambiar de mascota")]
+        [SerializeField] AudioClip moveClip;
 
         [Header("Medidas (unidades del mundo)")]
         [SerializeField] float logoBob = 3f / 32f;
@@ -68,7 +70,9 @@ namespace OnLinces
             logo.position = logoBase + new Vector3(0f, y, 0f);
             Place(subtitle.rectTransform, logoBase + Vector3.down * subtitleBelowLogo);
 
+            var before = selected;
             UpdateSelection();
+            if (selected != before) Sfx.Play(moveClip, 0.6f);
             Label(onLabel, Mascot.On, onCharacter, OnColor);
             Label(offLabel, Mascot.Off, offCharacter, OffColor);
 

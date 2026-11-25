@@ -9,6 +9,8 @@ namespace OnLinces
         [SerializeField] FloorData data;
         [Tooltip("De la entrada a la salida")]
         [SerializeField] RoomShell[] rooms;
+        [Tooltip("Al llegar por el portal")]
+        [SerializeField] AudioClip arriveClip;
 
         public int FloorNumber => floorNumber;
         public FloorData Data => data;
@@ -19,5 +21,7 @@ namespace OnLinces
             // por si se abre la escena directo
             if (floorNumber > 0) GameManager.Instance.Run.Floor = floorNumber;
         }
+
+        void Start() => Sfx.Play(arriveClip, 0.8f);
     }
 }

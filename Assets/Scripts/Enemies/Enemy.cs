@@ -29,6 +29,7 @@ namespace OnLinces
         [SerializeField] float framesPerSecond = 5f;
         [SerializeField] Color tint = Color.white;
         [SerializeField] SpriteFx deathFx;
+        [SerializeField] SpriteFx spawnFx;
 
         [Header("Vida y velocidad (base + por piso)")]
         [SerializeField] float baseHp = 3f;
@@ -87,6 +88,7 @@ namespace OnLinces
             int i = floorNum - 1;
             activeFrames = floorFrames != null && i >= 0 && i < floorFrames.Length && floorFrames[i].frames is { Length: > 0 }
                 ? floorFrames[i].frames : frames;
+            if (spawnFx != null) Instantiate(spawnFx, transform.position + Vector3.up * Units.Px(6), Quaternion.identity);
         }
 
         /// Aparece casi al instante.

@@ -91,7 +91,8 @@ namespace OnLinces
             HUD.Toast("¡Jefe derrotado!");
             if (loot)
             {
-                for (int i = 0; i < 8; i++) loot.Spawn(loot.coin, boss.transform.position);
+                loot.SpawnMany(loot.coin, boss.transform.position, 8);
+                loot.SpawnMany(loot.energy, boss.transform.position, loot.bossEnergyDrops);
                 loot.Spawn(loot.heart, boss.transform.position);
             }
             FindAnyObjectByType<PlayerHealth>()?.Heal(2);

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    public enum PickupKind { Coin, Heart, Pizza, Drink, Item, Weapon }
+    public enum PickupKind { Coin, Heart, Pizza, Drink, Item, Weapon, Energy }
 
     /// Recogible: lo gratis se toma al pasar; ítems, armas y tienda con E.
     [RequireComponent(typeof(Collider2D))]
@@ -25,6 +25,8 @@ namespace OnLinces
         [SerializeField] WeaponData weapon;
         [SerializeField] AudioClip takeClip;
         [SerializeField] AudioClip deniedClip;
+
+        const int EnergyPerOrb = 3;
 
         float t, baseY, groundY;
         Vector2 popVelPx;
@@ -85,9 +87,9 @@ namespace OnLinces
                 transform.position += (Vector3)(popVelPx / Units.PPU * Time.deltaTime);
                 popVelPx = Vector2.MoveTowards(popVelPx, Vector2.zero, 300f * Time.deltaTime);
             }
-            else if (kind == PickupKind.Coin && player && t > 0.5f)
+            else if (kind is PickupKind.Coin or PickupKind.Energy && player && t > 0.5f)
             {
-                // imán de monedas
+                // imán de monedas y energía
                 Vector2 d = player.position - transform.position;
                 float dpx = d.magnitude * Units.PPU;
                 if (dpx < 80f) transform.position += (Vector3)(d.normalized * Units.Px(Mathf.Min(dpx, (260f - dpx * 2f) * Time.deltaTime)));
@@ -130,6 +132,7 @@ namespace OnLinces
                     GameManager.Instance.Run.AddCoins(1);
                     HUD.FeedbackCoins(1);
                     break;
+                case PickupKind.Energy: p.GetComponent<PlayerWeapons>().AddEnergy(EnergyPerOrb); break;
                 case PickupKind.Heart: health.Heal(2); break;
                 case PickupKind.Pizza:
                     health.Heal(4);

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Loot
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.LootTable
   coin: {fileID: 6088207097559585575, guid: d8423280b04223e42b4d99e4a7250d70, type: 3}
+  energy: {fileID: 6088207097559585575, guid: 7d5c4c1eef8a4213851ecb80e9a39ac8, type: 3}
   heart: {fileID: 1151649483192871167, guid: 27ec1bc58231b5842a1b1805e2cc34b0, type: 3}
   pizza: {fileID: 815185392870939370, guid: 7818057847f94874b8fba47a33af3040, type: 3}
   drink: {fileID: 2449785191468813635, guid: ee7c420bf4a8ca54385bd5c341932a5c, type: 3}

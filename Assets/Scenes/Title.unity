@@ -1983,6 +1983,7 @@ MonoBehaviour:
   arrowRight: {fileID: 201212928}
   onButton: {fileID: 357891874}
   offButton: {fileID: 1243806606}
+  moveClip: {fileID: 8300000, guid: 0e644d5f5eddc7740b269cd6cf53e0cf, type: 3}
   logoBob: 0.09375
   subtitleBelowLogo: 0.85
   labelAboveFeet: 3.5

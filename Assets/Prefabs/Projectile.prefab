@@ -283,3 +283,5 @@ MonoBehaviour:
   glow: {fileID: 292627812103050135}
   playerGlow: {r: 1, g: 0.85, b: 0.45, a: 1}
   enemyGlow: {r: 1, g: 0.3, b: 0.45, a: 1}
+  hitFx: {fileID: 5514636719276217152, guid: 353a4af22dd915b45b6e5b28d50afed5, type: 3}
+  wallClip: {fileID: 8300000, guid: 70fcefda5a7453f41a33d304b98750e2, type: 3}

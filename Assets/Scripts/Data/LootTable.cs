@@ -8,6 +8,7 @@ namespace OnLinces
     {
         [Header("Recogibles")]
         public Pickup coin;
+        public Pickup energy;
         public Pickup heart;
         public Pickup pizza;
         public Pickup drink;
@@ -27,6 +28,9 @@ namespace OnLinces
         [Range(0, 1)] public float heartChance = 0.035f;
         [Range(0, 1)] public float drinkChance = 0.06f;
         [Range(0, 1)] public float pizzaChance = 0.01f;
+        [Tooltip("Orbes de energía (mín, máx inclusive)")]
+        public Vector2Int energyDrops = new(1, 3);
+        public int bossEnergyDrops = 12;
 
         [Header("Al limpiar una sala")]
         [Range(0, 1)] public float chestChance = 0.65f;
@@ -49,6 +53,12 @@ namespace OnLinces
             else if (r < heartChance + drinkChance) Spawn(drink, pos);
             else if (r < heartChance + drinkChance + pizzaChance) Spawn(pizza, pos);
             if (Random.value < coinChance) Spawn(coin, pos);
+            SpawnMany(energy, pos, Random.Range(energyDrops.x, energyDrops.y + 1));
+        }
+
+        public void SpawnMany(Pickup prefab, Vector3 pos, int n)
+        {
+            for (int i = 0; i < n; i++) Spawn(prefab, pos);
         }
     }
 }

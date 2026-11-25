@@ -37,7 +37,7 @@ namespace OnLinces
         const float DoubleAngle = 0.12f; // radianes
 
         int current;
-        const float EmptyRegenSeconds = 2f;
+        const float EmptyRegenSeconds = 3f;
 
         float cooldown, cooldown2, shootAnim, noEnergyWarn, regenTimer;
         PlayerStats stats;

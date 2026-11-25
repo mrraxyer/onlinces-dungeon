@@ -11,6 +11,8 @@ namespace OnLinces
         [Tooltip("Bloquea si está cerrada")]
         [SerializeField] Collider2D blocker;
         [SerializeField] bool startOpen = true;
+        [Tooltip("Opcional: reja que baja al cerrar")]
+        [SerializeField] SpriteRenderer gate;
 
         void Start() => SetOpen(startOpen);
 
@@ -18,6 +20,7 @@ namespace OnLinces
         {
             blocker.enabled = !open;
             spriteRenderer.sprite = open ? openSprite : closedSprite;
+            if (gate) gate.enabled = !open;
         }
     }
 }

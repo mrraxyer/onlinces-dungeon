@@ -16,6 +16,10 @@ namespace OnLinces
         [SerializeField] Light2D glow;
         [SerializeField] Color playerGlow = new(1f, 0.85f, 0.45f);
         [SerializeField] Color enemyGlow = new(1f, 0.3f, 0.45f);
+        [Tooltip("Chispa al chocar")]
+        [SerializeField] SpriteFx hitFx;
+        [Tooltip("Al chocar con la pared")]
+        [SerializeField] AudioClip wallClip;
 
         public float Damage { get; private set; }
         public bool FromPlayer { get; private set; }
@@ -52,10 +56,17 @@ namespace OnLinces
             if (life <= 0f) Destroy(gameObject);
         }
 
+        void Spark()
+        {
+            if (hitFx) Instantiate(hitFx, transform.position, Quaternion.Euler(0f, 0f, Random.Range(0, 4) * 90f));
+        }
+
         void OnTriggerEnter2D(Collider2D other)
         {
             if ((destroyOn.value & (1 << other.gameObject.layer)) != 0)
             {
+                Sfx.Play(wallClip, 0.3f);
+                Spark();
                 Destroy(gameObject);
                 return;
             }
@@ -66,6 +77,7 @@ namespace OnLinces
                 if (target != null && target.CanBeHit && alreadyHit.Add(target))
                 {
                     target.Hit(Damage, rb.linearVelocity.normalized * knock);
+                    Spark();
                     if (pierce-- <= 0) Destroy(gameObject);
                 }
             }

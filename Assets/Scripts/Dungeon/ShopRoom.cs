@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace OnLinces
 {
-    /// Tienda: corazón, bebida, pizza e ítem con precio.
+    /// Tienda: cada espacio ofrece algo aleatorio, sin repetir, entre curas y modificadores.
     public sealed class ShopRoom : MonoBehaviour
     {
         [SerializeField] LootTable loot;
@@ -17,11 +18,23 @@ namespace OnLinces
 
         void Start()
         {
-            Place(loot.heart, heartSlot, heartPrice);
-            Place(loot.pizza, pizzaSlot, pizzaPrice);
-            Place(loot.drink, drinkSlot, drinkPrice);
-            var item = Place(loot.itemPickup, itemSlot, itemPrice);
-            if (item) item.SetItem(loot.RandomItem());
+            var offers = new List<(Pickup prefab, int price, ItemData item)>
+            {
+                (loot.heart, heartPrice, null),
+                (loot.pizza, pizzaPrice, null),
+                (loot.drink, drinkPrice, null),
+            };
+            foreach (var it in loot.items) offers.Add((loot.itemPickup, itemPrice, it));
+
+            foreach (var slot in new[] { heartSlot, drinkSlot, pizzaSlot, itemSlot })
+            {
+                if (offers.Count == 0) break;
+                int i = Random.Range(0, offers.Count);
+                var o = offers[i];
+                offers.RemoveAt(i);
+                var p = Place(o.prefab, slot, o.price);
+                if (p && o.item) p.SetItem(o.item);
+            }
         }
 
         Pickup Place(Pickup prefab, Transform slot, int price)

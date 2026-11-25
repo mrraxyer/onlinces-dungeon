@@ -185,6 +185,7 @@ MonoBehaviour:
   framesPerSecond: 5
   tint: {r: 1, g: 1, b: 1, a: 1}
   deathFx: {fileID: 5514636719276217152, guid: c102002ccc22d3c4a8cf108b3b7a563a, type: 3}
+  spawnFx: {fileID: 5514636719276217152, guid: c4ede942bf2fa4f4fb77b5d73c453ccb, type: 3}
   baseHp: 2
   hpPerFloor: 0.5
   baseSpeedPx: 62
