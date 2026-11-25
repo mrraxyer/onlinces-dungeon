@@ -4,12 +4,13 @@ using Random = UnityEngine.Random;
 
 namespace OnLinces
 {
-    public enum EnemyKind { Bug, Fast, Glitch, Leak, LeakSmall, CopyPaste }
+    public enum EnemyKind { Bug, Fast, Glitch, Leak, LeakSmall, CopyPaste, Loop }
 
     /// Enemigo común.
     ///  · Bug/Fast/Leak: persiguen en zigzag (Leak se parte al morir).
     ///  · Glitch: flota y dispara.
     ///  · CopyPaste: se copia cada ~5 s.
+    ///  · Loop: gira alrededor del jugador y suelta balas en espiral.
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class Enemy : MonoBehaviour, IHittable
     {
@@ -37,7 +38,7 @@ namespace OnLinces
         [Tooltip("px")]
         [SerializeField] float contactRadiusPx = 17f;
 
-        [Header("Disparo (solo Glitch)")]
+        [Header("Disparo (Glitch y Loop)")]
         [SerializeField] Projectile projectilePrefab;
         [SerializeField] Sprite[] bulletSprites;
         [SerializeField] float bulletSpeedPx = 115f;
@@ -151,6 +152,23 @@ namespace OnLinces
                         TryClone();
                     }
                     break;
+                case EnemyKind.Loop:
+                    // órbita a ~80 px, acercándose o alejándose hasta ese radio
+                    float pull = Mathf.Clamp((to.magnitude - Units.Px(80)) / Units.Px(40), -1f, 1f);
+                    velPx = (side * (seed > 5f ? 1f : -1f) + dir * pull).normalized * speedPx;
+                    shootT -= dt;
+                    if (shootT <= 0f)
+                    {
+                        // 4 balas en cruz que rota en cada ráfaga
+                        float a0 = t * 1.3f;
+                        for (int k = 0; k < 4; k++)
+                        {
+                            float a = a0 + k * Mathf.PI / 2f;
+                            Fire(new Vector2(Mathf.Cos(a), Mathf.Sin(a)), k == 0);
+                        }
+                        shootT = 0.55f;
+                    }
+                    break;
                 default: // persiguen en zigzag
                     float wiggle = kind == EnemyKind.Leak ? 0.25f : 0.6f;
                     velPx = (dir + side * Mathf.Sin(t * 6f + seed) * wiggle).normalized * speedPx;
@@ -180,7 +198,7 @@ namespace OnLinces
             if (!string.IsNullOrEmpty(cloneToast)) HUD.Toast(cloneToast);
         }
 
-        void Fire(Vector2 dir)
+        void Fire(Vector2 dir, bool sound = true)
         {
             if (projectilePrefab == null) return;
             var origin = (Vector2)transform.position + Vector2.up * Units.Px(12) + dir * Units.Px(12);
@@ -188,7 +206,7 @@ namespace OnLinces
             var s = bulletSprites.Length > 0 ? bulletSprites[Random.Range(0, bulletSprites.Length)] : null;
             float bullet = DifficultyInfo.Bullet(GameManager.Instance.Run.Difficulty);
             p.Launch(s, dir * Units.Px((bulletSpeedPx + bulletSpeedPerFloorPx * floorNum) * bullet), 1f, 3f, fromPlayer: false);
-            Sfx.Play(shootClip, 0.6f);
+            if (sound) Sfx.Play(shootClip, 0.6f);
         }
 
         public void Hit(float damage, Vector2 dir)

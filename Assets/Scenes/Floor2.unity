@@ -14462,6 +14462,8 @@ MonoBehaviour:
     weight: 2
   - prefab: {fileID: 3413123383585152175, guid: abd5488512ac806478189acb0ab8efad, type: 3}
     weight: 2
+  - prefab: {fileID: 4816253942107323965, guid: 4f7db46965d14ad88e4db8330de67992, type: 3}
+    weight: 2
   waves: 2
   minDistanceFromPlayerPx: 110
   blockedBy:
@@ -26693,6 +26695,8 @@ MonoBehaviour:
     weight: 2
   - prefab: {fileID: 3413123383585152175, guid: abd5488512ac806478189acb0ab8efad, type: 3}
     weight: 2
+  - prefab: {fileID: 4816253942107323965, guid: 4f7db46965d14ad88e4db8330de67992, type: 3}
+    weight: 2
   waves: 2
   minDistanceFromPlayerPx: 110
   blockedBy:
@@ -32089,6 +32093,8 @@ MonoBehaviour:
   - prefab: {fileID: 5321659957119331487, guid: 8e99d725091efc44a876bfb21075a84c, type: 3}
     weight: 2
   - prefab: {fileID: 3413123383585152175, guid: abd5488512ac806478189acb0ab8efad, type: 3}
+    weight: 2
+  - prefab: {fileID: 4816253942107323965, guid: 4f7db46965d14ad88e4db8330de67992, type: 3}
     weight: 2
   waves: 2
   minDistanceFromPlayerPx: 110
@@ -46917,6 +46923,8 @@ MonoBehaviour:
   - prefab: {fileID: 5321659957119331487, guid: 8e99d725091efc44a876bfb21075a84c, type: 3}
     weight: 2
   - prefab: {fileID: 3413123383585152175, guid: abd5488512ac806478189acb0ab8efad, type: 3}
+    weight: 2
+  - prefab: {fileID: 4816253942107323965, guid: 4f7db46965d14ad88e4db8330de67992, type: 3}
     weight: 2
   waves: 2
   minDistanceFromPlayerPx: 110
