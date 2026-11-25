@@ -481,7 +481,10 @@ MonoBehaviour:
   kind: 1
   displayName: <div> SIN CENTRAR
   subtitle: 'Tarea: centrar un div.'
-  maxHp: 46
+  phaseNotes:
+  - "Solo recibe da\xF1o cuando est\xE1 centrado en la mira: emp\xFAjalo con tus disparos. Ataca con abanico de 3 balas, rayo horizontal, c\xEDrculos a tu alrededor y anillos."
+  - "El rayo tambi\xE9n sale vertical, invoca glitches y se queda centrado menos tiempo."
+  - "Abanico de 5 balas, 6 c\xEDrculos, anillos m\xE1s grandes y casi no se queda centrado."
   contactRadiusPx: 30
   spriteRenderer: {fileID: 6784881473340736960}
   frames:

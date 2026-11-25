@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cad7a65ae5b6cdd4eb425fe61082d533, type: 3}
   m_Name: Ciber
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.RoleData
-  displayName: "L\xEDder Ciberseguridad"
+  displayName: Ciberseguridad
   description: Nada entra sin permiso.
   icon: {fileID: -1925116887, guid: 7e073bdf7896f9b46ac1fab6ce02c9cf, type: 3}
   onSkin: {fileID: 11400000, guid: 51fa4d6e761c5674b925e1e05b526a51, type: 2}

@@ -481,7 +481,10 @@ MonoBehaviour:
   kind: 2
   displayName: KERNEL PANIC
   subtitle: "El servidor no responde por alguna extra\xF1a raz\xF3n."
-  maxHp: 50
+  phaseNotes:
+  - "L\xE1ser con aviso (cara roja), volcado de memoria en 3 anillos y ping: 4 balas directas a ti."
+  - "L\xE1ser triple, ping de 5. Nuevo: reinicio (se teletransporta lejos y suelta un anillo) y fork bomb (invoca bugs)."
+  - "L\xE1ser triple m\xE1s abierto, ping de 6, anillos m\xE1s grandes e invoca 2 bugs."
   contactRadiusPx: 30
   spriteRenderer: {fileID: 6784881473340736960}
   frames:

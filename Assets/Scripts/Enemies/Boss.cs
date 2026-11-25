@@ -15,6 +15,8 @@ namespace OnLinces
         [SerializeField] BossKind kind;
         public string displayName = "SPAGHETTI CODE";
         public string subtitle = "Sin documentar desde 2009";
+        [Tooltip("Qué hace en cada fase (diálogo de la sala de jefes)")]
+        [TextArea(2, 4)] public string[] phaseNotes = new string[3];
         [SerializeField] float contactRadiusPx = 30f;
 
         [Header("Arte")]

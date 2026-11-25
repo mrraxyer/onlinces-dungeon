@@ -208,7 +208,10 @@ MonoBehaviour:
   kind: 0
   displayName: SPAGHETTI CODE
   subtitle: Nunca ha sido documentado
-  maxHp: 42
+  phaseNotes:
+  - "Espiral de balas, embestida (al chocar con la pared suelta un anillo) y 3 l\xE1tigos con aviso."
+  - "Se mueve m\xE1s r\xE1pido y adem\xE1s invoca bugs."
+  - "Espiral doble, 4 l\xE1tigos e invoca 2 bugs a la vez."
   contactRadiusPx: 30
   spriteRenderer: {fileID: 3427560556784226609}
   frames:
