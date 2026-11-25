@@ -47,6 +47,16 @@ namespace OnLinces
             cam = Camera.main;
             logoBase = logo.position;
             subtitle.text = "D E B U G    D U N G E O N";
+
+            // versión abajo a la derecha (copia del subtítulo)
+            var version = Instantiate(subtitle, subtitle.transform.parent);
+            version.text = "v" + Application.version;
+            version.fontSize = subtitle.fontSize * 0.6f;
+            version.alignment = TextAlignmentOptions.BottomRight;
+            version.color = Dim;
+            var rt = version.rectTransform;
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 0f);
+            rt.anchoredPosition = new Vector2(-8f, 6f);
         }
 
         void Update()
