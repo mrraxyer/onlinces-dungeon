@@ -31,6 +31,8 @@ namespace OnLinces
         [Tooltip("Orbes de energía (mín, máx inclusive)")]
         public Vector2Int energyDrops = new(1, 3);
         public int bossEnergyDrops = 12;
+        [Tooltip("Orbes al cambiar de fase")]
+        public int bossPhaseEnergyDrops = 8;
 
         [Header("Al limpiar una sala")]
         [Range(0, 1)] public float chestChance = 0.65f;

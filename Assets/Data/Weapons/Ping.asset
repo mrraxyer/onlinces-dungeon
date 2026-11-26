@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bbd54b4f056d914a880ea032bb15f2d, type: 3}
+  m_Name: Ping
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.WeaponData
+  displayName: 'ping'
+  description: 'Al impactar rebota a 2 enemigos cercanos.'
+  rarity: 2
+  kind: 0
+  icon: {fileID: 418580158, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
+  projectileSprites:
+  - {fileID: -886044901, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
+  damage: 2
+  fireDelay: 0.3
+  projectileSpeedPx: 300
+  spreadDegrees: 4
+  count: 1
+  range: 0.7
+  energyCost: 2
+  pierce: 0
+  returns: 0
+  chain: 2
+  explosion: {fileID: 0}
+  homingDegPerSec: 0

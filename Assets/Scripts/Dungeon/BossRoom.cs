@@ -19,7 +19,7 @@ namespace OnLinces
         [SerializeField] AudioClip introClip, doorCloseClip, doorOpenClip;
         [SerializeField] AudioClip bossMusic;
         [SerializeField] AudioClip floorMusic;
-        [SerializeField] int maxMinions = 3;
+        [SerializeField] int maxMinions = 5;
         [Tooltip("Campo de tiro: el jefe lo elige una terminal y perder no termina la partida")]
         [SerializeField] bool practice;
 
@@ -79,7 +79,9 @@ namespace OnLinces
             for (int i = 0; i < n && minions.Count < maxMinions; i++)
             {
                 var p = ClampInside(near + Random.insideUnitCircle.normalized * 1.2f);
-                minions.Add(Instantiate(prefab, p, Quaternion.identity));
+                var m = Instantiate(prefab, p, Quaternion.identity);
+                m.Arena = this;
+                minions.Add(m);
             }
         }
 
@@ -90,6 +92,18 @@ namespace OnLinces
             if (!show) return;
             crosshair.transform.position = Center;
             crosshair.color = centered ? new Color(0.29f, 0.87f, 0.5f) : new Color(1f, 0.85f, 0.3f, 0.55f + 0.25f * Mathf.Sin(Time.time * 6f));
+        }
+
+        /// Los minions sueltan energía como un enemigo normal.
+        public void OnMinionDied(Enemy e)
+        {
+            if (loot) loot.SpawnMany(loot.energy, e.transform.position, Random.Range(loot.energyDrops.x, loot.energyDrops.y + 1));
+        }
+
+        /// Suelta energía al empezar la transición de fase.
+        public void OnBossPhaseChange(Boss boss)
+        {
+            if (loot) loot.SpawnMany(loot.energy, boss.transform.position, loot.bossPhaseEnergyDrops);
         }
 
         public void OnBossDefeated(Boss boss)

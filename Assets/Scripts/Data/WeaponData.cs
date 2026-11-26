@@ -37,6 +37,16 @@ namespace OnLinces
         [Tooltip("Enemigos extra que atraviesa cada bala")]
         public int pierce;
 
+        [Header("Especial (opcional)")]
+        [Tooltip("Boomerang: a media vida regresa a ti y golpea de nuevo")]
+        public bool returns;
+        [Tooltip("Saltos a enemigos cercanos tras impactar")]
+        public int chain;
+        [Tooltip("Explota al chocar o al acabar su alcance")]
+        public Explosion explosion;
+        [Tooltip("Grados/s que gira para perseguir enemigos")]
+        public float homingDegPerSec;
+
         public static string RarityName(Rarity r) => r switch
         {
             Rarity.Comun => "Común",

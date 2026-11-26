@@ -16,6 +16,13 @@ namespace OnLinces
 
         float flashStart, t;
 
+        /// Llamar justo tras Instantiate (antes de Start).
+        public void SetDamage(float enemy, int player)
+        {
+            enemyDamage = enemy;
+            playerDamage = player;
+        }
+
         void Start()
         {
             Sfx.Play(clip);

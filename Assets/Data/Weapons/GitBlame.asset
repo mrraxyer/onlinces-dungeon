@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bbd54b4f056d914a880ea032bb15f2d, type: 3}
+  m_Name: GitBlame
+  m_EditorClassIdentifier: Assembly-CSharp::OnLinces.WeaponData
+  displayName: 'git blame'
+  description: 'Balas teledirigidas que buscan al culpable.'
+  rarity: 4
+  kind: 0
+  icon: {fileID: -690327817, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
+  projectileSprites:
+  - {fileID: 592163628, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
+  damage: 2.5
+  fireDelay: 0.2
+  projectileSpeedPx: 230
+  spreadDegrees: 12
+  count: 1
+  range: 1.2
+  energyCost: 2
+  pierce: 0
+  returns: 0
+  chain: 0
+  explosion: {fileID: 0}
+  homingDegPerSec: 360

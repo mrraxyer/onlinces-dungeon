@@ -3,7 +3,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace OnLinces
 {
-    /// Bala en línea recta.
+    /// Bala en línea recta (o boomerang / en cadena / explosiva / teledirigida según el arma).
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class Projectile : MonoBehaviour
     {
@@ -30,6 +30,13 @@ namespace OnLinces
         float knock = 1f;
         readonly System.Collections.Generic.HashSet<IHittable> alreadyHit = new();
 
+        const float ChainRadiusPx = 90f, HomingRadiusPx = 140f, ChainDamage = 0.75f;
+        WeaponData special;
+        int chainLeft;
+        float lifeTotal, speed, scanT;
+        bool returning;
+        Transform homingTarget, owner;
+
         void Awake() => rb = GetComponent<Rigidbody2D>();
 
         /// Atraviesa N enemigos.
@@ -45,15 +52,89 @@ namespace OnLinces
             if (!fromPlayer && enemyMaterial != null) spriteRenderer.sharedMaterial = enemyMaterial;
             rb.linearVelocity = velocity;
             Damage = damage;
-            life = lifeSeconds;
+            life = lifeTotal = lifeSeconds;
+            speed = velocity.magnitude;
             FromPlayer = fromPlayer;
             if (glow) glow.color = fromPlayer ? playerGlow : enemyGlow;
+        }
+
+        /// Mecánicas especiales del arma del jugador.
+        public void SetSpecial(WeaponData w, int chains)
+        {
+            special = w;
+            chainLeft = chains;
+            if (w.returns)
+            {
+                pierce = int.MaxValue;
+                owner = FindAnyObjectByType<PlayerHealth>()?.transform;
+            }
         }
 
         void Update()
         {
             life -= Time.deltaTime;
-            if (life <= 0f) Destroy(gameObject);
+            if (special && special.returns && !returning && life <= lifeTotal / 2f && owner)
+            {
+                returning = true;
+                life = lifeTotal; // tiempo para volver
+                alreadyHit.Clear(); // golpea otra vez de regreso
+            }
+            if (life <= 0f) End();
+        }
+
+        void FixedUpdate()
+        {
+            if (!special) return;
+            if (returning)
+            {
+                Vector2 to = owner.position - transform.position;
+                if (to.magnitude < Units.Px(10)) Destroy(gameObject);
+                else rb.linearVelocity = to.normalized * speed;
+            }
+            else if (special.homingDegPerSec > 0f)
+            {
+                scanT -= Time.fixedDeltaTime;
+                if (scanT <= 0f) { scanT = 0.1f; homingTarget = Nearest(HomingRadiusPx); }
+                if (homingTarget)
+                {
+                    Vector2 v = rb.linearVelocity, to = homingTarget.position - transform.position;
+                    float a = Mathf.MoveTowardsAngle(Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg, Mathf.Atan2(to.y, to.x) * Mathf.Rad2Deg,
+                        special.homingDegPerSec * Time.fixedDeltaTime) * Mathf.Deg2Rad;
+                    rb.linearVelocity = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * speed;
+                }
+            }
+        }
+
+        /// Enemigo vivo más cercano que aún no golpeó esta bala.
+        Transform Nearest(float radiusPx)
+        {
+            Transform best = null;
+            float bestD = float.MaxValue;
+            foreach (var col in Physics2D.OverlapCircleAll(transform.position, Units.Px(radiusPx)))
+            {
+                var h = col.GetComponentInParent<IHittable>();
+                if (h == null || h is Crate || !h.CanBeHit || alreadyHit.Contains(h)) continue;
+                float d = Vector2.Distance(col.transform.position, transform.position);
+                if (d < bestD) { bestD = d; best = ((Component)h).transform; }
+            }
+            return best;
+        }
+
+        void Chain()
+        {
+            var next = Nearest(ChainRadiusPx);
+            if (!next) return;
+            var p = Instantiate(this, transform.position, Quaternion.identity);
+            p.alreadyHit.UnionWith(alreadyHit);
+            p.Launch(spriteRenderer.sprite, ((Vector2)(next.position - transform.position)).normalized * speed, Damage * ChainDamage, lifeTotal, true);
+            p.SetSpecial(special, chainLeft - 1);
+        }
+
+        /// Se acaba: explota si el arma lo pide.
+        void End()
+        {
+            if (special && special.explosion) Instantiate(special.explosion, transform.position, Quaternion.identity).SetDamage(Damage, 0);
+            Destroy(gameObject);
         }
 
         void Spark()
@@ -67,7 +148,7 @@ namespace OnLinces
             {
                 Sfx.Play(wallClip, 0.3f);
                 Spark();
-                Destroy(gameObject);
+                End();
                 return;
             }
 
@@ -78,7 +159,8 @@ namespace OnLinces
                 {
                     target.Hit(Damage, rb.linearVelocity.normalized * knock);
                     Spark();
-                    if (pierce-- <= 0) Destroy(gameObject);
+                    if (chainLeft > 0) Chain();
+                    if (pierce-- <= 0) End();
                 }
             }
             else

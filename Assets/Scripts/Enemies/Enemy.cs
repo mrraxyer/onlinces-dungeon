@@ -4,13 +4,15 @@ using Random = UnityEngine.Random;
 
 namespace OnLinces
 {
-    public enum EnemyKind { Bug, Fast, Glitch, Leak, LeakSmall, CopyPaste, Loop }
+    public enum EnemyKind { Bug, Fast, Glitch, Leak, LeakSmall, CopyPaste, Loop, Nullptr, Virus }
 
     /// Enemigo común.
     ///  · Bug/Fast/Leak: persiguen en zigzag (Leak se parte al morir).
     ///  · Glitch: flota y dispara.
     ///  · CopyPaste: se copia cada ~5 s.
     ///  · Loop: gira alrededor del jugador y suelta balas en espiral.
+    ///  · Nullptr: persigue, se desvanece y reaparece junto al jugador.
+    ///  · Virus: persigue rápido y al morir revienta en un anillo de balas.
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class Enemy : MonoBehaviour, IHittable
     {
@@ -39,7 +41,7 @@ namespace OnLinces
         [Tooltip("px")]
         [SerializeField] float contactRadiusPx = 17f;
 
-        [Header("Disparo (Glitch y Loop)")]
+        [Header("Disparo (Glitch, Loop y Virus)")]
         [SerializeField] Projectile projectilePrefab;
         [SerializeField] Sprite[] bulletSprites;
         [SerializeField] float bulletSpeedPx = 115f;
@@ -56,19 +58,24 @@ namespace OnLinces
         [SerializeField] string cloneToast = "Ctrl+V";
 
         public Room Room { get; set; }
-        public bool CanBeHit => spawnT <= 0f && !dying;
+        /// Minion de un jefe.
+        public BossRoom Arena { get; set; }
+        public bool CanBeHit => spawnT <= 0f && !dying && !Hidden;
 
         const float SpawnTime = 0.7f;
+        // Nullptr: persigue -> se desvanece -> oculto -> aparece
+        const float PhaseChase = 2.6f, PhaseFade = 0.35f, PhaseHidden = 0.6f;
         const int MaxCopies = 7;
         Rigidbody2D rb;
         PlayerHealth player;
-        float hp, fullHp, speedPx, t, spawnT = SpawnTime, shootT = 1.6f, flash, seed, cloneT;
+        float hp, fullHp, speedPx, t, spawnT = SpawnTime, shootT = 1.6f, flash, seed, cloneT, phaseT;
         Vector2 knockPx;
         bool dying;
         int floorNum, generation;
         float? presetHp;
         Sprite[] activeFrames;
         Vector2 home;
+        bool Hidden => kind == EnemyKind.Nullptr && phaseT > PhaseChase + PhaseFade && phaseT <= PhaseChase + PhaseFade + PhaseHidden;
 
         void Awake()
         {
@@ -103,6 +110,9 @@ namespace OnLinces
             flash -= Time.deltaTime;
             var c = flash > 0f ? new Color(1f, 0.55f, 0.55f) : tint;
             c.a = spawnT > 0f ? 1f - Mathf.Clamp01(spawnT / SpawnTime) : 1f;
+            if (kind == EnemyKind.Nullptr && phaseT > PhaseChase)
+                c.a *= phaseT < PhaseChase + PhaseFade ? 1f - (phaseT - PhaseChase) / PhaseFade
+                    : Hidden ? 0f : (phaseT - PhaseChase - PhaseFade - PhaseHidden) / PhaseFade;
             spriteRenderer.color = c;
         }
 
@@ -171,6 +181,15 @@ namespace OnLinces
                         shootT = 0.55f;
                     }
                     break;
+                case EnemyKind.Nullptr:
+                    float before = phaseT;
+                    phaseT += dt;
+                    float hideAt = PhaseChase + PhaseFade, showAt = hideAt + PhaseHidden;
+                    if (before < showAt && phaseT >= showAt) Teleport();
+                    if (phaseT >= showAt + PhaseFade) phaseT = Random.Range(0f, 0.8f);
+                    velPx = phaseT > PhaseChase ? Vector2.zero : (dir + side * Mathf.Sin(t * 4f + seed) * 0.3f).normalized * speedPx;
+                    spriteRenderer.flipX = to.x < 0f;
+                    break;
                 default: // persiguen en zigzag
                     float wiggle = kind == EnemyKind.Leak ? 0.25f : 0.6f;
                     velPx = (dir + side * Mathf.Sin(t * 6f + seed) * wiggle).normalized * speedPx;
@@ -181,7 +200,20 @@ namespace OnLinces
             rb.linearVelocity = (velPx + knockPx) / Units.PPU;
             knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 700f * dt);
 
-            if (to.magnitude < Units.Px(contactRadiusPx)) player.Hurt(1, transform.position);
+            if (!Hidden && to.magnitude < Units.Px(contactRadiusPx)) player.Hurt(1, transform.position);
+        }
+
+        /// Reaparece a ~60 px del jugador en un sitio libre de la sala.
+        void Teleport()
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                var p = (Vector2)player.transform.position + Random.insideUnitCircle.normalized * Units.Px(Random.Range(50f, 75f));
+                if (Room != null && !Room.IsFree(p)) continue;
+                rb.position = p;
+                transform.position = p;
+                return;
+            }
         }
 
         void TryClone()
@@ -244,6 +276,16 @@ namespace OnLinces
                 return;
             }
 
+            if (kind == EnemyKind.Virus)
+            {
+                float a0 = Random.Range(0f, Mathf.PI * 2f);
+                for (int k = 0; k < 8; k++)
+                {
+                    float a = a0 + k * Mathf.PI / 4f;
+                    Fire(new Vector2(Mathf.Cos(a), Mathf.Sin(a)), k == 0);
+                }
+            }
+
             if (splitInto != null)
             {
                 foreach (int s in new[] { -1, 1 })
@@ -256,6 +298,7 @@ namespace OnLinces
             }
 
             if (Room != null) Room.OnEnemyDied(this);
+            else if (Arena != null) Arena.OnMinionDied(this);
             Destroy(gameObject);
         }
     }

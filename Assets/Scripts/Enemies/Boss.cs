@@ -170,6 +170,7 @@ namespace OnLinces
                 Css("", 0f);
                 Sfx.Play(transitionClip);
                 rb.linearVelocity = Vector2.zero;
+                if (room) room.OnBossPhaseChange(this);
                 return;
             }
 
@@ -268,7 +269,7 @@ namespace OnLinces
                 case "summon":
                     if (subN == 0)
                     {
-                        if (room) room.SpawnMinions(minionPrefab, phase < 3 ? 1 : 2, transform.position);
+                        if (room) room.SpawnMinions(minionPrefab, phase < 3 ? 2 : 3, transform.position);
                         subN = 1;
                     }
                     if (stateT <= 1.2f) { state = "move"; stateT = 1f * Rest; }
@@ -379,7 +380,7 @@ namespace OnLinces
                     if (subN == 0)
                     {
                         subN = 1;
-                        room.SpawnMinions(minionPrefab, 1, transform.position);
+                        room.SpawnMinions(minionPrefab, 2, transform.position);
                         Css("<span> <span> <span>", 1.5f);
                     }
                     if (stateT <= 1f) { state = "move"; stateT = 1f * Rest; }
@@ -464,7 +465,7 @@ namespace OnLinces
                     if (subN == 0)
                     {
                         subN = 1;
-                        if (room) room.SpawnMinions(minionPrefab, phase < 3 ? 1 : 2, transform.position);
+                        if (room) room.SpawnMinions(minionPrefab, phase < 3 ? 2 : 3, transform.position);
                         Css("fork() bomb", 1.5f);
                     }
                     if (stateT <= 1f) { state = "move"; stateT = 1f * Rest; }

@@ -89,6 +89,14 @@ namespace OnLinces
             return null;
         }
 
+        /// Dentro de la sala (con 1 tile de margen) y sin obstáculos.
+        public bool IsFree(Vector2 p)
+        {
+            var b = area.bounds;
+            return p.x > b.min.x + 1f && p.x < b.max.x - 1f && p.y > b.min.y + 1f && p.y < b.max.y - 1f
+                && !Physics2D.OverlapCircle(p, 0.45f, blockedBy);
+        }
+
         public void Register(Enemy e)
         {
             e.Room = this;

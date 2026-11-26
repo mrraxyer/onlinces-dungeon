@@ -27,6 +27,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b21a81df95689984abb8aff261f75bae, type: 2}
   - {fileID: 11400000, guid: 1736b39cbc924933aa83102f12ce3ae0, type: 2}
   - {fileID: 11400000, guid: 6d83cd6306d14f6583b4246d9fa40ed0, type: 2}
+  - {fileID: 11400000, guid: 2d93fbcc7d1b40d69081096b98842054, type: 2}
+  - {fileID: 11400000, guid: c6ec859f48644f9da0ede2e2044da13b, type: 2}
+  - {fileID: 11400000, guid: 0a8dbffd227e4d068ab1554b419efbe3, type: 2}
+  - {fileID: 11400000, guid: 7b8436e016584ba3816b6f2260854c85, type: 2}
   items:
   - {fileID: 11400000, guid: 6e0849e1ae1d0da4a991e379c7e136f5, type: 2}
   - {fileID: 11400000, guid: 7343672b276d1fa47bd84db8b5d32f5f, type: 2}
@@ -38,7 +42,8 @@ MonoBehaviour:
   heartChance: 0.035
   drinkChance: 0.02
   pizzaChance: 0.01
-  energyDrops: {x: 0, y: 2}
+  energyDrops: {x: 1, y: 2}
   bossEnergyDrops: 4
+  bossPhaseEnergyDrops: 8
   chestChance: 0.65
   weaponChestShare: 0.4
