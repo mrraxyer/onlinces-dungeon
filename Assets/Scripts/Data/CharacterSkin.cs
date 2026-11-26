@@ -12,24 +12,19 @@ namespace OnLinces
         [SerializeField] Texture2D bodySheet;
         [Tooltip("3x4: normal, disparo, parpadeo")]
         [SerializeField] Texture2D headSheet;
-        [Tooltip("4x1: poses")]
-        [SerializeField] Texture2D extraSheet;
 
         [Header("Se llenan solos")]
         [SerializeField] Sprite[] body = Array.Empty<Sprite>();
         [SerializeField] Sprite[] head = Array.Empty<Sprite>();
-        [SerializeField] Sprite[] extra = Array.Empty<Sprite>();
 
         public Sprite[] Body => body;
         public Sprite[] Head => head;
-        public Sprite[] Extra => extra;
 
 #if UNITY_EDITOR
         void OnValidate()
         {
             body = Load(bodySheet);
             head = Load(headSheet);
-            extra = Load(extraSheet);
         }
 
         // orden numérico: _2 antes que _10

@@ -33,7 +33,6 @@ namespace OnLinces
         bool used, noPedestal;
         Transform player;
 
-        public int Price => price;
         bool NeedsE => price > 0 || kind is PickupKind.Item or PickupKind.Weapon;
 
         void Awake()

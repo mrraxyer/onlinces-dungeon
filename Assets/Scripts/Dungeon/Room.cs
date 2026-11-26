@@ -28,7 +28,6 @@ namespace OnLinces
         PlayerHealth player;
 
         public event Action Cleared;
-        public bool IsCleared => state == State.Cleared;
         public bool IsFighting => state == State.Fighting;
         public IReadOnlyList<Enemy> Alive => alive;
 

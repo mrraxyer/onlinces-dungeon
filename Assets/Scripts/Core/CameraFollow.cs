@@ -23,12 +23,5 @@ namespace OnLinces
                 Mathf.Round(smooth.y * Units.PPU) / Units.PPU,
                 smooth.z);
         }
-
-        /// Mueve la cámara sin suavizado.
-        public void SnapTo(Vector3 pos)
-        {
-            smooth = new Vector3(pos.x, pos.y, transform.position.z);
-            transform.position = smooth;
-        }
     }
 }
