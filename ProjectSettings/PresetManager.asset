@@ -11,5 +11,11 @@ PresetManager:
       m_ManagedTypeFallback: 
     second:
     - m_Preset: {fileID: 2655988077585873504, guid: 4476f4150e042d743abbd2e69f72867a, type: 2}
-      m_Filter: glob:"Assets/Art/**"
+      m_Filter: glob:"Assets/**/Sprites/**"
+      m_Disabled: 0
+    - m_Preset: {fileID: 2655988077585873504, guid: 4476f4150e042d743abbd2e69f72867a, type: 2}
+      m_Filter: glob:"Assets/UI/Logo/**"
+      m_Disabled: 0
+    - m_Preset: {fileID: 2655988077585873504, guid: 4476f4150e042d743abbd2e69f72867a, type: 2}
+      m_Filter: glob:"Assets/Fonts/**"
       m_Disabled: 0

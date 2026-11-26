@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Parámetros de cada dificultad. Archivo: Assets/Data/Resources/Difficulty.asset
+    /// Parámetros de cada dificultad. Archivo: Assets/Resources/Difficulty.asset
     /// (en Resources para que el juego lo cargue sin que una escena lo referencie).
     [CreateAssetMenu(menuName = "OnLinces/Dificultad", fileName = "Difficulty")]
     public sealed class DifficultySettings : ScriptableObject

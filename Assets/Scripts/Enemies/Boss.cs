@@ -76,7 +76,7 @@ namespace OnLinces
         {
             room = r;
             var run = GameManager.Instance.Run;
-            // valores en Assets/Data/Resources/Difficulty.asset
+            // valores en Assets/Resources/Difficulty.asset
             var cfg = DifficultySettings.Current;
             maxHp = cfg.bossHearts * DifficultySettings.HpPerHeart;
             maxHp *= 1f + cfg.bossHpPerFloor * (run.Floor - 1);

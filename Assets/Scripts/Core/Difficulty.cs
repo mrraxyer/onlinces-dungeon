@@ -2,7 +2,7 @@ namespace OnLinces
 {
     public enum Difficulty { Facil, Media, Dificil }
 
-    /// Multiplicadores por dificultad. Los valores están en Assets/Data/Resources/Difficulty.asset.
+    /// Multiplicadores por dificultad. Los valores están en Assets/Resources/Difficulty.asset.
     public static class DifficultyInfo
     {
         static DifficultySettings.Level L(Difficulty d) => DifficultySettings.Current.Get(d);

@@ -10,8 +10,8 @@ from collections import deque
 
 from PIL import Image
 
-ROOT = pathlib.Path("Assets/Art/Sprites")
-FOLDERS = ["Bosses", "Characters", "Enemies", "Items", "Props", "Tiles", "Weapons"]
+ROOT = pathlib.Path("Assets")
+FOLDERS = [f + "/Sprites" for f in ["Bosses", "Characters", "Enemies", "Items", "Props", "Tiles", "Weapons"]]
 BEVEL_PX = 3
 STRENGTH = 2.5
 

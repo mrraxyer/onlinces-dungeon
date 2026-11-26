@@ -1,10 +1,10 @@
-"""Genera Assets/Art/Logo/logo.png (splash) con el título, las mascotas y "DEBUG DUNGEON".
+"""Genera Assets/UI/Logo/logo.png (splash) con el título, las mascotas y "DEBUG DUNGEON".
 Uso: python Tools/make_logo.py   (desde la raíz del proyecto)
 """
 import re
 from PIL import Image
 
-A = "Assets/Art/Sprites/"
+A = "Assets/"
 SCALE = 4  # px de arte -> px finales (nítido, sin filtro)
 PURPLE = (124, 58, 237, 255)
 GREEN = (74, 222, 128, 255)
@@ -12,8 +12,8 @@ INK = (24, 20, 37, 255)
 
 
 def font_text(text, color):
-    fnt = open("Assets/Art/Fonts/pixel.fnt", encoding="utf8").read()
-    sheet = Image.open("Assets/Art/Fonts/pixel.png").convert("RGBA")
+    fnt = open("Assets/Fonts/pixel.fnt", encoding="utf8").read()
+    sheet = Image.open("Assets/Fonts/pixel.png").convert("RGBA")
     chars = {int(m[0]): tuple(map(int, m[1:])) for m in
              re.findall(r"char id=(\d+) x=(\d+) y=(\d+) width=(\d+) height=(\d+) xoffset=(-?\d+) yoffset=(-?\d+) xadvance=(\d+)", fnt)}
     w = sum(chars[ord(c)][6] + 1 for c in text)
@@ -42,9 +42,9 @@ def outlined(img, color, px=1):
 
 
 def main():
-    title = Image.open(A + "UI/title.png").convert("RGBA")
-    on = Image.open(A + "Characters/On/on_full.png").convert("RGBA").crop((0, 0, 48, 48))
-    off = Image.open(A + "Characters/Off/off_full.png").convert("RGBA").crop((0, 0, 48, 48))
+    title = Image.open(A + "UI/Sprites/title.png").convert("RGBA")
+    on = Image.open(A + "Characters/Sprites/On/on_full.png").convert("RGBA").crop((0, 0, 48, 48))
+    off = Image.open(A + "Characters/Sprites/Off/off_full.png").convert("RGBA").crop((0, 0, 48, 48))
     on, off = on.crop(on.getbbox()), off.crop(off.getbbox())
 
     word = outlined(font_text("DEBUG DUNGEON", GREEN), INK)
@@ -68,7 +68,7 @@ def main():
     logo.paste(word, (wx, wy), word)
 
     logo = logo.resize((logo.width * SCALE, logo.height * SCALE), Image.NEAREST)
-    logo.save("Assets/Art/Logo/logo.png")
+    logo.save("Assets/UI/Logo/logo.png")
     assert logo.getbbox() is not None and logo.width > 600, logo.size
     print("logo", logo.size)
 
