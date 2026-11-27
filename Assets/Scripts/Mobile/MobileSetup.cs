@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Teléfono: horizontal y 60 fps. Siempre crea TouchControls (en PC solo aporta el menú de pausa).
+    /// Teléfono: horizontal (los 60 fps los pone VideoSettings). Siempre crea TouchControls (en PC solo aporta el menú de pausa).
     public static class MobileSetup
     {
         const string PrefabName = "TouchControls";
@@ -12,7 +12,6 @@ namespace OnLinces
         {
             if (Application.isMobilePlatform)
             {
-                Application.targetFrameRate = 60;
                 Screen.sleepTimeout = SleepTimeout.NeverSleep;
                 Screen.autorotateToPortrait = false;
                 Screen.autorotateToPortraitUpsideDown = false;

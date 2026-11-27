@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -43,6 +44,7 @@ namespace OnLinces
         PlayerController player;
         PlayerSkill skill;
         bool paused;
+        GraphicsMenu graphics;
         System.IDisposable anyButton;
         float skillAlpha = 1f;
         float searchT;
@@ -63,6 +65,7 @@ namespace OnLinces
             if (pauseButton) pauseButton.onClick.AddListener(Pause);
             if (continueButton) continueButton.onClick.AddListener(Resume);
             if (quitButton) quitButton.onClick.AddListener(QuitToTitle);
+            if (pausePanel && continueButton && quitButton) BuildGraphicsMenu();
             if (gameplay) gameplay.SetActive(false);
             if (pausePanel) pausePanel.SetActive(false);
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -108,7 +111,9 @@ namespace OnLinces
             }
             if (player != null && ((Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) || (pad != null && pad.startButton.wasPressedThisFrame)))
             {
-                if (paused) Resume(); else Pause();
+                if (!paused) Pause();
+                else if (graphics && graphics.IsOpen) graphics.Close();
+                else Resume();
             }
             // mando en menús: si nada está seleccionado, selecciona el botón más alto
             if (PadActive && (player == null || paused)) SelectForGamepad();
@@ -163,8 +168,39 @@ namespace OnLinces
             if (!paused) return;
             paused = false;
             Time.timeScale = 1f;
+            if (graphics) graphics.Close();
             if (pausePanel) pausePanel.SetActive(false);
         }
+
+        // "Gráficos" entre Continuar y Salir (la caja crece un botón) y el panel de estadísticas
+        void BuildGraphicsMenu()
+        {
+            const float step = 50f;
+            var box = (RectTransform)continueButton.transform.parent;
+            var btn = Instantiate(continueButton, box);
+            btn.name = "BtnGraphics";
+            btn.onClick = new Button.ButtonClickedEvent();
+            btn.GetComponentInChildren<TMP_Text>().text = "Gráficos";
+            btn.transform.SetSiblingIndex(continueButton.transform.GetSiblingIndex() + 1);
+            box.sizeDelta += new Vector2(0f, step);
+            foreach (RectTransform child in box)
+                if (child != btn.transform && child != quitButton.transform) child.anchoredPosition += new Vector2(0f, step / 2f);
+            var cont = ((RectTransform)continueButton.transform).anchoredPosition;
+            ((RectTransform)btn.transform).anchoredPosition = cont - new Vector2(0f, step);
+            ((RectTransform)quitButton.transform).anchoredPosition = cont - new Vector2(0f, 2f * step);
+            // el prefab trae navegación explícita Continuar <-> Salir: se rehace en ciclo con Gráficos en medio
+            Link(continueButton, quitButton, btn);
+            Link(btn, continueButton, quitButton);
+            Link(quitButton, btn, continueButton);
+
+            graphics = gameObject.AddComponent<GraphicsMenu>();
+            graphics.Build(box.gameObject, continueButton);
+            btn.onClick.AddListener(graphics.Open);
+            gameObject.AddComponent<PerfStats>().Build(pausePanel.transform.parent, continueButton.GetComponentInChildren<TMP_Text>());
+        }
+
+        static void Link(Button b, Selectable up, Selectable down) =>
+            b.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnUp = up, selectOnDown = down };
 
         void QuitToTitle()
         {
