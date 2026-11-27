@@ -37,12 +37,13 @@ namespace OnLinces
             }
             if (Time.timeScale == 0f) best = null; // en pausa no hay diálogo
 
-            // jugador 2: su propio aviso sobre la cabeza (el diálogo de info es del jugador 1)
+            // jugador 2: su aviso sobre la cabeza; su cartel se ve si el 1 no tiene uno abierto
             if (!controller) controller = GetComponent<PlayerController>();
             if (controller.IsGuest)
             {
                 bool usable = best != null && !string.IsNullOrEmpty(best.Prompt);
                 HUD.SetGuestPrompt(usable ? controller.Key("key_e", "xb_a", "ps_cross") + " " + best.Prompt : "", transform);
+                HUD.SetGuestInfo(best?.InfoTitle, best?.InfoBody); // carteles y descripciones
                 if (usable && controller.Act(interact).WasPressedThisFrame()) best.Interact(gameObject);
                 return;
             }

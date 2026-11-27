@@ -132,15 +132,33 @@ namespace OnLinces
                 rt.anchoredPosition = local;
         }
 
+        (string title, string body) info, guestInfo;
+
         /// title null = esconder.
         public static void SetInfo(string title, string body)
         {
-            if (!instance || !instance.infoPanel) return;
+            if (!instance) return;
+            instance.info = (title, body);
+            instance.ShowInfo();
+        }
+
+        /// Cartel cerca del jugador 2: se ve si el 1 no tiene uno abierto.
+        public static void SetGuestInfo(string title, string body)
+        {
+            if (!instance || instance.guestInfo == (title, body)) return;
+            instance.guestInfo = (title, body);
+            instance.ShowInfo();
+        }
+
+        void ShowInfo()
+        {
+            if (!infoPanel) return;
+            var (title, body) = !string.IsNullOrEmpty(info.title) ? info : guestInfo;
             bool show = !string.IsNullOrEmpty(title);
-            instance.infoPanel.SetActive(show);
+            infoPanel.SetActive(show);
             if (!show) return;
-            instance.infoTitle.text = title;
-            instance.infoBody.text = body ?? "";
+            infoTitle.text = title;
+            infoBody.text = body ?? "";
         }
 
         public static void Toast(string text)

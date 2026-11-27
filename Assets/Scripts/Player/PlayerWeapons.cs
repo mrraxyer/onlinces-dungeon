@@ -72,13 +72,10 @@ namespace OnLinces
             Energy = maxEnergy;
             stats = GetComponent<PlayerStats>();
             skill = GetComponent<PlayerSkill>();
-            // se conservan entre pisos (el jugador 2 empieza con una copia de las del 1 y no las guarda)
-            var run = GameManager.Instance.Run;
-            if (!GetComponent<PlayerController>().IsGuest)
-            {
-                if (run.Weapons.Count > 0) { slots.Clear(); slots.AddRange(run.Weapons); }
-                else run.Weapons.AddRange(slots);
-            }
+            // se conservan entre pisos, cada jugador las suyas
+            var saved = Saved();
+            if (saved.Count > 0) { slots.Clear(); slots.AddRange(saved); }
+            else saved.AddRange(slots);
             RefreshWeaponSprite();
         }
 
@@ -88,14 +85,17 @@ namespace OnLinces
             WeaponData dropped = null;
             if (slots.Count < 2) { slots.Add(weapon); current = slots.Count - 1; }
             else { dropped = slots[current]; slots[current] = weapon; }
-            if (!GetComponent<PlayerController>().IsGuest)
-            {
-                var run = GameManager.Instance.Run;
-                run.Weapons.Clear();
-                run.Weapons.AddRange(slots);
-            }
+            var saved = Saved();
+            saved.Clear();
+            saved.AddRange(slots);
             RefreshWeaponSprite();
             return dropped;
+        }
+
+        List<WeaponData> Saved()
+        {
+            var run = GameManager.Instance.Run;
+            return GetComponent<PlayerController>().IsGuest ? run.GuestWeapons : run.Weapons;
         }
 
         void Update()

@@ -18,6 +18,7 @@ namespace OnLinces
         public Difficulty Difficulty = Difficulty.Media;
         public readonly List<ItemData> Items = new();
         public readonly List<WeaponData> Weapons = new(); // vacío = iniciales
+        public readonly List<WeaponData> GuestWeapons = new(); // las del jugador 2; vacío = copia de las del 1
 
         int coins;
         public int Coins => coins;
