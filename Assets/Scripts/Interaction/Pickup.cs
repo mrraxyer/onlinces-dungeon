@@ -94,7 +94,7 @@ namespace OnLinces
 
             if (visual) visual.transform.localPosition = new Vector3(0, baseY + Units.Px(Mathf.Sin(t * 3f) * 1.5f), 0);
             if (priceLabel && price > 0)
-                priceLabel.color = GameManager.Instance.Run.Coins >= price ? new Color(0.17f, 0.1f, 0.06f) : new Color(0.75f, 0.12f, 0.15f);
+                priceLabel.color = GameManager.Instance.Run.Coins >= price ? Color.white : HUD.Bad;
         }
 
         // ---------- al pasar encima ----------

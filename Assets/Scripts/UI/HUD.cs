@@ -7,10 +7,11 @@ namespace OnLinces
     /// Textos del HUD: monedas, aviso, diálogo, toast y avisos apilados.
     public sealed class HUD : MonoBehaviour
     {
-        public static readonly Color Good = new(0.13f, 0.45f, 0.18f);
-        public static readonly Color Bad = new(0.7f, 0.12f, 0.15f);
-        public static readonly Color Info = new(0.17f, 0.1f, 0.06f);
-        public static readonly Color Gold = new(0.55f, 0.36f, 0.02f);
+        // claros: los paneles pixel art son oscuros
+        public static readonly Color Good = new(0.32f, 0.85f, 0.45f);
+        public static readonly Color Bad = new(0.95f, 0.32f, 0.35f);
+        public static readonly Color Info = Color.white;
+        public static readonly Color Gold = new(1f, 0.82f, 0.29f);
 
         [SerializeField] TMP_Text coinsLabel;
         [SerializeField] TMP_Text promptLabel;
