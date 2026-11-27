@@ -91,9 +91,9 @@ namespace OnLinces
         {
             if (iframes > 0f || IsDead) return;
             iframes = invulnerableTime;
-            CameraFollow.Shake(3f);
             var away = (Vector2)transform.position - from;
             if (away.sqrMagnitude > 0.0001f) controller.Knock(away.normalized * knockbackPx);
+            HitFeedback.PlayerHit(away.sqrMagnitude > 0.0001f ? away.normalized : Vector2.zero, !HasShield);
 
             if (HasShield)
             {
