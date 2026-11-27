@@ -22,8 +22,8 @@ namespace OnLinces
             InfoText.Section("Datos",
                 $"{InfoText.Stat("Vida", Hearts(role.maxHp))}  ·  {InfoText.Stat("Velocidad", role.speedPx.ToString("0"))}"));
 
-        /// 7 → "3½ corazones"
-        static string Hearts(int half) => $"{half / 2}{(half % 2 == 1 ? "½" : "")} corazones";
+        /// 7 → "7 corazones"
+        static string Hearts(int hp) => $"{hp} corazones";
         public bool CanInteract => true;
         public Vector3 Position => transform.position;
 

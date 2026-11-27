@@ -37,7 +37,8 @@ namespace OnLinces
             if (TouchControls.Active) { Coop.Configured = false; SceneFlow.StartRun(mascot); return; }
             if (FindAnyObjectByType<PlayerSetup>()) return;
             var canvas = FindObjectsByType<Canvas>(FindObjectsInactive.Exclude)
-                .FirstOrDefault(c => c.isRootCanvas && c.renderMode == RenderMode.ScreenSpaceOverlay);
+                // solo la escena actual: el canvas de ScreenFade (DontDestroyOnLoad, sin CanvasScaler) lo encogía en la 2ª visita
+                .FirstOrDefault(c => c.isRootCanvas && c.renderMode == RenderMode.ScreenSpaceOverlay && c.gameObject.scene == UnityEngine.SceneManagement.SceneManager.GetActiveScene());
             if (!canvas) { SceneFlow.StartRun(mascot); return; }
 
             var go = new GameObject("PlayerSetup", typeof(RectTransform));

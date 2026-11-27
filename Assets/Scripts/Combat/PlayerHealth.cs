@@ -142,7 +142,7 @@ namespace OnLinces
             TookDamageThisRoom = true;
             int lost = Mathf.Min(Hp, amount);
             Hp = Mathf.Max(0, Hp - amount);
-            HUD.Feedback("-" + HalfHearts(lost) + " vida", HUD.Bad);
+            HUD.Feedback("-" + lost + " vida", HUD.Bad);
             Changed?.Invoke();
             if (Hp == 0 && BossRoom.TryRescue(this)) Sfx.Play(hurtClip);
             else if (Hp == 0) StartCoroutine(Die());
@@ -156,19 +156,16 @@ namespace OnLinces
             int before = Hp;
             Hp = Mathf.Min(MaxHp, Hp + amount);
             Sfx.Play(healClip, 0.7f);
-            HUD.Feedback("+" + HalfHearts(Hp - before) + " vida", HUD.Good);
+            HUD.Feedback("+" + (Hp - before) + " vida", HUD.Good);
             Changed?.Invoke();
             return true;
         }
-
-        /// 3 → "1½"
-        static string HalfHearts(int halves) => (halves / 2 > 0 ? (halves / 2).ToString() : "") + (halves % 2 == 1 ? "½" : "");
 
         public void RaiseMax(int amount)
         {
             MaxHp += amount;
             Hp = Mathf.Min(MaxHp, Hp + amount);
-            HUD.Feedback("+" + HalfHearts(amount) + " corazón máximo", HUD.Good);
+            HUD.Feedback("+" + amount + " vida máxima", HUD.Good);
             Changed?.Invoke();
         }
 

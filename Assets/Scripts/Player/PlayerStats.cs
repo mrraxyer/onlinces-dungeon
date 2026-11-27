@@ -26,7 +26,7 @@ namespace OnLinces
         }
 
         public static string MascotTitle(Mascot m) => m == Mascot.On ? "El optimista" : "El escéptico";
-        public static string MascotPerk(Mascot m) => m == Mascot.On ? "+10% velocidad y cadencia" : "+15% daño y +1 corazón";
+        public static string MascotPerk(Mascot m) => m == Mascot.On ? "+10% velocidad y cadencia" : "+15% daño y +2 corazones";
 
         void Update() => boostT -= Time.deltaTime;
 

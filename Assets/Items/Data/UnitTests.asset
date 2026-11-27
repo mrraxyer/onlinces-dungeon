@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: UnitTests
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.ItemData
   displayName: Unit tests
-  description: "+1 coraz\xF3n m\xE1ximo y te cura"
+  description: "+2 corazones m\xE1ximos y te cura"
   icon: {fileID: -926573554, guid: f5ac0c953c746a441a52d240e453d22f, type: 3}
   effect: 3

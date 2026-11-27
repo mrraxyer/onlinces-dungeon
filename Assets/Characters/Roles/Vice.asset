@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Vice
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.RoleData
   displayName: Vicepresidente
-  description: "Siempre listo para suplir: aguanta y no se rinde (+1 coraz\xF3n)."
+  description: "Siempre listo para suplir: aguanta y no se rinde (+2 corazones)."
   icon: {fileID: -1732067743, guid: 7e073bdf7896f9b46ac1fab6ce02c9cf, type: 3}
   onSkin: {fileID: 11400000, guid: 163dc2657b2be664cb0580ec19476084, type: 2}
   offSkin: {fileID: 11400000, guid: 746523f9a4d70b94982e80891987e64b, type: 2}

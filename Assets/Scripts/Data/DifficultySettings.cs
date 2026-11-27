@@ -67,7 +67,7 @@ namespace OnLinces
             if (!Mathf.Approximately(l.enemyHp, 1f)) parts.Add($"enemigos con {Pct(l.enemyHp)} de vida");
             if (!Mathf.Approximately(l.bulletSpeed, 1f)) parts.Add($"balas a {Pct(l.bulletSpeed)} de velocidad");
             if (!Mathf.Approximately(l.enemyCount, 1f)) parts.Add($"{Pct(l.enemyCount)} de enemigos");
-            if (l.playerHalfHearts > 0) parts.Add($"+{l.playerHalfHearts / 2f:0.#} corazón(es)");
+            if (l.playerHalfHearts > 0) parts.Add($"+{l.playerHalfHearts} corazón(es)");
             if (parts.Count == 0) return "La experiencia normal.";
             var s = string.Join(", ", parts) + ".";
             return char.ToUpper(s[0]) + s.Substring(1);

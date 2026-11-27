@@ -62,7 +62,9 @@ namespace OnLinces
             counter.enableAutoSizing = false;
             counter.fontSize = PixelText.Base * 2f;
             counter.color = Color.white;
-                        counter.raycastTarget = false;
+            counter.textWrappingMode = TextWrappingModes.NoWrap; // dos dígitos no caben en el ícono y partían en dos filas
+            counter.overflowMode = TextOverflowModes.Overflow;
+            counter.raycastTarget = false;
             counter.enabled = false;
         }
 
