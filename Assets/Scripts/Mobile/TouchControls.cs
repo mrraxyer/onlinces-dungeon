@@ -26,7 +26,12 @@ namespace OnLinces
         [SerializeField] Button continueButton;
         [SerializeField] Button quitButton;
 
-        public static bool Active { get; private set; }
+        /// Controles en pantalla en uso: teléfono en modo táctil. Con un mando físico el teléfono pasa a modo mando
+        /// (sin controles en pantalla, apuntado con stick, íconos de mando) y vuelve a táctil al tocar la pantalla.
+        public static bool Active => touchDevice && !padMode;
+        /// Teléfono (o "probar con el ratón" en el editor), use o no un mando.
+        public static bool TouchDevice => touchDevice;
+        static bool touchDevice, padMode;
         /// (0,0) si no apunta.
         public static Vector2 Aim { get; private set; }
         public static bool FireHeld { get; private set; }
@@ -36,7 +41,7 @@ namespace OnLinces
         static bool padActive;
         /// Nombre del botón según el mando: Xbox o PlayStation.
         public static string Pad(string xbox, string ps) =>
-            (Coop.Configured && Coop.P1Pad != null ? Coop.P1Pad : Gamepad.current) is UnityEngine.InputSystem.DualShock.DualShockGamepad ? ps : xbox;
+            Coop.IsPlayStation(Coop.Configured && Coop.P1Pad != null ? Coop.P1Pad : Gamepad.current) ? ps : xbox;
         /// Ícono del botón (Resources/Sprite Assets/Buttons) según el dispositivo en uso.
         public static string Key(string keyboard, string xbox, string ps) =>
             $"<sprite=\"Buttons\" name=\"{(PadActive ? Pad(xbox, ps) : keyboard)}\">";
@@ -52,7 +57,7 @@ namespace OnLinces
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics()
         {
-            Active = false;
+            touchDevice = padMode = false;
             Aim = Vector2.zero;
             FireHeld = false;
             padActive = false;
@@ -60,7 +65,7 @@ namespace OnLinces
 
         void Awake()
         {
-            Active = Application.isMobilePlatform || (Application.isEditor && forceInEditor);
+            touchDevice = Application.isMobilePlatform || (Application.isEditor && forceInEditor);
             if (skillButton) skillAlpha = skillButton.color.a;
             if (pauseButton) pauseButton.onClick.AddListener(Pause);
             if (continueButton) continueButton.onClick.AddListener(Resume);
@@ -70,8 +75,13 @@ namespace OnLinces
             BuildMeleeButton();
             if (pausePanel) pausePanel.SetActive(false);
             SceneManager.sceneLoaded += OnSceneLoaded;
-            // en táctil los sticks en pantalla son un mando virtual: no cuenta
-            anyButton = InputSystem.onAnyButtonPress.Call(c => { if (!Active) padActive = c.device is Gamepad; });
+            anyButton = InputSystem.onAnyButtonPress.Call(c =>
+            {
+                if (!touchDevice) { padActive = c.device is Gamepad; return; }
+                // los controles en pantalla son un mando virtual (no nativo): no cuentan como mando físico
+                if (c.device is Gamepad && c.device.native) padMode = padActive = true;
+                else if (c.device is Touchscreen || c.device is Mouse) padMode = padActive = false;
+            });
         }
 
         void OnDestroy()
@@ -104,12 +114,11 @@ namespace OnLinces
 
             // Esc en PC, botón "atrás" en Android, Start/Options en mando
             var pad = Gamepad.current;
-            if (!Active)
-            {
-                // los sticks y el ratón no son botones: se revisan aparte
-                if (pad != null && (pad.leftStick.ReadValue().sqrMagnitude > 0.25f || pad.rightStick.ReadValue().sqrMagnitude > 0.25f)) padActive = true;
-                else if (Mouse.current != null && Mouse.current.delta.ReadValue().sqrMagnitude > 4f) padActive = false;
-            }
+            // los sticks y el ratón no son botones: se revisan aparte
+            bool sticks = pad != null && (pad.leftStick.ReadValue().sqrMagnitude > 0.25f || pad.rightStick.ReadValue().sqrMagnitude > 0.25f);
+            if (touchDevice) { if (sticks && pad.native) padMode = padActive = true; }
+            else if (sticks) padActive = true;
+            else if (Mouse.current != null && Mouse.current.delta.ReadValue().sqrMagnitude > 4f) padActive = false;
             if (player != null && ((Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) || (pad != null && pad.startButton.wasPressedThisFrame)))
             {
                 if (!paused) Pause();
@@ -119,7 +128,14 @@ namespace OnLinces
             // mando en menús: si nada está seleccionado, selecciona el botón más alto
             if (PadActive && (player == null || paused)) SelectForGamepad();
 
-            if (!Active) return; // PC: solo pausa
+            if (!Active)
+            {
+                // PC, o teléfono con mando: solo pausa, sin controles en pantalla
+                if (gameplay && gameplay.activeSelf) gameplay.SetActive(false);
+                Aim = Vector2.zero;
+                FireHeld = false;
+                return;
+            }
 
             bool show = player != null && !paused;
             if (gameplay && gameplay.activeSelf != show) gameplay.SetActive(show);

@@ -34,7 +34,7 @@ namespace OnLinces
         /// Lo abre el botón de la mascota. En el teléfono no hay nada que elegir: empieza directo.
         public static void Open(Mascot mascot, AudioClip clickClip)
         {
-            if (TouchControls.Active) { Coop.Configured = false; SceneFlow.StartRun(mascot); return; }
+            if (TouchControls.TouchDevice) { Coop.Configured = false; SceneFlow.StartRun(mascot); return; }
             if (FindAnyObjectByType<PlayerSetup>()) return;
             var canvas = FindObjectsByType<Canvas>(FindObjectsInactive.Exclude)
                 // solo la escena actual: el canvas de ScreenFade (DontDestroyOnLoad, sin CanvasScaler) lo encogía en la 2ª visita

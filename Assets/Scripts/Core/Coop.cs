@@ -20,6 +20,10 @@ namespace OnLinces
 
         /// Ícono del botón según el mando (Xbox o PlayStation).
         public static string PadKey(Gamepad pad, string xbox, string ps) =>
-            $"<sprite=\"Buttons\" name=\"{(pad is UnityEngine.InputSystem.DualShock.DualShockGamepad ? ps : xbox)}\">";
+            $"<sprite=\"Buttons\" name=\"{(IsPlayStation(pad) ? ps : xbox)}\">";
+
+        /// DualShock o DualSense. En Android Unity solo reconoce el DS4: el DualSense llega como mando genérico, se ve por el nombre.
+        public static bool IsPlayStation(Gamepad pad) =>
+            pad is UnityEngine.InputSystem.DualShock.DualShockGamepad || (pad != null && pad.description.product is string n && n.Contains("DualSense"));
     }
 }
