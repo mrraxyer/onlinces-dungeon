@@ -39,7 +39,7 @@ namespace OnLinces
             Current = current;
 
             // sin Prompt (carteles): solo el diálogo, sin botón
-            var prompt = current != null && !string.IsNullOrEmpty(current.Prompt) ? (TouchControls.Active ? "<b>USAR:</b> " : "E: ") + current.Prompt : "";
+            var prompt = current != null && !string.IsNullOrEmpty(current.Prompt) ? (TouchControls.Active ? "<b>USAR:</b> " : TouchControls.Key("key_e", "xb_a", "ps_cross") + " ") + current.Prompt : "";
             if (prompt != shownPrompt || current != shownTarget)
             {
                 shownPrompt = prompt;

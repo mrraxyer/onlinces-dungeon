@@ -6,7 +6,7 @@ namespace OnLinces
     /// Habilidad del puesto.
     ///  · Deploy doble: dispara las dos armas.
     ///  · Junta general: daño y cadencia x2 + torreta.
-    ///  · Suplencia: escudo, invulnerable y +½ vida.
+    ///  · Suplencia: escudo temporal e invulnerable.
     ///  · Firewall total: burbuja que borra balas.
     public sealed class PlayerSkill : MonoBehaviour
     {
@@ -23,6 +23,7 @@ namespace OnLinces
         [SerializeField] AudioClip useClip;
         [SerializeField] AudioClip notReadyClip;
 
+        const float SuplenciaShieldSeconds = 6f;
         float cooldownLeft, activeLeft;
         SkillKind activeKind;
 
@@ -82,9 +83,8 @@ namespace OnLinces
                     }
                     break;
                 case SkillKind.Suplencia:
-                    health?.GiveShield();
+                    health?.GiveShield(SuplenciaShieldSeconds);
                     health?.GiveIframes(2.5f);
-                    health?.Heal(1);
                     break;
                 case SkillKind.FirewallTotal:
                     health?.GiveIframes(0.5f);

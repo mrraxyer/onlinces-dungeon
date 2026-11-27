@@ -33,13 +33,28 @@ namespace OnLinces
         [Header("Energía (se llena en cada piso)")]
         [SerializeField] int maxEnergy = 140;
 
+        [Header("Melee (sin energía y con un enemigo encima)")]
+        [Tooltip("Hoja de 3 cuadros en horizontal")]
+        [SerializeField] Sprite meleeSheet;
+        [SerializeField] AudioClip meleeClip;
+        [SerializeField] float meleeDamage = 4f;
+        [Tooltip("px: distancia a la que se activa")]
+        [SerializeField] float meleeTriggerPx = 30f;
+        [SerializeField] float meleeRadiusPx = 24f;
+        [SerializeField] float meleeDelay = 0.35f;
+        [Tooltip("px/s del impulso hacia el enemigo")]
+        [SerializeField] float meleeLungePx = 260f;
+
         const float ShootAnimTime = 0.14f;
         const float DoubleAngle = 0.12f; // radianes
 
         int current;
         const float EmptyRegenSeconds = 3f;
+        // armas rápidas: cobran energía como máximo una vez por ventana
+        const float EnergyWindow = 0.5f;
 
-        float cooldown, cooldown2, shootAnim, noEnergyWarn, regenTimer;
+        float cooldown, cooldown2, shootAnim, noEnergyWarn, regenTimer, energyWindow;
+        Sprite[] meleeFrames;
         PlayerStats stats;
         PlayerSkill skill;
 
@@ -84,6 +99,7 @@ namespace OnLinces
             cooldown2 -= Time.deltaTime;
             shootAnim -= Time.deltaTime;
             noEnergyWarn -= Time.deltaTime;
+            energyWindow -= Time.deltaTime;
 
             // recarga lenta mientras no esté al máximo
             if (Energy < maxEnergy)
@@ -124,9 +140,13 @@ namespace OnLinces
             if (cooldown <= 0f && Current != null)
             {
                 cooldown = Current.fireDelay * delayMult;
-                if (Energy >= Current.energyCost)
+                if (energyWindow > 0f) Fire(Current, aim); // ya pagado en esta ventana
+                // sin energía (aunque el arma sea gratis): melee si hay un enemigo encima
+                else if (Energy < Mathf.Max(1, Current.energyCost) && TryMelee()) cooldown = meleeDelay;
+                else if (Energy >= Current.energyCost)
                 {
                     Energy -= Current.energyCost;
+                    if (Current.energyCost > 0) energyWindow = EnergyWindow;
                     Fire(Current, aim);
                 }
                 else if (noEnergyWarn <= 0f)
@@ -142,6 +162,61 @@ namespace OnLinces
                 cooldown2 = other.fireDelay * delayMult;
                 Fire(other, Rotate(aim, DoubleAngle));
             }
+        }
+
+        bool TryMelee()
+        {
+            // enemigo más cercano dentro del rango
+            Component target = null;
+            float best = Units.Px(meleeTriggerPx);
+            foreach (var col in Physics2D.OverlapCircleAll(transform.position, best))
+            {
+                var h = col.GetComponentInParent<IHittable>();
+                if (h is not (Enemy or Boss) || !h.CanBeHit) continue;
+                float d = Vector2.Distance(col.ClosestPoint(transform.position), transform.position);
+                if (d <= best) { best = d; target = (Component)h; }
+            }
+            if (target == null) return false;
+
+            var dir = (Vector2)(target.transform.position - transform.position);
+            dir = dir.sqrMagnitude > 0.0001f ? dir.normalized : controller.Aim;
+            controller.Knock(dir * meleeLungePx);
+            shootAnim = ShootAnimTime;
+            Sfx.Play(meleeClip, 0.7f);
+
+            float damage = meleeDamage * (stats ? stats.DamageMult : 1f);
+            var center = (Vector2)transform.position + dir * Units.Px(14);
+            var hit = new HashSet<IHittable>();
+            foreach (var col in Physics2D.OverlapCircleAll(center, Units.Px(meleeRadiusPx)))
+            {
+                var h = col.GetComponentInParent<IHittable>();
+                if (h != null && h.CanBeHit && hit.Add(h)) h.Hit(damage, dir);
+            }
+            if (meleeSheet) StartCoroutine(SlashFx(center, dir));
+            return true;
+        }
+
+        System.Collections.IEnumerator SlashFx(Vector2 at, Vector2 dir)
+        {
+            if (meleeFrames == null)
+            {
+                // la hoja viene sin cortar: 3 cuadros cuadrados
+                var r = meleeSheet.rect;
+                float w = r.width / 3f;
+                meleeFrames = new Sprite[3];
+                for (int i = 0; i < 3; i++)
+                    meleeFrames[i] = Sprite.Create(meleeSheet.texture, new Rect(r.x + w * i, r.y, w, r.height), new Vector2(0.5f, 0.5f), meleeSheet.pixelsPerUnit);
+            }
+            var sr = new GameObject("Slash").AddComponent<SpriteRenderer>();
+            sr.transform.SetPositionAndRotation(at + Vector2.up * Units.Px(8), Quaternion.Euler(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg));
+            if (weaponRenderer) sr.sharedMaterial = weaponRenderer.sharedMaterial;
+            sr.sortingOrder = 10;
+            foreach (var f in meleeFrames)
+            {
+                sr.sprite = f;
+                yield return new WaitForSeconds(0.05f);
+            }
+            Destroy(sr.gameObject);
         }
 
         static Vector2 Rotate(Vector2 v, float a) =>

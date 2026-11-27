@@ -33,9 +33,8 @@ namespace OnLinces
         [SerializeField] SpriteFx deathFx;
         [SerializeField] SpriteFx spawnFx;
 
-        [Header("Vida y velocidad (base + por piso)")]
+        [Header("Vida (fija, x dificultad) y velocidad (base + por piso)")]
         [SerializeField] float baseHp = 3f;
-        [SerializeField] float hpPerFloor = 1f;
         [SerializeField] float baseSpeedPx = 48f;
         [SerializeField] float speedPerFloorPx = 4f;
         [Tooltip("px")]
@@ -87,7 +86,7 @@ namespace OnLinces
         void Start()
         {
             floorNum = GameManager.Instance.Run.Floor;
-            hp = presetHp ?? (baseHp + hpPerFloor * floorNum) * DifficultyInfo.EnemyHp(GameManager.Instance.Run.Difficulty);
+            hp = presetHp ?? baseHp * DifficultyInfo.EnemyHp(GameManager.Instance.Run.Difficulty);
             fullHp = hp;
             home = transform.position;
             speedPx = baseSpeedPx + speedPerFloorPx * floorNum;

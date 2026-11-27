@@ -15,10 +15,12 @@ namespace OnLinces
         public sealed class Level
         {
             public string displayName = "Media";
-            [Tooltip("Multiplica la vida de los enemigos comunes")]
+            [Tooltip("Multiplica la vida base de los enemigos comunes (igual en todos los pisos)")]
             public float enemyHp = 1f;
-            [Tooltip("Multiplica la vida de los jefes")]
-            public float bossHp = 1f;
+            [Header("Vida de cada jefe, en corazones (1 corazón = 2 de vida)")]
+            public int spaghettiHearts = 44;
+            public int divHearts = 60;
+            public int kernelHearts = 75;
             [Tooltip("Multiplica la velocidad de las balas enemigas")]
             public float bulletSpeed = 1f;
             [Tooltip("Multiplica cuántos enemigos salen por oleada")]
@@ -27,15 +29,16 @@ namespace OnLinces
             public int playerHalfHearts;
         }
 
-        public Level facil = new() { displayName = "Fácil", enemyHp = 0.7f, bossHp = 0.7f, bulletSpeed = 0.85f, enemyCount = 0.75f, playerHalfHearts = 2 };
-        public Level media = new();
-        public Level dificil = new() { displayName = "Difícil", enemyHp = 1.35f, bossHp = 1.35f, bulletSpeed = 1.2f, enemyCount = 1.3f };
+        public Level facil = new() { displayName = "Fácil", enemyHp = 0.8f, spaghettiHearts = 35, divHearts = 48, kernelHearts = 60, bulletSpeed = 0.85f, enemyCount = 0.75f, playerHalfHearts = 2 };
+        public Level media = new() { spaghettiHearts = 53, divHearts = 71, kernelHearts = 90 };
+        public Level dificil = new() { displayName = "Difícil", enemyHp = 1.6f, spaghettiHearts = 88, divHearts = 119, kernelHearts = 150, bulletSpeed = 2f, enemyCount = 1.8f };
 
-        [Header("Jefes (en todas las dificultades)")]
-        [Tooltip("Vida base de todos los jefes, en corazones (1 corazón = 2 de vida, como el jugador)")]
-        public int bossHearts = 33;
-        [Tooltip("Vida extra de los jefes por cada piso después del 1 (0.35 = +35%)")]
-        public float bossHpPerFloor = 0.35f;
+        /// Vida máxima del jefe (fija, no cambia por piso).
+        public float BossHp(Difficulty d, BossKind k)
+        {
+            var l = Get(d);
+            return (k switch { BossKind.Spaghetti => l.spaghettiHearts, BossKind.Div => l.divHearts, _ => l.kernelHearts }) * HpPerHeart;
+        }
 
         public Level Get(Difficulty d) => d switch { Difficulty.Facil => facil, Difficulty.Media => media, _ => dificil };
 
@@ -62,7 +65,6 @@ namespace OnLinces
             static string Pct(float v) => Mathf.RoundToInt(v * 100f) + "%";
             var parts = new List<string>();
             if (!Mathf.Approximately(l.enemyHp, 1f)) parts.Add($"enemigos con {Pct(l.enemyHp)} de vida");
-            if (!Mathf.Approximately(l.bossHp, 1f)) parts.Add($"jefes con {Pct(l.bossHp)} de vida");
             if (!Mathf.Approximately(l.bulletSpeed, 1f)) parts.Add($"balas a {Pct(l.bulletSpeed)} de velocidad");
             if (!Mathf.Approximately(l.enemyCount, 1f)) parts.Add($"{Pct(l.enemyCount)} de enemigos");
             if (l.playerHalfHearts > 0) parts.Add($"+{l.playerHalfHearts / 2f:0.#} corazón(es)");

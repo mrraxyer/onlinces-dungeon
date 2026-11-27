@@ -34,7 +34,7 @@ namespace OnLinces
         public bool TookDamageThisRoom { get; set; }
         public event Action Changed;
 
-        float iframes;
+        float iframes, shieldTimer;
         SpriteRenderer[] renderers;
 
         void Awake() => renderers = GetComponentsInChildren<SpriteRenderer>(true);
@@ -73,6 +73,13 @@ namespace OnLinces
         void Update()
         {
             iframes -= Time.deltaTime;
+            if (shieldTimer > 0f && (shieldTimer -= Time.deltaTime) <= 0f && HasShield)
+            {
+                Shield = 0;
+                if (shieldVisual) shieldVisual.SetActive(false);
+                HUD.Feedback("Escudo agotado", HUD.Info);
+                Changed?.Invoke();
+            }
             float a = iframes > 0f && (int)(iframes * 14f) % 2 == 0 ? 0.35f : 1f;
             foreach (var r in renderers)
             {
@@ -134,9 +141,11 @@ namespace OnLinces
             Changed?.Invoke();
         }
 
-        public void GiveShield()
+        /// seconds > 0: se acaba solo (si no había uno permanente).
+        public void GiveShield(float seconds = 0f)
         {
             if (!HasShield) HUD.Feedback("Escudo activado", HUD.Info);
+            shieldTimer = seconds > 0f && (!HasShield || shieldTimer > 0f) ? seconds : 0f;
             Shield = shieldPoints;
             if (shieldVisual) shieldVisual.SetActive(true);
             Changed?.Invoke();

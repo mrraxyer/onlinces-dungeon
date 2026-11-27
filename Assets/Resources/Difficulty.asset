@@ -15,23 +15,27 @@ MonoBehaviour:
   facil:
     displayName: "F\xE1cil"
     enemyHp: 0.8
-    bossHp: 0.8
+    spaghettiHearts: 35
+    divHearts: 48
+    kernelHearts: 60
     bulletSpeed: 0.85
     enemyCount: 0.75
     playerHalfHearts: 2
   media:
     displayName: Media
     enemyHp: 1
-    bossHp: 1.2
+    spaghettiHearts: 53
+    divHearts: 71
+    kernelHearts: 90
     bulletSpeed: 1
     enemyCount: 1.2
     playerHalfHearts: 0
   dificil:
     displayName: "Dif\xEDcil"
     enemyHp: 1.6
-    bossHp: 2
+    spaghettiHearts: 88
+    divHearts: 119
+    kernelHearts: 150
     bulletSpeed: 2
     enemyCount: 1.8
     playerHalfHearts: 0
-  bossHearts: 44
-  bossHpPerFloor: 0.35

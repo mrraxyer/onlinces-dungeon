@@ -6,12 +6,12 @@ namespace OnLinces
     [RequireComponent(typeof(LineRenderer))]
     public sealed class Telegraph : MonoBehaviour
     {
-        enum Shape { Beam, Circle }
+        enum Shape { Beam, Circle, Ring }
 
         LineRenderer line;
         Shape shape;
         Vector2 a, b;
-        float radius, warn, active, t;
+        float radius, band, warn, active, t;
         Color color;
         bool hitDone;
         PlayerHealth player;
@@ -32,6 +32,15 @@ namespace OnLinces
             return tg;
         }
 
+        /// Anillo de grosor bandPx alrededor de p: solo daña sobre la banda.
+        public static Telegraph Ring(Telegraph prefab, Vector2 p, float radiusPx, float bandPx, float warn, Color color)
+        {
+            var tg = Instantiate(prefab);
+            tg.band = Units.Px(bandPx);
+            tg.Init(Shape.Ring, p, p, Units.Px(radiusPx), warn, 0.3f, color);
+            return tg;
+        }
+
         void Init(Shape s, Vector2 pa, Vector2 pb, float r, float w, float act, Color c)
         {
             line = GetComponent<LineRenderer>();
@@ -48,7 +57,7 @@ namespace OnLinces
             }
             else
             {
-                const int n = 28;
+                int n = shape == Shape.Ring ? 48 : 28;
                 line.positionCount = n;
                 line.loop = true;
                 for (int i = 0; i < n; i++)
@@ -60,6 +69,15 @@ namespace OnLinces
             Refresh();
         }
 
+        /// Mueve el rayo; puede volver a dañar (el jugador tiene invulnerabilidad breve).
+        public void Sweep(Vector2 pa, Vector2 pb)
+        {
+            a = pa; b = pb;
+            line.SetPosition(0, a);
+            line.SetPosition(1, b);
+            hitDone = false;
+        }
+
         void Update()
         {
             t += Time.deltaTime;
@@ -67,7 +85,7 @@ namespace OnLinces
             if (t >= warn && !hitDone && player != null && Touches(player.transform.position + Vector3.up * Units.Px(6)))
             {
                 hitDone = true;
-                player.Hurt(1, shape == Shape.Circle ? a : (Vector2)player.transform.position + Vector2.down);
+                player.Hurt(1, shape != Shape.Beam ? a : (Vector2)player.transform.position + Vector2.down);
             }
             if (t >= warn + active) Destroy(gameObject);
         }
@@ -78,13 +96,14 @@ namespace OnLinces
             float blink = 0.35f + 0.25f * Mathf.Sin(t * 20f);
             var c = color; c.a = on ? 0.95f : blink;
             line.startColor = line.endColor = c;
-            float w = shape == Shape.Beam ? radius * 2f : Units.Px(2);
+            float w = shape == Shape.Beam ? radius * 2f : shape == Shape.Ring ? band : Units.Px(2);
             line.startWidth = line.endWidth = on ? w : Mathf.Max(Units.Px(1), w * 0.35f);
         }
 
         bool Touches(Vector2 p)
         {
             if (shape == Shape.Circle) return Vector2.Distance(p, a) <= radius;
+            if (shape == Shape.Ring) return Mathf.Abs(Vector2.Distance(p, a) - radius) <= band / 2f + Units.Px(3);
             var ab = b - a;
             float k = Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude);
             return Vector2.Distance(p, a + ab * k) <= radius + Units.Px(4);

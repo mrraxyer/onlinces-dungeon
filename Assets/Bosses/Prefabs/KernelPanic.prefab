@@ -483,8 +483,8 @@ MonoBehaviour:
   subtitle: "El servidor no responde por alguna extra\xF1a raz\xF3n."
   phaseNotes:
   - "L\xE1ser con aviso (cara roja), volcado de memoria en 3 anillos y ping: 4 balas directas a ti."
-  - "L\xE1ser triple, ping de 5. Nuevo: reinicio (se teletransporta lejos y suelta un anillo) y fork bomb (invoca bugs)."
-  - "L\xE1ser triple m\xE1s abierto, ping de 6, anillos m\xE1s grandes e invoca 2 bugs."
+  - "Al empezar: se teletransporta al centro y queda 10 s inmune con un l\xE1ser de sala que te sigue mientras salen bugs. Luego: l\xE1ser triple, ping de 5. Nuevo: reinicio (se teletransporta lejos y suelta un anillo) y fork bomb (invoca bugs)."
+  - "Al empezar: vuelve al centro y queda 10 s inmune lanzando oleadas de 4 anillos cada vez m\xE1s amplios que da\xF1an si los pisas, mientras salen bugs. Luego: l\xE1ser triple m\xE1s abierto, ping de 6, anillos m\xE1s grandes e invoca 2 bugs."
   contactRadiusPx: 30
   spriteRenderer: {fileID: 6784881473340736960}
   frames:

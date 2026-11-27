@@ -21,6 +21,6 @@ MonoBehaviour:
   maxHp: 8
   skill: 2
   skillName: Suplencia
-  skillDescription: "Escudo, 2.5 s invulnerable y +\xBD vida."
-  cooldown: 13
+  skillDescription: "Escudo temporal (6 s) y 2.5 s invulnerable."
+  cooldown: 16
   duration: 2.5

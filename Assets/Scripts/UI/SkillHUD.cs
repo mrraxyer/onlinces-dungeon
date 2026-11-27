@@ -65,7 +65,7 @@ namespace OnLinces
             icon.color = ready ? Color.white : Dimmed;
             counter.enabled = !ready;
             if (!ready) counter.text = Mathf.CeilToInt(skill.CooldownFraction * r.cooldown).ToString();
-            string key = TouchControls.Active ? "" : "  [Espacio]";
+            string key = TouchControls.Active ? "" : "  " + TouchControls.Key("key_space", "xb_rb", "ps_r1");
             nameLabel.text = r.skillName + key;
         }
     }

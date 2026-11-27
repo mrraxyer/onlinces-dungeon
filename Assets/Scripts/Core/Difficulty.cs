@@ -9,7 +9,7 @@ namespace OnLinces
 
         public static string Name(Difficulty d) => L(d).displayName;
         public static float EnemyHp(Difficulty d) => L(d).enemyHp;
-        public static float BossHp(Difficulty d) => L(d).bossHp;
+        public static float BossHp(Difficulty d, BossKind k) => DifficultySettings.Current.BossHp(d, k);
         public static float Bullet(Difficulty d) => L(d).bulletSpeed;
         public static float Count(Difficulty d) => L(d).enemyCount;
         /// Medios corazones extra.

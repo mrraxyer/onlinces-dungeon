@@ -9,6 +9,8 @@ namespace OnLinces
     ///  · Spaghetti: espiral, embestida, látigos e invoca bugs.
     ///  · <div>: solo recibe daño centrado; los disparos lo empujan.
     ///  · Kernel Panic: láser con carga, volcado de memoria, ping y reinicio (se teletransporta).
+    ///    Al entrar a fase 2 y 3 se teletransporta al centro, 10 s inmune e invoca esbirros:
+    ///    fase 2 con un láser de sala que sigue al jugador; fase 3 con oleadas de 4 anillos alrededor.
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class Boss : MonoBehaviour, IHittable
     {
@@ -44,6 +46,11 @@ namespace OnLinces
         [SerializeField] AudioClip transitionClip;
 
         const float BulletSpeed = 0.8f, PhaseTransition = 3f, Windup = 0.4f;
+        // ataque de sala del Kernel (fases 2 y 3)
+        const float LighthouseTime = 10f, LighthouseTurnDeg = 32f, LighthouseSpawnEvery = 3.3f;
+        // fase 3: anillos desde el kernel hasta las esquinas de la sala (px), uno tras otro
+        const float RingFirstPx = 56f, RingGapPx = 66f, RingBandPx = 18f;
+        const float RingWarn = 0.9f, RingStep = 0.15f, RingWaveEvery = 3.2f;
         // pausa entre ataques: más corta en cada fase
         float Rest => phase == 1 ? 0.9f : phase == 2 ? 0.75f : 0.6f;
         static readonly (string css, Vector2 dir)[] CssMoves =
@@ -56,7 +63,7 @@ namespace OnLinces
 
         public float Hp { get; private set; }
         public float MaxHp => maxHp;
-        public bool CanBeHit => intro <= 0f && !dying && transitionT <= 0f;
+        public bool CanBeHit => intro <= 0f && !dying && transitionT <= 0f && state != "lighthouse";
         public int Phase => phase;
         public int NextPhase => nextPhase;
         public bool InTransition => transitionT > 0f;
@@ -68,6 +75,10 @@ namespace OnLinces
         int phase = 1, nextPhase = 1, attackI, subN;
         float transitionT, windupT;
         SpriteRenderer shield;
+        Telegraph beam;
+        float beamAngle, waveT, fireT;
+        int firesLeft;
+        bool ringsMode;
         string state = "move";
         Vector2 knockPx, dashDir, anchor;
         bool dying, centered;
@@ -77,10 +88,7 @@ namespace OnLinces
             room = r;
             var run = GameManager.Instance.Run;
             // valores en Assets/Resources/Difficulty.asset
-            var cfg = DifficultySettings.Current;
-            maxHp = cfg.bossHearts * DifficultySettings.HpPerHeart;
-            maxHp *= 1f + cfg.bossHpPerFloor * (run.Floor - 1);
-            maxHp *= DifficultyInfo.BossHp(run.Difficulty);
+            maxHp = DifficultyInfo.BossHp(run.Difficulty, kind);
             Hp = maxHp;
             anchor = transform.position;
         }
@@ -110,7 +118,7 @@ namespace OnLinces
         {
             t += Time.deltaTime;
             if (kind == BossKind.Kernel && frames.Length > 1)
-                spriteRenderer.sprite = frames[state == "laser" || (phase == 3 && (int)(t * 4f) % 2 == 0) ? 1 : 0]; // cara roja al cargar
+                spriteRenderer.sprite = frames[state == "laser" || state == "lighthouse" || (phase == 3 && (int)(t * 4f) % 2 == 0) ? 1 : 0]; // cara roja al cargar
             else if (frames.Length > 0) spriteRenderer.sprite = frames[(int)(t * (phase < 3 ? 6 : 9)) % frames.Length];
             flash -= Time.deltaTime;
             cssT -= Time.deltaTime;
@@ -131,6 +139,11 @@ namespace OnLinces
                     shield.sprite = shieldFrames[(int)(t * 8f) % shieldFrames.Length];
                     shield.color = new Color(1f, 1f, 1f, 0.55f + 0.3f * Mathf.Sin(t * 12f));
                 }
+            }
+            if (shield && state == "lighthouse")
+            {
+                shield.enabled = true;
+                shield.sprite = shieldFrames[(int)(t * 8f) % shieldFrames.Length];
             }
             if (windupT > 0f)
             {
@@ -202,6 +215,7 @@ namespace OnLinces
             Ring(8 + phase * 2, 90f); // onda al despertar
             state = "move";
             stateT = 0.8f * Rest;
+            if (kind == BossKind.Kernel && phase >= 2) StartLighthouse();
         }
 
         // ---------------- Spaghetti Code ----------------
@@ -390,6 +404,38 @@ namespace OnLinces
         }
 
         // ---------------- Kernel Panic ----------------
+        void StartLighthouse()
+        {
+            state = "lighthouse";
+            stateT = LighthouseTime;
+            subT = 1f; // primera oleada de bugs
+            waveT = 0f;
+            firesLeft = 0;
+            ringsMode = phase >= 3;
+            // se teletransporta al centro (como el reinicio)
+            rb.position = Center;
+            transform.position = Center;
+            intro = 0.6f;
+            Sfx.Play(dashClip);
+            Css(ringsMode ? "kernel: memory flood" : "systemctl start laser-sala.service", 2.5f);
+        }
+
+        void ClearBeam()
+        {
+            if (beam) Destroy(beam.gameObject);
+            beam = null;
+        }
+
+        void OnDestroy() => ClearBeam();
+
+        /// Carga (sonido + aviso que parpadea) y suelta n disparos con sonido, separados RingStep.
+        void ChargeAttack(int fires)
+        {
+            Sfx.Play(laserChargeClip, 0.8f);
+            fireT = RingWarn + 0.3f; // el aviso de Telegraph dura warn + 0.3
+            firesLeft = fires;
+        }
+
         Vector2 Kernel(float dt)
         {
             stateT -= dt; subT -= dt;
@@ -397,6 +443,55 @@ namespace OnLinces
             Vector2 eyes = (Vector2)transform.position + Vector2.up * Units.Px(46);
             switch (state)
             {
+                case "lighthouse":
+                    if (!ringsMode)
+                    {
+                        var toP = (Vector2)player.transform.position - eyes;
+                        float target = Mathf.Atan2(toP.y, toP.x) * Mathf.Rad2Deg;
+                        if (beam == null && stateT > 0f)
+                        {
+                            beamAngle = target;
+                            beam = Telegraph.Beam(telegraphPrefab, eyes, eyes + Dir(beamAngle * Mathf.Deg2Rad) * Units.Px(500), RingWarn, LighthouseTime, 6f, new Color(1f, 0.3f, 0.4f));
+                            ChargeAttack(1);
+                        }
+                        // gira despacio hacia el jugador
+                        beamAngle = Mathf.MoveTowardsAngle(beamAngle, target, LighthouseTurnDeg * dt);
+                        if (beam) beam.Sweep(eyes, eyes + Dir(beamAngle * Mathf.Deg2Rad) * Units.Px(500));
+                    }
+                    else if ((waveT -= dt) <= 0f)
+                    {
+                        // anillos cada vez más amplios, se activan del centro hacia afuera
+                        waveT = RingWaveEvery;
+                        var c = (Vector2)transform.position + Vector2.up * Units.Px(30);
+                        // hasta la esquina más lejana de la sala
+                        var r = room ? room.PlayRect : new Rect(c - Vector2.one * 6f, Vector2.one * 12f);
+                        float farPx = Mathf.Max(Vector2.Distance(c, r.min), Vector2.Distance(c, r.max),
+                            Vector2.Distance(c, new Vector2(r.xMin, r.yMax)), Vector2.Distance(c, new Vector2(r.xMax, r.yMin))) * Units.PPU;
+                        int n = 0;
+                        for (float radius = RingFirstPx; radius <= farPx + RingBandPx; radius += RingGapPx, n++)
+                            Telegraph.Ring(telegraphPrefab, c, radius, RingBandPx, RingWarn + RingStep * n, new Color(1f, 0.3f, 0.4f));
+                        ChargeAttack(n);
+                    }
+                    if (firesLeft > 0 && (fireT -= dt) <= 0f)
+                    {
+                        Sfx.Play(laserFireClip, ringsMode ? 0.4f : 0.7f);
+                        firesLeft--;
+                        fireT = RingStep;
+                    }
+                    if (subT <= 0f)
+                    {
+                        subT = LighthouseSpawnEvery;
+                        if (room) room.SpawnMinions(minionPrefab, 2, transform.position);
+                        Css("fork() bomb", 1.5f);
+                    }
+                    if (stateT <= 0f)
+                    {
+                        ClearBeam();
+                        if (shield) shield.enabled = false;
+                        Sfx.Play(phaseClip);
+                        state = "move"; stateT = 1f * Rest;
+                    }
+                    return Vector2.zero;
                 case "move":
                     if (stateT <= 0f)
                     {

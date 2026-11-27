@@ -1159,6 +1159,13 @@ MonoBehaviour:
   shootOn: {fileID: 8300000, guid: 2c15f9cd5181879408c4cd77eddacde7, type: 3}
   shootOff: {fileID: 8300000, guid: a423f48dc378df946969000e101c5ab3, type: 3}
   maxEnergy: 140
+  meleeSheet: {fileID: 21300000, guid: c63ced17a6b534e4fac75c8e84b76908, type: 3}
+  meleeClip: {fileID: 8300000, guid: 6ff00c65be88e5a4c963222dcda416db, type: 3}
+  meleeDamage: 4
+  meleeTriggerPx: 30
+  meleeRadiusPx: 24
+  meleeDelay: 0.35
+  meleeLungePx: 260
 --- !u!114 &6651623252626382245
 MonoBehaviour:
   m_ObjectHideFlags: 0

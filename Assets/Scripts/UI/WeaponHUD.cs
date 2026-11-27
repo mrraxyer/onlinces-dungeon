@@ -24,7 +24,7 @@ namespace OnLinces
         const float LineHeight = 14f;
 
         WeaponData shownCurrent, shownOther;
-        bool shown, shownTouch;
+        bool shown, shownTouch, shownPad;
         TMP_Text costLabel;
 
         // Línea de costo creada en runtime (mismo estilo que el nombre) para no tocar cada escena de piso.
@@ -45,11 +45,12 @@ namespace OnLinces
             if (cur != null) icon.color = weapons.Energy >= cur.energyCost ? Color.white : Dimmed;
             var other = weapons ? weapons.Other : null;
             bool touch = TouchControls.Active;
-            if (shown && cur == shownCurrent && other == shownOther && touch == shownTouch) return;
+            if (shown && cur == shownCurrent && other == shownOther && touch == shownTouch && TouchControls.PadActive == shownPad) return;
             shown = true;
             shownCurrent = cur;
             shownOther = other;
             shownTouch = touch;
+            shownPad = TouchControls.PadActive;
 
             panel.SetActive(cur != null);
             if (cur == null) return;
@@ -63,7 +64,7 @@ namespace OnLinces
 
             otherRow.SetActive(other != null);
             if (other != null) otherIcon.sprite = other.icon;
-            keyLabel.text = touch ? "" : "Q";
+            keyLabel.text = touch ? "" : TouchControls.Key("key_q", "xb_lb", "ps_l1");
         }
     }
 }
