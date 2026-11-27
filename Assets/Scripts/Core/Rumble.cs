@@ -56,7 +56,7 @@ namespace OnLinces
                 until = Mathf.Max(until, cur.until);
             }
             active[pad] = new Pulse { low = low, high = high, until = until };
-            pad.SetMotorSpeeds(Mathf.Clamp01(low), Mathf.Clamp01(high));
+            Motors(pad, Mathf.Clamp01(low), Mathf.Clamp01(high));
             if (runner == null)
             {
                 runner = new GameObject("Rumble").AddComponent<Runner>();
@@ -65,10 +65,17 @@ namespace OnLinces
             }
         }
 
+        // el DualSense va por DualSenseFx: Unity solo le manda vibración por USB y pisaría la luz y los gatillos
+        static void Motors(Gamepad pad, float low, float high)
+        {
+            if (DualSenseFx.Handles(pad)) DualSenseFx.SetMotors(pad, low, high);
+            else pad.SetMotorSpeeds(low, high);
+        }
+
         static void StopAll()
         {
             foreach (var pad in active.Keys)
-                if (pad.added) pad.SetMotorSpeeds(0f, 0f);
+                if (pad.added) Motors(pad, 0f, 0f);
             active.Clear();
         }
 
@@ -86,7 +93,7 @@ namespace OnLinces
                     if (Time.unscaledTime >= kv.Value.until || !kv.Key.added) done.Add(kv.Key);
                 foreach (var pad in done)
                 {
-                    if (pad.added) pad.SetMotorSpeeds(0f, 0f);
+                    if (pad.added) Motors(pad, 0f, 0f);
                     active.Remove(pad);
                 }
             }

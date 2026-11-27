@@ -55,6 +55,7 @@ namespace OnLinces
             if (cam == null) cam = Camera.main;
             if (aimOrigin == null) aimOrigin = transform;
             IsGuest = spawningGuest;
+            gameObject.AddComponent<PadFeedback>(); // luz, LEDs y gatillo del DualSense
             if (IsGuest)
             {
                 guestActions = Instantiate(move.asset);
