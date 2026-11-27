@@ -233,6 +233,7 @@ namespace OnLinces
             float damage = w.damage * (stats ? stats.DamageMult : 1f);
             if (skill && skill.IsActive(SkillKind.JuntaGeneral)) damage *= 2f;
             shootAnim = ShootAnimTime;
+            Rumble.Play(controller, 0f, 0.15f, 0.04f); // zumbido corto por disparo
 
             Vector2 origin = (Vector2)hand.position + aim * Units.Px(muzzleDistancePx);
             float baseAngle = Mathf.Atan2(aim.y, aim.x) * Mathf.Rad2Deg;

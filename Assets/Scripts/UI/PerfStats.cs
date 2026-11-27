@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace OnLinces
 {
     /// Estadísticas abajo a la izquierda: FPS, ms, mín/máx, CPU/GPU, memoria, resolución y gráfica de FPS.
-    /// Se prende en Pausa > Gráficos > Estadísticas.
+    /// Se prende en Pausa > Opciones > Estadísticas.
     public sealed class PerfStats : MonoBehaviour
     {
         const int N = 172, H = 32, Pad = 4, TextHeight = 44;

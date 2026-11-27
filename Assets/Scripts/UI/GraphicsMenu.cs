@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace OnLinces
 {
-    /// Submenú "Gráficos" de la pausa, hecho copiando su caja y sus botones.
+    /// Submenú "Opciones" de la pausa (gráficos y vibración), hecho copiando su caja y sus botones.
     /// Clic / A = siguiente valor (resolución y límite de FPS abren una lista); izquierda / derecha = anterior / siguiente; B = volver.
     public sealed class GraphicsMenu : MonoBehaviour
     {
@@ -53,7 +53,7 @@ namespace OnLinces
             box.name = "GraphicsBox";
             foreach (var b in box.GetComponentsInChildren<Button>(true)) Destroy(b.gameObject);
             var title = (RectTransform)box.transform.Find("Title");
-            title.GetComponent<TMP_Text>().text = "GRÁFICOS";
+            title.GetComponent<TMP_Text>().text = "OPCIONES";
 
             // en teléfono la resolución, el modo y el VSync los decide el sistema
             bool desktop = !Application.isMobilePlatform;
@@ -87,6 +87,7 @@ namespace OnLinces
                 d => VideoSettings.SetFpsLimit(limits[Wrap(Array.IndexOf(limits, VideoSettings.FpsLimit) + d, limits.Length)]),
                 () => !desktop || !VideoSettings.VSync, click: () => OpenDropdown(fpsList));
             Add(template, () => "Estadísticas: " + YesNo(VideoSettings.ShowStats), _ => VideoSettings.SetShowStats(!VideoSettings.ShowStats));
+            Add(template, () => "Vibración: " + YesNo(Rumble.Enabled), _ => Rumble.SetEnabled(!Rumble.Enabled));
             Add(template, () => "Volver", _ => Back(), cycles: false);
 
             var rt = (RectTransform)box.transform;
@@ -122,7 +123,7 @@ namespace OnLinces
             Select(rows[0].button);
         }
 
-        /// Un nivel atrás: lista → Gráficos → Pausa.
+        /// Un nivel atrás: lista → Opciones → Pausa.
         public void Back()
         {
             if (open != null)

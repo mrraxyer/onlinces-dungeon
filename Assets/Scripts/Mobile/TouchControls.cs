@@ -172,7 +172,7 @@ namespace OnLinces
             if (pausePanel) pausePanel.SetActive(false);
         }
 
-        // "Gráficos" entre Continuar y Salir (la caja crece un botón) y el panel de estadísticas
+        // "Opciones" entre Continuar y Salir (la caja crece un botón) y el panel de estadísticas
         void BuildGraphicsMenu()
         {
             const float step = 50f;
@@ -180,7 +180,7 @@ namespace OnLinces
             var btn = Instantiate(continueButton, box);
             btn.name = "BtnGraphics";
             btn.onClick = new Button.ButtonClickedEvent();
-            btn.GetComponentInChildren<TMP_Text>().text = "Gráficos";
+            btn.GetComponentInChildren<TMP_Text>().text = "Opciones";
             btn.transform.SetSiblingIndex(continueButton.transform.GetSiblingIndex() + 1);
             box.sizeDelta += new Vector2(0f, step);
             foreach (RectTransform child in box)
@@ -188,7 +188,7 @@ namespace OnLinces
             var cont = ((RectTransform)continueButton.transform).anchoredPosition;
             ((RectTransform)btn.transform).anchoredPosition = cont - new Vector2(0f, step);
             ((RectTransform)quitButton.transform).anchoredPosition = cont - new Vector2(0f, 2f * step);
-            // el prefab trae navegación explícita Continuar <-> Salir: se rehace en ciclo con Gráficos en medio
+            // el prefab trae navegación explícita Continuar <-> Salir: se rehace en ciclo con Opciones en medio
             Link(continueButton, quitButton, btn);
             Link(btn, continueButton, quitButton);
             Link(quitButton, btn, continueButton);

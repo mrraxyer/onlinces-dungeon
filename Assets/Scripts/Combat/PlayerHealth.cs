@@ -124,6 +124,9 @@ namespace OnLinces
             var away = (Vector2)transform.position - from;
             if (away.sqrMagnitude > 0.0001f) controller.Knock(away.normalized * knockbackPx);
             HitFeedback.PlayerHit(transform, away.sqrMagnitude > 0.0001f ? away.normalized : Vector2.zero, !HasShield);
+            // con escudo, más suave
+            if (HasShield) Rumble.Play(controller, 0.25f, 0.35f, 0.12f);
+            else Rumble.Play(controller, 0.7f, 0.9f, 0.25f);
 
             if (HasShield)
             {
@@ -184,6 +187,7 @@ namespace OnLinces
             IsDead = true;
             controller.enabled = false;
             Sfx.Play(dieClip);
+            Rumble.Play(controller, 1f, 1f, 0.6f);
             yield return new WaitForSeconds(1.2f);
             // en cooperativo sigue el otro y el caído sale del mapa; vuelve en el siguiente piso
             foreach (var p in All) if (!p.IsDead) { gameObject.SetActive(false); yield break; }
