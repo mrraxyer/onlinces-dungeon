@@ -93,7 +93,7 @@ namespace OnLinces
             iframes = invulnerableTime;
             var away = (Vector2)transform.position - from;
             if (away.sqrMagnitude > 0.0001f) controller.Knock(away.normalized * knockbackPx);
-            HitFeedback.PlayerHit(away.sqrMagnitude > 0.0001f ? away.normalized : Vector2.zero, !HasShield);
+            HitFeedback.PlayerHit(transform, away.sqrMagnitude > 0.0001f ? away.normalized : Vector2.zero, !HasShield);
 
             if (HasShield)
             {

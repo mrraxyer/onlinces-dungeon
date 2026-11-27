@@ -19,10 +19,6 @@ namespace OnLinces
         [Tooltip("Radio del desenfoque, en alturas de pantalla")]
         [SerializeField] float blurSize = 0.02f;
 
-        static readonly int CenterId = Shader.PropertyToID("_BlackoutCenter");
-        static readonly int RadiiId = Shader.PropertyToID("_BlackoutRadii");
-        static readonly int BlurId = Shader.PropertyToID("_BlackoutBlur");
-        static readonly int BlurSizeId = Shader.PropertyToID("_BlurSize");
 
         enum State { Calm, Warn, Active }
         State state;
@@ -46,15 +42,12 @@ namespace OnLinces
 
         void SetBlur(float amount)
         {
-            if (blurFeature) blurFeature.SetActive(amount > 0.01f);
-            Shader.SetGlobalFloat(BlurId, amount);
-            if (amount <= 0.01f || !playerLight) return;
+            // el desenfoque lo comparte con el golpe (ScreenBlur)
             var cam = Camera.main;
-            if (!cam) return;
+            if (amount <= 0.01f || !playerLight || !cam) { ScreenBlur.SetBlackout(blurFeature, 0f, Vector2.zero, Vector2.zero, blurSize); return; }
             float h = cam.orthographicSize * 2f;
-            Shader.SetGlobalVector(CenterId, cam.WorldToViewportPoint(playerLight.transform.position));
-            Shader.SetGlobalVector(RadiiId, new Vector4(playerLight.pointLightInnerRadius / h, playerLight.pointLightOuterRadius / h));
-            Shader.SetGlobalFloat(BlurSizeId, blurSize);
+            ScreenBlur.SetBlackout(blurFeature, amount, cam.WorldToViewportPoint(playerLight.transform.position),
+                new Vector2(playerLight.pointLightInnerRadius / h, playerLight.pointLightOuterRadius / h), blurSize);
         }
 
         bool Fighting()
