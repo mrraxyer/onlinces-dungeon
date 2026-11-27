@@ -39,6 +39,7 @@ namespace OnLinces
             var ph = other.GetComponentInParent<PlayerHealth>();
             if (ph == null || ph.gameObject.scene != gameObject.scene) return;
             player = ph;
+            PlayerHealth.GatherAt(ph);
             state = State.Fighting;
             player.TookDamageThisRoom = false;
             player.GetComponent<PlayerStats>()?.OnRoomEntered();

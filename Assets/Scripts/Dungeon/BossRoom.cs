@@ -54,6 +54,7 @@ namespace OnLinces
             if (started || practice) return;
             var ph = other.GetComponentInParent<PlayerHealth>();
             if (ph == null || ph.gameObject.scene != gameObject.scene) return;
+            PlayerHealth.GatherAt(ph);
             StartFight(bosses[Random.Range(0, bosses.Length)]);
         }
 
@@ -129,7 +130,7 @@ namespace OnLinces
                 loot.SpawnMany(loot.energy, boss.transform.position, loot.bossEnergyDrops);
                 loot.Spawn(loot.heart, boss.transform.position);
             }
-            FindAnyObjectByType<PlayerHealth>()?.Heal(2);
+            foreach (var p in PlayerHealth.All) p.Heal(2);
         }
 
         /// Práctica: en vez de morir, se cura y termina la pelea.
@@ -154,7 +155,7 @@ namespace OnLinces
             Sfx.Play(doorOpenClip);
             Music.Play(floorMusic);
             HUD.Toast(toast);
-            FindAnyObjectByType<PlayerHealth>()?.Heal(99);
+            foreach (var p in PlayerHealth.All) p.Heal(99);
         }
     }
 }

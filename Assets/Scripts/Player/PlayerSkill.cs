@@ -55,7 +55,7 @@ namespace OnLinces
             }
             if (firewallBubble) firewallBubble.SetActive(IsActive(SkillKind.FirewallTotal));
 
-            if (skillAction == null || !skillAction.action.WasPressedThisFrame()) return;
+            if (skillAction == null || !GetComponent<PlayerController>().Act(skillAction).WasPressedThisFrame()) return;
             var health = GetComponent<PlayerHealth>();
             if (health && health.IsDead) return;
             if (!Ready) { Sfx.Play(notReadyClip, 0.4f); return; }

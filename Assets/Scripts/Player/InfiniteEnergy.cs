@@ -9,8 +9,8 @@ namespace OnLinces
 
         void Update()
         {
-            if (!weapons) weapons = FindAnyObjectByType<PlayerWeapons>();
-            if (weapons) weapons.AddEnergy(weapons.MaxEnergy);
+            foreach (var p in PlayerHealth.All)
+                if (p.TryGetComponent(out weapons)) weapons.AddEnergy(weapons.MaxEnergy);
         }
     }
 }

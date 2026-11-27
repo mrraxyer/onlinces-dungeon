@@ -31,6 +31,9 @@ namespace OnLinces
         class Entry { public GameObject go; public TMP_Text text; public CanvasGroup group; public float t; public int coins; }
 
         static HUD instance;
+        TMP_Text guestPrompt;
+        Transform guestTarget;
+        Canvas canvas;
         float toastT;
         CanvasGroup toastGroup;
         readonly List<Entry> entries = new();
@@ -59,6 +62,13 @@ namespace OnLinces
 
         void Update()
         {
+            // en cooperativo la cámara no está sobre nadie: cada aviso va sobre su jugador
+            if (guestPrompt)
+            {
+                Place(PanelOf(promptLabel), PlayerController.Main ? PlayerController.Main.transform : null);
+                Place(PanelOf(guestPrompt), guestTarget);
+            }
+
             if (toastLabel != null && toastT > 0f)
             {
                 toastT -= Time.unscaledDeltaTime;
@@ -94,6 +104,31 @@ namespace OnLinces
         public static void SetPrompt(string text)
         {
             if (instance) Show(instance.promptLabel, text);
+        }
+
+        /// Aviso "usar" del jugador 2, sobre su cabeza.
+        public static void SetGuestPrompt(string text, Transform target)
+        {
+            if (!instance || !instance.promptLabel) return;
+            if (!instance.guestPrompt)
+            {
+                var p = PanelOf(instance.promptLabel);
+                instance.guestPrompt = Instantiate(p, p.transform.parent).GetComponentInChildren<TMP_Text>(true);
+                instance.canvas = instance.GetComponentInParent<Canvas>();
+            }
+            instance.guestTarget = target;
+            if (instance.guestPrompt.text != text || string.IsNullOrEmpty(text)) Show(instance.guestPrompt, text);
+        }
+
+        void Place(GameObject panel, Transform target)
+        {
+            var cam = Camera.main;
+            if (!panel || !panel.activeSelf || !target || !cam) return;
+            var rt = (RectTransform)panel.transform;
+            Vector2 screen = cam.WorldToScreenPoint(target.position + Vector3.up * Units.Px(30));
+            var uiCam = canvas && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)rt.parent, screen, uiCam, out var local))
+                rt.anchoredPosition = local;
         }
 
         /// title null = esconder.

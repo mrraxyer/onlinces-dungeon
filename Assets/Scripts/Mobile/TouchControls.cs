@@ -91,7 +91,7 @@ namespace OnLinces
                 if (searchT <= 0f)
                 {
                     searchT = 0.5f;
-                    player = FindAnyObjectByType<PlayerController>();
+                    player = PlayerController.Main;
                     skill = player ? player.GetComponent<PlayerSkill>() : null;
                 }
             }

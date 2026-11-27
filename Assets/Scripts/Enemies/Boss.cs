@@ -163,6 +163,7 @@ namespace OnLinces
             float dt = Time.fixedDeltaTime;
             if (dying) { rb.linearVelocity = Vector2.zero; return; }
             if (intro > 0f) { intro -= dt; rb.linearVelocity = Vector2.zero; return; }
+            player = PlayerHealth.Nearest(transform.position);
             if (player == null || player.IsDead) { rb.linearVelocity = Vector2.zero; return; }
 
             if (transitionT > 0f)

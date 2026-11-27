@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace OnLinces
@@ -13,8 +14,8 @@ namespace OnLinces
         Vector2 a, b;
         float radius, band, warn, active, t;
         Color color;
-        bool hitDone;
-        PlayerHealth player;
+        /// Cada jugador recibe un solo golpe.
+        readonly List<PlayerHealth> hit = new();
 
         /// Rayo de a a b.
         public static Telegraph Beam(Telegraph prefab, Vector2 a, Vector2 b, float warn, float active, float halfWidthPx, Color color)
@@ -45,7 +46,6 @@ namespace OnLinces
         {
             line = GetComponent<LineRenderer>();
             shape = s; a = pa; b = pb; radius = r; warn = w + 0.3f; active = act; color = c;
-            player = FindAnyObjectByType<PlayerHealth>();
             line.useWorldSpace = true;
             line.sortingOrder = 9;
             if (shape == Shape.Beam)
@@ -75,18 +75,20 @@ namespace OnLinces
             a = pa; b = pb;
             line.SetPosition(0, a);
             line.SetPosition(1, b);
-            hitDone = false;
+            hit.Clear();
         }
 
         void Update()
         {
             t += Time.deltaTime;
             Refresh();
-            if (t >= warn && !hitDone && player != null && Touches(player.transform.position + Vector3.up * Units.Px(6)))
-            {
-                hitDone = true;
-                player.Hurt(1, shape != Shape.Beam ? a : (Vector2)player.transform.position + Vector2.down);
-            }
+            if (t >= warn)
+                foreach (var player in PlayerHealth.All)
+                {
+                    if (hit.Contains(player) || !Touches(player.transform.position + Vector3.up * Units.Px(6))) continue;
+                    hit.Add(player);
+                    player.Hurt(1, shape != Shape.Beam ? a : (Vector2)player.transform.position + Vector2.down);
+                }
             if (t >= warn + active) Destroy(gameObject);
         }
 

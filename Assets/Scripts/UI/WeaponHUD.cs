@@ -26,10 +26,25 @@ namespace OnLinces
         WeaponData shownCurrent, shownOther;
         bool shown, shownTouch, shownPad;
         TMP_Text costLabel;
+        PlayerController owner;
+
+        /// Copia para el jugador 2, debajo de su habilidad.
+        public static void AddFor(PlayerWeapons guest)
+        {
+            var main = FindAnyObjectByType<WeaponHUD>();
+            if (!main) return;
+            var hud = Instantiate(main, main.transform.parent);
+            hud.weapons = guest;
+            ((RectTransform)hud.transform).anchoredPosition = new Vector2(8f, -248f);
+        }
 
         // Línea de costo creada en runtime (mismo estilo que el nombre) para no tocar cada escena de piso.
         void Awake()
         {
+            // copia del jugador 2: ya trae la línea de costo y el espacio
+            var copied = nameLabel.transform.parent.Find("Cost");
+            if (copied) { costLabel = copied.GetComponent<TMP_Text>(); return; }
+
             costLabel = Instantiate(nameLabel, nameLabel.transform.parent);
             costLabel.name = "Cost";
             costLabel.color = EnergyColor;
@@ -44,7 +59,9 @@ namespace OnLinces
             // como el cooldown: ícono oscuro si no alcanza la energía
             if (cur != null) icon.color = weapons.Energy >= cur.energyCost ? Color.white : Dimmed;
             var other = weapons ? weapons.Other : null;
-            bool touch = TouchControls.Active;
+            if (!owner && weapons) owner = weapons.GetComponent<PlayerController>();
+            bool guest = owner && owner.IsGuest;
+            bool touch = TouchControls.Active && !guest;
             if (shown && cur == shownCurrent && other == shownOther && touch == shownTouch && TouchControls.PadActive == shownPad) return;
             shown = true;
             shownCurrent = cur;
@@ -64,7 +81,7 @@ namespace OnLinces
 
             otherRow.SetActive(other != null);
             if (other != null) otherIcon.sprite = other.icon;
-            keyLabel.text = touch ? "" : TouchControls.Key("key_q", "xb_lb", "ps_l1");
+            keyLabel.text = touch ? "" : guest ? owner.Key("key_q", "xb_lb", "ps_l1") : TouchControls.Key("key_q", "xb_lb", "ps_l1");
         }
     }
 }

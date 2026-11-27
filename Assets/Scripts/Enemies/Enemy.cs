@@ -201,6 +201,7 @@ namespace OnLinces
                 knockPx = Vector2.MoveTowards(knockPx, Vector2.zero, 700f * dt);
                 return;
             }
+            player = PlayerHealth.Nearest(transform.position);
             if (player == null || player.IsDead)
             {
                 rb.linearVelocity = Vector2.zero;

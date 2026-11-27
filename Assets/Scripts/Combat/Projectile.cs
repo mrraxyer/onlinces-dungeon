@@ -72,7 +72,7 @@ namespace OnLinces
             if (w.returns)
             {
                 pierce = int.MaxValue;
-                owner = FindAnyObjectByType<PlayerHealth>()?.transform;
+                owner = PlayerHealth.Nearest(transform.position)?.transform; // quien la lanzó
             }
         }
 

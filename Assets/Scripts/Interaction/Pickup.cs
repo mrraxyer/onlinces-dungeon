@@ -46,8 +46,6 @@ namespace OnLinces
 
         void Start()
         {
-            var ph = FindAnyObjectByType<PlayerHealth>();
-            if (ph) player = ph.transform;
             RefreshVisual();
         }
 
@@ -86,7 +84,7 @@ namespace OnLinces
                 transform.position += (Vector3)(popVelPx / Units.PPU * Time.deltaTime);
                 popVelPx = Vector2.MoveTowards(popVelPx, Vector2.zero, 300f * Time.deltaTime);
             }
-            else if (kind is PickupKind.Coin or PickupKind.Energy && player && t > 0.5f)
+            else if (kind is PickupKind.Coin or PickupKind.Energy && t > 0.5f && (player = PlayerHealth.Nearest(transform.position)?.transform) != null)
             {
                 // imán de monedas y energía
                 Vector2 d = player.position - transform.position;

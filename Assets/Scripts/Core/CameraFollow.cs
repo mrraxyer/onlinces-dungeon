@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OnLinces
 {
-    /// Sigue al jugador, suavizado y alineado al píxel.
+    /// Sigue al jugador (o al punto medio de los vivos en cooperativo), suavizado y alineado al píxel.
     public sealed class CameraFollow : MonoBehaviour
     {
         [SerializeField] Transform target;
@@ -34,7 +34,11 @@ namespace OnLinces
         void LateUpdate()
         {
             if (target == null) return;
-            var goal = new Vector3(target.position.x, target.position.y, transform.position.z);
+            // shortcut: sin zoom; si se separan mucho uno queda fuera de cuadro (las salas se cierran con ambos dentro)
+            Vector2 sum = Vector2.zero; int n = 0;
+            foreach (var p in PlayerHealth.All) if (!p.IsDead) { sum += (Vector2)p.transform.position; n++; }
+            Vector2 c = n > 0 ? sum / n : (Vector2)target.position;
+            var goal = new Vector3(c.x, c.y, transform.position.z);
             smooth = Vector3.Lerp(smooth, goal, 1f - Mathf.Exp(-sharpness * Time.deltaTime));
             // tiempo real: sigue moviéndose durante el hitstop
             float dt = Mathf.Min(Time.unscaledDeltaTime, 1f / 30f);

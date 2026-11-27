@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace OnLinces
@@ -37,14 +38,43 @@ namespace OnLinces
         float iframes, shieldTimer;
         SpriteRenderer[] renderers;
 
+        /// Jugadores en la escena (1 o 2).
+        public static readonly List<PlayerHealth> All = new();
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() => All.Clear();
+
+        /// El vivo más cercano (o cualquiera si todos murieron).
+        public static PlayerHealth Nearest(Vector2 from)
+        {
+            PlayerHealth best = null;
+            float bestD = float.MaxValue;
+            foreach (var p in All)
+            {
+                float d = ((Vector2)p.transform.position - from).sqrMagnitude + (p.IsDead ? 1e6f : 0f);
+                if (d < bestD) { bestD = d; best = p; }
+            }
+            return best;
+        }
+
+        /// Al cerrarse una sala, los demás entran con quien la abrió.
+        public static void GatherAt(PlayerHealth who)
+        {
+            foreach (var p in All)
+                if (p != who && !p.IsDead) p.GetComponent<Rigidbody2D>().position = who.transform.position;
+        }
+
         void Awake() => renderers = GetComponentsInChildren<SpriteRenderer>(true);
+        void OnEnable() => All.Add(this);
+        void OnDisable() => All.Remove(this);
 
         void Start()
         {
             var run = GameManager.Instance.Run;
             MaxHp = ComputeMax();
-            Hp = run.Hp > 0 ? Mathf.Min(run.Hp, MaxHp) : MaxHp;
-            Changed += () => run.Hp = Hp; // pasa al siguiente piso
+            bool guest = controller && controller.IsGuest;
+            Hp = run.Hp > 0 && !guest ? Mathf.Min(run.Hp, MaxHp) : MaxHp;
+            if (!guest) Changed += () => run.Hp = Hp; // pasa al siguiente piso
             if (shieldVisual) shieldVisual.SetActive(false);
             var role = GetComponent<PlayerRole>();
             if (role) role.Changed += () => { MaxHp = ComputeMax(); Hp = MaxHp; Changed?.Invoke(); };
@@ -158,6 +188,8 @@ namespace OnLinces
             controller.enabled = false;
             Sfx.Play(dieClip);
             yield return new WaitForSeconds(1.2f);
+            // en cooperativo sigue el otro; el caído vuelve en el siguiente piso
+            foreach (var p in All) if (!p.IsDead) yield break;
             SceneFlow.Die();
         }
     }

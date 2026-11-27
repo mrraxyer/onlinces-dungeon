@@ -20,6 +20,7 @@ namespace OnLinces
         static void ResetStatics() { Current = null; tapRequested = false; }
 
         IInteractable current, shownTarget;
+        PlayerController controller;
         string shownPrompt;
 
         void OnEnable() { if (interact) interact.action.Enable(); }
@@ -35,6 +36,17 @@ namespace OnLinces
                 if (d < bestD) { bestD = d; best = it; }
             }
             if (Time.timeScale == 0f) best = null; // en pausa no hay diálogo
+
+            // jugador 2: su propio aviso sobre la cabeza (el diálogo de info es del jugador 1)
+            if (!controller) controller = GetComponent<PlayerController>();
+            if (controller.IsGuest)
+            {
+                bool usable = best != null && !string.IsNullOrEmpty(best.Prompt);
+                HUD.SetGuestPrompt(usable ? controller.Key("key_e", "xb_a", "ps_cross") + " " + best.Prompt : "", transform);
+                if (usable && controller.Act(interact).WasPressedThisFrame()) best.Interact(gameObject);
+                return;
+            }
+
             current = best;
             Current = current;
 

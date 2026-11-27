@@ -17,10 +17,25 @@ namespace OnLinces
         [SerializeField] TMP_Text nameLabel;
 
         TMP_Text counter;
+        PlayerController owner;
+
+        /// Copia para el jugador 2, debajo de sus barras.
+        public static void AddFor(PlayerSkill guest)
+        {
+            var main = FindAnyObjectByType<SkillHUD>();
+            if (!main) return;
+            var hud = Instantiate(main, main.transform.parent);
+            hud.skill = guest;
+            ((RectTransform)hud.transform).anchoredPosition = new Vector2(8f, -218f);
+        }
 
         // Se crea en runtime para no tocar el HUD de cada escena de piso.
         void Awake()
         {
+            // copia del jugador 2: ya trae la línea y el contador
+            var copied = cooldownCover.transform.Find("CooldownCounter");
+            if (copied) { counter = copied.GetComponent<TMP_Text>(); return; }
+
             nameLabel.color = NameColor; // el texto de escena era oscuro para el fondo claro de diálogo
 
             // Línea blanca de arriba, igual que el accent de WeaponHUD.
@@ -62,7 +77,8 @@ namespace OnLinces
             icon.color = ready ? Color.white : Dimmed;
             counter.enabled = !ready;
             if (!ready) counter.text = Mathf.CeilToInt(skill.CooldownFraction * r.cooldown).ToString();
-            string key = TouchControls.Active ? "" : "  " + TouchControls.Key("key_space", "xb_rb", "ps_r1");
+            if (!owner) owner = skill.GetComponent<PlayerController>();
+            string key = TouchControls.Active && !owner.IsGuest ? "" : "  " + owner.Key("key_space", "xb_rb", "ps_r1");
             nameLabel.text = r.skillName + key;
         }
     }

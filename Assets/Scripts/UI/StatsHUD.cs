@@ -23,6 +23,20 @@ namespace OnLinces
         PlayerWeapons weapons;
         TMP_FontAsset font;
         (int, int, int, int, int, int) last = (-1, -1, -1, -1, -1, -1);
+        Color back = Back;
+
+        static readonly Color GuestBack = new(0.05f, 0.12f, 0.25f, 0.85f);
+
+        /// Copia de las barras para el jugador 2, debajo del HUD del arma.
+        public static void AddFor(PlayerHealth guest)
+        {
+            var main = FindAnyObjectByType<StatsHUD>();
+            if (!main) return; // escenas sin HUD (lobby, práctica)
+            var hud = Instantiate(main, main.transform.parent);
+            hud.player = guest;
+            hud.back = GuestBack;
+            ((RectTransform)hud.transform).anchoredPosition = new Vector2(8f, -174f);
+        }
 
         void Start()
         {
@@ -31,7 +45,7 @@ namespace OnLinces
             if (anyText) font = anyText.font; // misma fuente que el resto del HUD
             foreach (Transform c in transform) c.gameObject.SetActive(false); // corazones viejos
 
-            panel = Box("Bars", transform, Back);
+            panel = Box("Bars", transform, back);
             panel.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
             panel.anchoredPosition = Vector2.zero;
             hp = MakeRow("VID", HpColor);
