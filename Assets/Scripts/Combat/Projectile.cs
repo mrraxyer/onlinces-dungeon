@@ -37,6 +37,12 @@ namespace OnLinces
         bool returning;
         Transform homingTarget, owner;
 
+        // Al llegar a su alcance: se frena, crece y se desvanece en vez de borrarse de golpe.
+        const float FadeTime = 0.16f;
+        float fadeT = -1f, glowBase;
+        Vector3 scaleBase;
+        Color colorBase;
+
         void Awake() => rb = GetComponent<Rigidbody2D>();
 
         /// Atraviesa N enemigos.
@@ -72,6 +78,7 @@ namespace OnLinces
 
         void Update()
         {
+            if (fadeT >= 0f) { Fade(); return; }
             life -= Time.deltaTime;
             if (special && special.returns && !returning && life <= lifeTotal / 2f && owner)
             {
@@ -79,12 +86,34 @@ namespace OnLinces
                 life = lifeTotal; // tiempo para volver
                 alreadyHit.Clear(); // golpea otra vez de regreso
             }
-            if (life <= 0f) End();
+            if (life <= 0f) End(fadeOut: true);
+        }
+
+        void StartFade()
+        {
+            fadeT = FadeTime;
+            scaleBase = transform.localScale;
+            colorBase = spriteRenderer.color;
+            glowBase = glow ? glow.intensity : 0f;
+            foreach (var c in GetComponentsInChildren<Collider2D>()) c.enabled = false;
+        }
+
+        void Fade()
+        {
+            fadeT -= Time.deltaTime;
+            float k = Mathf.Clamp01(fadeT / FadeTime);      // 1 → 0
+            float e = 1f - k * k;                           // ease-out
+            transform.localScale = scaleBase * (1f + 0.7f * e);
+            var c = colorBase; c.a *= k;
+            spriteRenderer.color = c;
+            if (glow) glow.intensity = glowBase * k;
+            rb.linearVelocity *= Mathf.Exp(-14f * Time.deltaTime); // frena suave
+            if (fadeT <= 0f) Destroy(gameObject);
         }
 
         void FixedUpdate()
         {
-            if (!special) return;
+            if (!special || fadeT >= 0f) return;
             if (returning)
             {
                 Vector2 to = owner.position - transform.position;
@@ -131,10 +160,15 @@ namespace OnLinces
         }
 
         /// Se acaba: explota si el arma lo pide.
-        void End()
+        void End(bool fadeOut = false)
         {
-            if (special && special.explosion) Instantiate(special.explosion, transform.position, Quaternion.identity).SetDamage(Damage, 0);
-            Destroy(gameObject);
+            if (special && special.explosion)
+            {
+                Instantiate(special.explosion, transform.position, Quaternion.identity).SetDamage(Damage, 0);
+                Destroy(gameObject);
+            }
+            else if (fadeOut) StartFade();
+            else Destroy(gameObject);
         }
 
         void Spark()
@@ -144,6 +178,7 @@ namespace OnLinces
 
         void OnTriggerEnter2D(Collider2D other)
         {
+            if (fadeT >= 0f) return;
             if ((destroyOn.value & (1 << other.gameObject.layer)) != 0)
             {
                 Sfx.Play(wallClip, 0.3f);

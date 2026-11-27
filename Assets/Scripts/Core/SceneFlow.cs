@@ -16,13 +16,13 @@ namespace OnLinces
         {
             GameManager.Instance.ResetRun();
             Run.Mascot = mascot;
-            SceneManager.LoadScene(Lobby);
+            ScreenFade.Load(Lobby);
         }
 
         public static void EnterDungeon()
         {
             Run.Floor = 1;
-            SceneManager.LoadScene(FloorScene(1));
+            ScreenFade.Load(FloorScene(1));
         }
 
         public static void CompleteFloor()
@@ -30,20 +30,20 @@ namespace OnLinces
             if (Run.Floor < LastFloor)
             {
                 Run.Floor++;
-                SceneManager.LoadScene(FloorScene(Run.Floor));
+                ScreenFade.Load(FloorScene(Run.Floor));
             }
             else
             {
                 Run.Won = true;
                 SaveSystem.RegisterWin(Run.Difficulty);
-                SceneManager.LoadScene(End);
+                ScreenFade.Load(End);
             }
         }
 
         public static void Die()
         {
             Run.Won = false;
-            SceneManager.LoadScene(End);
+            ScreenFade.Load(End);
         }
 
         /// Nueva partida con la misma mascota, puesto y dificultad.
@@ -52,13 +52,13 @@ namespace OnLinces
             var old = Run;
             GameManager.Instance.ResetRun();
             Run.Mascot = old.Mascot; Run.Role = old.Role; Run.Difficulty = old.Difficulty;
-            SceneManager.LoadScene(Lobby);
+            ScreenFade.Load(Lobby);
         }
 
         public static void BackToTitle()
         {
             GameManager.Instance.ResetRun();
-            SceneManager.LoadScene(Title);
+            ScreenFade.Load(Title);
         }
     }
 }

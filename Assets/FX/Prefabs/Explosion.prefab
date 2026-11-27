@@ -219,6 +219,7 @@ MonoBehaviour:
   - {fileID: 803200394, guid: 72d5012459006a34d847dd78476e10a1, type: 3}
   - {fileID: 1000391912, guid: 72d5012459006a34d847dd78476e10a1, type: 3}
   framesPerSecond: 16
+  fade: 0
 --- !u!114 &1785156190391477666
 MonoBehaviour:
   m_ObjectHideFlags: 0

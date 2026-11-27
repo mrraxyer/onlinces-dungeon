@@ -105,7 +105,7 @@ namespace OnLinces
             if (font) t.font = font;
             t.text = s;
             t.color = color;
-            t.fontSize = 8f;
+            t.fontSize = PixelText.Base;
             t.alignment = align;
             t.textWrappingMode = TextWrappingModes.NoWrap;
             t.raycastTarget = false;

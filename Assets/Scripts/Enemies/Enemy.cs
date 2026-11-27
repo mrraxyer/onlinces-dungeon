@@ -74,6 +74,15 @@ namespace OnLinces
         float? presetHp;
         Sprite[] activeFrames;
         Vector2 home;
+
+        // Aparición: cae del cielo (caída acelerada, como con gravedad) y se aplasta al tocar el suelo.
+        const float FallTime = 0.42f, FallHeight = 3.5f, SquashTime = 0.2f, FadeInTime = 0.12f;
+        bool falling, fellIn;
+        Vector2 ground;
+        Transform shadow;
+        Vector3 shadowScale, baseScale;
+        float squashT, hitT;
+        const float HitSquashTime = 0.12f;
         bool Hidden => kind == EnemyKind.Nullptr && phaseT > PhaseChase + PhaseFade && phaseT <= PhaseChase + PhaseFade + PhaseHidden;
 
         void Awake()
@@ -94,6 +103,47 @@ namespace OnLinces
             int i = floorNum - 1;
             activeFrames = floorFrames != null && i >= 0 && i < floorFrames.Length && floorFrames[i].frames is { Length: > 0 }
                 ? floorFrames[i].frames : frames;
+            shadow = transform.Find("Shadow");
+            if (shadow) shadowScale = shadow.localScale;
+            baseScale = transform.localScale;
+            // estela fantasma para los rápidos
+            if (!dummy && (kind == EnemyKind.Fast || kind == EnemyKind.Virus || kind == EnemyKind.Nullptr))
+                gameObject.AddComponent<OnionSkin>().Init(spriteRenderer, kind == EnemyKind.Virus ? new Color(0.6f, 1f, 0.6f) : new Color(0.7f, 0.85f, 1f));
+            // las copias y los pedazos aparecen ya en el suelo
+            if (spawnT >= SpawnTime - 0.001f) BeginFall();
+            else if (spawnFx != null) Instantiate(spawnFx, transform.position + Vector3.up * Units.Px(6), Quaternion.identity);
+        }
+
+        void BeginFall()
+        {
+            falling = fellIn = true;
+            ground = transform.position;
+            rb.simulated = false;
+            UpdateFall();
+        }
+
+        void UpdateFall()
+        {
+            float p = Mathf.Clamp01((SpawnTime - spawnT) / FallTime);
+            float h = FallHeight * (1f - p * p); // y = h0·(1 - t²): acelera al caer
+            transform.position = ground + Vector2.up * h;
+            if (shadow)
+            {
+                // la sombra se queda en el suelo y crece al acercarse
+                shadow.localPosition = new Vector3(0f, -h, 0f);
+                shadow.localScale = shadowScale * Mathf.Lerp(0.25f, 1f, p);
+            }
+            if (p >= 1f) Land();
+        }
+
+        void Land()
+        {
+            falling = false;
+            transform.position = ground;
+            rb.position = ground;
+            rb.simulated = true;
+            if (shadow) { shadow.localPosition = Vector3.zero; shadow.localScale = shadowScale; }
+            squashT = SquashTime;
             if (spawnFx != null) Instantiate(spawnFx, transform.position + Vector3.up * Units.Px(6), Quaternion.identity);
         }
 
@@ -104,11 +154,30 @@ namespace OnLinces
         void Update()
         {
             t += Time.deltaTime;
+            if (falling) UpdateFall();
+            if (squashT > 0f)
+            {
+                // aplastado al aterrizar y regresa a su forma (interpolación con rebote suave)
+                squashT = Mathf.Max(0f, squashT - Time.deltaTime);
+                float k = squashT / SquashTime;
+                float s = 0.3f * k * Mathf.Cos((1f - k) * Mathf.PI * 2f); // aplasta, estira y se asienta
+                transform.localScale = new Vector3(baseScale.x * (1f + s), baseScale.y * (1f - s), baseScale.z);
+            }
+            else if (hitT > 0f)
+            {
+                // golpe: se aplasta (1.25, 0.8) y regresa lineal a su escala
+                hitT = Mathf.Max(0f, hitT - Time.deltaTime);
+                float k = hitT / HitSquashTime;
+                transform.localScale = new Vector3(baseScale.x * (1f + 0.25f * k), baseScale.y * (1f - 0.2f * k), baseScale.z);
+            }
             if (activeFrames != null && activeFrames.Length > 0)
                 spriteRenderer.sprite = activeFrames[(int)(t * framesPerSecond) % activeFrames.Length];
             flash -= Time.deltaTime;
             var c = flash > 0f ? new Color(1f, 0.55f, 0.55f) : tint;
-            c.a = spawnT > 0f ? 1f - Mathf.Clamp01(spawnT / SpawnTime) : 1f;
+            if (spawnT <= 0f) fellIn = false;
+            c.a = spawnT <= 0f ? 1f
+                : fellIn ? Mathf.Clamp01((SpawnTime - spawnT) / FadeInTime)
+                : 1f - Mathf.Clamp01(spawnT / SpawnTime);
             if (kind == EnemyKind.Nullptr && phaseT > PhaseChase)
                 c.a *= phaseT < PhaseChase + PhaseFade ? 1f - (phaseT - PhaseChase) / PhaseFade
                     : Hidden ? 0f : (phaseT - PhaseChase - PhaseFade - PhaseHidden) / PhaseFade;
@@ -247,6 +316,8 @@ namespace OnLinces
             if (!CanBeHit) return;
             hp -= damage;
             flash = 0.08f;
+            if (squashT <= 0f) hitT = HitSquashTime;
+            DamageNumber.Spawn(transform.position + Vector3.up * Units.Px(24), damage);
             knockPx = dir * 150f * (kind == EnemyKind.Leak ? 0.4f : 1f);
             Sfx.Play(hitClip, 0.5f);
             if (hp <= 0f) Die();
@@ -271,7 +342,9 @@ namespace OnLinces
                 hp = fullHp;
                 knockPx = Vector2.zero;
                 rb.position = home;
+                transform.position = home;
                 spawnT = SpawnTime;
+                BeginFall();
                 return;
             }
 

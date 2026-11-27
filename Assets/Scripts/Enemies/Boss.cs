@@ -211,6 +211,7 @@ namespace OnLinces
             if (shield) shield.enabled = false;
             Sfx.Play(phaseClip);
             HUD.Toast("FASE " + phase);
+            CameraFollow.Shake(5f);
             FindAnyObjectByType<Blackout>()?.TriggerNow();
             Ring(8 + phase * 2, 90f); // onda al despertar
             state = "move";
@@ -628,6 +629,7 @@ namespace OnLinces
                 return;
             }
             if (kind == BossKind.Div) damage *= 1.25f;
+            DamageNumber.Spawn(transform.position + Vector3.up * 1.2f, damage);
             // no se puede saltar una fase: el daño se corta en el umbral (66% / 33%)
             // (un poco abajo del umbral: con el valor exacto, la comparación de fase puede fallar por redondeo)
             float floorHp = phase == 1 ? maxHp * 0.66f - 0.01f : phase == 2 ? maxHp * 0.33f - 0.01f : 0f;

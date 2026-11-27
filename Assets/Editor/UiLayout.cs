@@ -21,7 +21,7 @@ public static class UiLayout
     static readonly Vector2 FeedbackCornerWithMinimap = new(-104f, -8f);
     static readonly Vector2 ToastBottom = new(0f, 12f);
     static readonly Vector2 WeaponTopLeft = new(8f, -116f); // bajo la habilidad
-    static readonly Color TapColor = new(1f, 0.86f, 0.5f);
+    static readonly Color TapColor = Color.white; // panel oscuro estilo original
 
     [MenuItem("OnLinces/Acomodar UI de todas las escenas")]
     static void AllScenes()
@@ -122,7 +122,7 @@ public static class UiLayout
         var button = prompt.gameObject.AddComponent<Button>();
         button.targetGraphic = img;
         var colors = button.colors;
-        colors.pressedColor = new Color(0.75f, 0.6f, 0.3f);
+        colors.pressedColor = new Color(0.65f, 0.62f, 0.8f);
         button.colors = colors;
         UnityEventTools.AddPersistentListener(button.onClick, dialog.Use);
 

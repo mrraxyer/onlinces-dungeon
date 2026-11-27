@@ -26,6 +26,7 @@ namespace OnLinces
         void Start()
         {
             Sfx.Play(clip);
+            CameraFollow.Shake(6f);
             if (flash) flashStart = flash.intensity;
             float r = Units.Px(radiusPx);
             var hit = new System.Collections.Generic.HashSet<IHittable>(); // un golpe por objetivo

@@ -18,6 +18,7 @@ namespace OnLinces
 
         void Awake()
         {
+            gameObject.AddComponent<EdgeFade>(); // borde del mapa que se funde con el vacío
             // por si se abre la escena directo
             if (floorNumber > 0) GameManager.Instance.Run.Floor = floorNumber;
         }

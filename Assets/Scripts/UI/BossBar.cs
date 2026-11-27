@@ -158,8 +158,8 @@ namespace OnLinces
             rt.offsetMin = rt.offsetMax = Vector2.zero;
             var t = rt.gameObject.AddComponent<TextMeshProUGUI>();
             if (font) t.font = font;
-            t.fontSize = size;
-            t.fontStyle = style;
+            t.fontSize = PixelText.Size(size); // la fuente pixel solo se ve nítida en múltiplos de 11
+            t.fontStyle = style & ~(FontStyles.Bold | FontStyles.Italic);
             t.alignment = align;
             t.textWrappingMode = TextWrappingModes.NoWrap;
             t.raycastTarget = false;

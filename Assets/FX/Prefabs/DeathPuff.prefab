@@ -111,3 +111,4 @@ MonoBehaviour:
   - {fileID: -487699522, guid: 313eb15300d4b8d49b253191b3323c04, type: 3}
   - {fileID: -568260340, guid: 313eb15300d4b8d49b253191b3323c04, type: 3}
   framesPerSecond: 12
+  fade: 0

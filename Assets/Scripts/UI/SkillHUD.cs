@@ -44,13 +44,10 @@ namespace OnLinces
             counter = go.AddComponent<TextMeshProUGUI>();
             counter.font = nameLabel.font;
             counter.alignment = TextAlignmentOptions.Center;
-            counter.enableAutoSizing = true;
-            counter.fontSizeMin = 8;
-            counter.fontSizeMax = 200;
+            counter.enableAutoSizing = false;
+            counter.fontSize = PixelText.Base * 2f;
             counter.color = Color.white;
-            counter.outlineWidth = 0.2f;
-            counter.outlineColor = Color.black;
-            counter.raycastTarget = false;
+                        counter.raycastTarget = false;
             counter.enabled = false;
         }
 

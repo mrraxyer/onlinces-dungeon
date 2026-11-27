@@ -39,7 +39,7 @@ namespace OnLinces
             Sfx.Play(enterClip);
             if (string.IsNullOrEmpty(sceneName)) SceneFlow.EnterDungeon();
             else if (sceneName == SceneFlow.Lobby) SceneFlow.BackToLobby();
-            else UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            else ScreenFade.Load(sceneName);
         }
     }
 }

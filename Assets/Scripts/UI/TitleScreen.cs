@@ -53,7 +53,7 @@ namespace OnLinces
             // versión abajo a la derecha (copia del subtítulo)
             var version = Instantiate(subtitle, subtitle.transform.parent);
             version.text = "v" + Application.version;
-            version.fontSize = subtitle.fontSize * 0.6f;
+            version.fontSize = PixelText.Base;
             version.alignment = TextAlignmentOptions.BottomRight;
             version.color = Dim;
             var rt = version.rectTransform;
@@ -107,7 +107,7 @@ namespace OnLinces
         {
             bool sel = m == selected;
             label.text = $"<color=#{ColorUtility.ToHtmlStringRGB(sel ? color : Dim)}><b>{m}</b> - {PlayerStats.MascotTitle(m)}</color>\n" +
-                         $"<size=85%><color=#{ColorUtility.ToHtmlStringRGB(sel ? PerkColor : Dim)}>{PlayerStats.MascotPerk(m)}</color></size>";
+                         $"<color=#{ColorUtility.ToHtmlStringRGB(sel ? PerkColor : Dim)}>{PlayerStats.MascotPerk(m)}</color>";
             Place(label.rectTransform, character.position + Vector3.up * labelAboveFeet);
 
             var sr = character.GetComponent<SpriteRenderer>(); // la no elegida, apagada
