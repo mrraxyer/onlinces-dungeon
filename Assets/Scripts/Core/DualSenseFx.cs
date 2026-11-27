@@ -7,6 +7,12 @@ using UnityEngine.InputSystem.DualShock;
 using UnityEngine.InputSystem.HID;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
+#if UNITY_EDITOR || UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_WSA
+using DualSensePad = UnityEngine.InputSystem.DualShock.DualSenseGamepadHID;
+#else
+// Unity solo compila el DualSense por HID en escritorio: en Android/iOS nunca hay uno y todo esto no hace nada
+using DualSensePad = OnLinces.DualSenseFx.NoPad;
+#endif
 
 namespace OnLinces
 {
@@ -15,6 +21,11 @@ namespace OnLinces
     /// Cada envío lleva todo el estado del mando; solo se manda cuando algo cambió.
     public static class DualSenseFx
     {
+#if !(UNITY_EDITOR || UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_WSA)
+        /// Nunca se crea: así "pad is DualSensePad" siempre es falso fuera de escritorio.
+        public sealed class NoPad : Gamepad { }
+#endif
+
         /// Efecto de un gatillo. Zonas 0-9 a lo largo del recorrido, fuerza 1-8, frecuencia en Hz.
         public readonly struct Trigger : IEquatable<Trigger>
         {
@@ -55,7 +66,7 @@ namespace OnLinces
             public int reportSize;
         }
 
-        static readonly Dictionary<DualSenseGamepadHID, State> pads = new();
+        static readonly Dictionary<DualSensePad, State> pads = new();
         static Flusher flusher;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -67,7 +78,7 @@ namespace OnLinces
             Application.quitting += ResetAll;
         }
 
-        public static bool Handles(Gamepad pad) => pad is DualSenseGamepadHID ds && ds.added;
+        public static bool Handles(Gamepad pad) => pad is DualSensePad ds && ds.added;
 
         public static void SetMotors(Gamepad pad, float low, float high) =>
             Change(pad, s => { s.low = Byte(low); s.high = Byte(high); });
@@ -97,7 +108,7 @@ namespace OnLinces
 
         static void Change(Gamepad pad, Action<State> edit)
         {
-            if (pad is not DualSenseGamepadHID ds || !ds.added) return;
+            if (pad is not DualSensePad ds || !ds.added) return;
             if (!pads.TryGetValue(ds, out var s)) pads[ds] = s = NewState(ds);
             var before = (s.low, s.high, s.r, s.g, s.b, s.leds, s.trigger, s.left);
             edit(s);
@@ -146,7 +157,7 @@ namespace OnLinces
             public FourCC typeStatic => new('H', 'I', 'D', 'O');
         }
 
-        static bool Send(DualSenseGamepadHID pad, State s)
+        static bool Send(DualSensePad pad, State s)
         {
             var cmd = new OutputCommand { baseCommand = new InputDeviceCommand(new FourCC('H', 'I', 'D', 'O'), InputDeviceCommand.BaseCommandSize + s.reportSize) };
             var report = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref cmd, 1)).Slice(InputDeviceCommand.BaseCommandSize, s.reportSize);

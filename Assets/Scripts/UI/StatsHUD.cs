@@ -55,6 +55,8 @@ namespace OnLinces
 
         void Update()
         {
+            // recompilar en Play borra las filas (no se serializan) y Start no vuelve a correr
+            if (hp == null) return;
             int en = weapons ? weapons.Energy : 0, maxEn = weapons ? weapons.MaxEnergy : 0;
             var now = (player.Hp, player.MaxHp, player.Shield, player.MaxShield, en, maxEn);
             if (now == last) return;
