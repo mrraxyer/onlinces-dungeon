@@ -31,8 +31,9 @@ namespace OnLinces
             if (difficultyLabel) difficultyLabel.text = $"Dificultad: <b>{DifficultyInfo.Name(GameManager.Instance.Run.Difficulty)}</b>  >";
         }
 
-        public void PlayAsOn() => SceneFlow.StartRun(Mascot.On);
-        public void PlayAsOff() => SceneFlow.StartRun(Mascot.Off);
+        // antes del lobby: jugadores, personaje y plataforma
+        public void PlayAsOn() => PlayerSetup.Open(Mascot.On, clickClip);
+        public void PlayAsOff() => PlayerSetup.Open(Mascot.Off, clickClip);
         public void EnterDungeon() => SceneFlow.EnterDungeon();
         public void CompleteFloor() => SceneFlow.CompleteFloor();
         public void Die() => SceneFlow.Die();

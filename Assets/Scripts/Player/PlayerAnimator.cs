@@ -34,7 +34,7 @@ namespace OnLinces
         /// Según mascota y puesto.
         void RefreshSkin()
         {
-            var mascot = GameManager.Instance.Run.Mascot;
+            var mascot = controller.Mascot;
             var role = GetComponent<PlayerRole>();
             var roleSkin = role && role.Current ? role.Current.SkinFor(mascot) : null;
             skin = roleSkin != null ? roleSkin : (mascot == Mascot.Off ? offSkin : onSkin);

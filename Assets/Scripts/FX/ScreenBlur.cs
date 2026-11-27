@@ -18,7 +18,8 @@ namespace OnLinces
         static ScreenBlur instance;
         ScriptableRendererFeature feature;
         float blackout, blackoutSize;
-        Vector2 blackoutCenter, blackoutRadii;
+        Vector4 blackoutCenter; // xy y zw: un centro por jugador
+        Vector2 blackoutRadii;
         float hitT = -1f;
         Transform player;
 
@@ -35,13 +36,13 @@ namespace OnLinces
         }
 
         /// El apagón: cuánto, dónde (viewport) y radios en alturas de pantalla.
-        public static void SetBlackout(ScriptableRendererFeature f, float amount, Vector2 center, Vector2 radii, float size)
+        public static void SetBlackout(ScriptableRendererFeature f, float amount, Vector4 centers, Vector2 radii, float size)
         {
             if (amount <= 0.01f && instance == null) { Apply(f, 0f); return; }
             var s = Instance;
             if (f) s.feature = f;
             s.blackout = amount;
-            s.blackoutCenter = center;
+            s.blackoutCenter = centers;
             s.blackoutRadii = radii;
             s.blackoutSize = size;
         }
@@ -68,7 +69,8 @@ namespace OnLinces
 
             if (hit > blackout && player && Camera.main)
             {
-                Shader.SetGlobalVector(CenterId, Camera.main.WorldToViewportPoint(player.position + Vector3.up * 0.4f));
+                Vector2 c = Camera.main.WorldToViewportPoint(player.position + Vector3.up * 0.4f);
+                Shader.SetGlobalVector(CenterId, new Vector4(c.x, c.y, c.x, c.y));
                 Shader.SetGlobalVector(RadiiId, new Vector4(HitInner, HitOuter));
                 Shader.SetGlobalFloat(BlurSizeId, HitSize);
                 Apply(feature, hit);

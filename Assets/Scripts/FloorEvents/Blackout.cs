@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -26,6 +27,20 @@ namespace OnLinces
         float baseIntensity;
         Room[] rooms;
         BossRoom bossRoom;
+        readonly List<Light2D> lights = new();
+
+        /// La luz de cada jugador vivo (el invitado trae su copia de la del prefab).
+        void FindLights()
+        {
+            lights.Clear();
+            if (!playerLight) return;
+            foreach (var p in PlayerHealth.All)
+            {
+                if (p.IsDead) continue;
+                foreach (var l in p.GetComponentsInChildren<Light2D>(true))
+                    if (l.name == playerLight.name) { lights.Add(l); break; }
+            }
+        }
 
         void Start()
         {
@@ -44,9 +59,11 @@ namespace OnLinces
         {
             // el desenfoque lo comparte con el golpe (ScreenBlur)
             var cam = Camera.main;
-            if (amount <= 0.01f || !playerLight || !cam) { ScreenBlur.SetBlackout(blurFeature, 0f, Vector2.zero, Vector2.zero, blurSize); return; }
+            if (amount <= 0.01f || !playerLight || !cam || lights.Count == 0) { ScreenBlur.SetBlackout(blurFeature, 0f, Vector4.zero, Vector2.zero, blurSize); return; }
             float h = cam.orthographicSize * 2f;
-            ScreenBlur.SetBlackout(blurFeature, amount, cam.WorldToViewportPoint(playerLight.transform.position),
+            Vector2 a = cam.WorldToViewportPoint(lights[0].transform.position);
+            Vector2 b = lights.Count > 1 ? cam.WorldToViewportPoint(lights[1].transform.position) : a;
+            ScreenBlur.SetBlackout(blurFeature, amount, new Vector4(a.x, a.y, b.x, b.y),
                 new Vector2(playerLight.pointLightInnerRadius / h, playerLight.pointLightOuterRadius / h), blurSize);
         }
 
@@ -91,10 +108,11 @@ namespace OnLinces
             float want = state == State.Active ? 1f : state == State.Warn && Mathf.Sin(Time.time * 30f) > 0.3f ? 0.5f : 0f;
             dark = Mathf.MoveTowards(dark, want, Time.deltaTime * (state == State.Warn ? 6f : 2f));
             if (globalLight) globalLight.intensity = Mathf.Lerp(baseIntensity, darkIntensity, dark);
-            if (playerLight)
+            FindLights();
+            foreach (var l in lights)
             {
-                playerLight.enabled = dark > 0.01f;
-                playerLight.intensity = dark * 1.2f;
+                l.enabled = dark > 0.01f;
+                l.intensity = dark * 1.2f;
             }
             SetBlur(dark);
         }

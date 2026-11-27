@@ -86,7 +86,7 @@ namespace OnLinces
             var run = GameManager.Instance.Run;
             var role = GetComponent<PlayerRole>();
             int baseHp = role && role.Current ? role.Current.maxHp : maxHp;
-            return baseHp + run.BonusMaxHp + (run.Mascot == Mascot.Off ? offBonus : 0) + DifficultyInfo.PlayerHp(run.Difficulty);
+            return baseHp + run.BonusMaxHp + (controller.Mascot == Mascot.Off ? offBonus : 0) + DifficultyInfo.PlayerHp(run.Difficulty);
         }
 
         /// Recalcula al cambiar la dificultad.
@@ -188,8 +188,8 @@ namespace OnLinces
             controller.enabled = false;
             Sfx.Play(dieClip);
             yield return new WaitForSeconds(1.2f);
-            // en cooperativo sigue el otro; el caído vuelve en el siguiente piso
-            foreach (var p in All) if (!p.IsDead) yield break;
+            // en cooperativo sigue el otro y el caído sale del mapa; vuelve en el siguiente piso
+            foreach (var p in All) if (!p.IsDead) { gameObject.SetActive(false); yield break; }
             SceneFlow.Die();
         }
     }

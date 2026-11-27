@@ -16,7 +16,7 @@ Shader "Hidden/OnLinces/BlackoutBlur"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
 
-            float4 _BlackoutCenter; // xy: jugador en viewport
+            float4 _BlackoutCenter; // xy y zw: jugadores en viewport (iguales si es uno)
             float4 _BlackoutRadii;  // x: interior, y: exterior (en alturas de pantalla)
             float _BlackoutBlur;    // 0..1
             float _BlurSize;        // radio del desenfoque en alturas de pantalla
@@ -27,7 +27,7 @@ Shader "Hidden/OnLinces/BlackoutBlur"
                 half4 src = SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, uv);
 
                 float aspect = _ScreenParams.x / _ScreenParams.y;
-                float d = length((uv - _BlackoutCenter.xy) * float2(aspect, 1));
+                float d = min(length((uv - _BlackoutCenter.xy) * float2(aspect, 1)), length((uv - _BlackoutCenter.zw) * float2(aspect, 1)));
                 float mask = smoothstep(_BlackoutRadii.x, _BlackoutRadii.y, d) * _BlackoutBlur;
                 if (mask <= 0.001) return src;
 

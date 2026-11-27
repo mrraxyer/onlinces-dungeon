@@ -20,7 +20,7 @@ namespace OnLinces
         {
             var run = GameManager.Instance.Run;
             // ventaja de mascota (el corazón de Off está en PlayerHealth)
-            if (run.Mascot == Mascot.On) { SpeedMult *= 1.1f; FireDelayMult /= 1.1f; }
+            if (GetComponent<PlayerController>().Mascot == Mascot.On) { SpeedMult *= 1.1f; FireDelayMult /= 1.1f; }
             else DamageMult *= 1.15f;
             foreach (var it in run.Items) ApplyPassive(it);
         }

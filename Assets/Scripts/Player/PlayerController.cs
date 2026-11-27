@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 namespace OnLinces
 {
-    /// Movimiento y puntería del jugador. El de la escena es el jugador 1; Select/Back en otro mando suma al jugador 2 (invitado).
+    /// Movimiento y puntería del jugador. El de la escena es el jugador 1; el 2 (invitado) se crea si se eligió en el título.
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class PlayerController : MonoBehaviour
     {
@@ -29,14 +29,14 @@ namespace OnLinces
         public bool SwitchWeaponPressed { get; private set; }
         /// Jugador 2: no guarda nada en la partida y solo usa su mando.
         public bool IsGuest { get; private set; }
+        /// Personaje de este jugador (el 2 puede elegir otro).
+        public Mascot Mascot => IsGuest ? Coop.P2Mascot : GameManager.Instance.Run.Mascot;
         public static PlayerController Main { get; private set; }
-        /// Mando del invitado; sigue unido entre pisos mientras esté conectado.
-        static Gamepad guestPad;
         static bool spawningGuest;
         static readonly Color GuestTint = new(0.65f, 0.85f, 1f);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void ResetStatics() { Main = null; guestPad = null; spawningGuest = false; }
+        static void ResetStatics() { Main = null; spawningGuest = false; }
 
         InputActionAsset guestActions;
 
@@ -58,7 +58,7 @@ namespace OnLinces
             if (IsGuest)
             {
                 guestActions = Instantiate(move.asset);
-                guestActions.devices = new InputDevice[] { guestPad };
+                guestActions.devices = new InputDevice[] { Coop.P2Pad };
                 guestActions.Enable();
             }
             else Main = this;
@@ -67,14 +67,15 @@ namespace OnLinces
         void Start()
         {
             if (IsGuest) return;
-            if (guestPad != null && (!guestPad.added || TouchControls.Active)) guestPad = null; // se desconectó
             FilterMainDevices();
-            if (guestPad != null) SpawnGuest();
+            if (Coop.HasGuest) SpawnGuest();
         }
 
-        /// El jugador 1 usa todo menos el mando del invitado (incluido el stick táctil, que se crea tarde).
+        /// Jugador 1: solo la plataforma elegida en el título (sin elegir, o en el teléfono: todo).
         void FilterMainDevices() =>
-            move.asset.devices = guestPad == null ? null : InputSystem.devices.Where(d => d != guestPad).ToArray();
+            move.asset.devices = !Coop.Configured || TouchControls.Active ? null
+                : Coop.P1Pad != null ? new InputDevice[] { Coop.P1Pad }
+                : InputSystem.devices.Where(d => d is Keyboard || d is Mouse).ToArray();
 
         void OnDeviceChange(InputDevice d, InputDeviceChange c) => FilterMainDevices();
 
@@ -84,8 +85,6 @@ namespace OnLinces
 
         void SpawnGuest()
         {
-            FilterMainDevices();
-            if (lastPad == guestPad) lastPad = null;
             spawningGuest = true;
             var go = Instantiate(gameObject, transform.position + Vector3.right * 0.75f, transform.rotation);
             spawningGuest = false;
@@ -96,26 +95,8 @@ namespace OnLinces
         }
 
         /// Ícono del botón para este jugador (el invitado siempre con su mando).
-        public string Key(string keyboard, string xbox, string ps) => IsGuest
-            ? $"<sprite=\"Buttons\" name=\"{(guestPad is UnityEngine.InputSystem.DualShock.DualShockGamepad ? ps : xbox)}\">"
-            : TouchControls.Key(keyboard, xbox, ps);
-
-        void TryJoin()
-        {
-            // en el teléfono no cabe un segundo HUD
-            if (guestPad != null || TouchControls.Active) return;
-            foreach (var pad in Gamepad.all)
-            {
-                // shortcut: cualquier mando que pulse Select es el jugador 2 (si era el del jugador 1, este sigue con teclado/táctil)
-                if (!pad.selectButton.wasPressedThisFrame) continue;
-                guestPad = pad;
-                SpawnGuest();
-                HUD.Toast("¡Jugador 2 se unió!");
-                return;
-            }
-        }
-
-        Gamepad lastPad;
+        public string Key(string keyboard, string xbox, string ps) =>
+            IsGuest ? Coop.PadKey(Coop.P2Pad, xbox, ps) : TouchControls.Key(keyboard, xbox, ps);
 
         void OnEnable()
         {
@@ -126,7 +107,6 @@ namespace OnLinces
 
         void Update()
         {
-            if (!IsGuest) TryJoin();
             MoveInput = Act(move).ReadValue<Vector2>();
             IsShooting = Act(attack).IsPressed() || (!IsGuest && TouchControls.FireHeld);
             SwitchWeaponPressed = nextWeapon != null && Act(nextWeapon).WasPressedThisFrame();
@@ -135,15 +115,7 @@ namespace OnLinces
 
         void UpdateAim()
         {
-            if (IsGuest)
-            {
-                var gs = guestPad.added ? guestPad.rightStick.ReadValue() : Vector2.zero;
-                if (gs.sqrMagnitude > 0.09f) Aim = gs.normalized;
-                else if (MoveInput.sqrMagnitude > 0.01f) Aim = MoveInput.normalized;
-                return;
-            }
-
-            if (TouchControls.Active)
+            if (TouchControls.Active && !IsGuest)
             {
                 // suelta: mira hacia donde camina
                 if (TouchControls.FireHeld) Aim = TouchControls.Aim.normalized;
@@ -151,9 +123,10 @@ namespace OnLinces
                 return;
             }
 
-            // el último mando que usó el jugador 1, nunca el del invitado
-            if (Gamepad.current != null && Gamepad.current != guestPad) lastPad = Gamepad.current;
-            var stick = lastPad != null && lastPad.added ? lastPad.rightStick.ReadValue() : Vector2.zero;
+            // con plataforma elegida, cada uno apunta solo con lo suyo
+            var pad = IsGuest ? Coop.P2Pad : Coop.Configured ? Coop.P1Pad : Gamepad.current;
+            bool mouseOk = !IsGuest && (!Coop.Configured || Coop.P1Pad == null);
+            var stick = pad != null && pad.added ? pad.rightStick.ReadValue() : Vector2.zero;
             if (stick.sqrMagnitude > 0.09f)
             {
                 usingMouse = false;
@@ -161,7 +134,7 @@ namespace OnLinces
                 return;
             }
 
-            if (Mouse.current != null)
+            if (mouseOk && Mouse.current != null)
             {
                 var m = Mouse.current.position.ReadValue();
                 if (m != lastMouse || Mouse.current.leftButton.isPressed) usingMouse = true;

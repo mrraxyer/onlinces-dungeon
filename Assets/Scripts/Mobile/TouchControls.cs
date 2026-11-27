@@ -30,10 +30,12 @@ namespace OnLinces
         public static Vector2 Aim { get; private set; }
         public static bool FireHeld { get; private set; }
         /// Se está jugando con un mando físico (último dispositivo usado).
-        public static bool PadActive { get; private set; }
+        /// Con plataforma elegida en el título queda fija (no cambia al tocar el mando del jugador 2).
+        public static bool PadActive => Coop.Configured && !Active ? Coop.P1Pad != null : padActive;
+        static bool padActive;
         /// Nombre del botón según el mando: Xbox o PlayStation.
         public static string Pad(string xbox, string ps) =>
-            Gamepad.current is UnityEngine.InputSystem.DualShock.DualShockGamepad ? ps : xbox;
+            (Coop.Configured && Coop.P1Pad != null ? Coop.P1Pad : Gamepad.current) is UnityEngine.InputSystem.DualShock.DualShockGamepad ? ps : xbox;
         /// Ícono del botón (Resources/Sprite Assets/Buttons) según el dispositivo en uso.
         public static string Key(string keyboard, string xbox, string ps) =>
             $"<sprite=\"Buttons\" name=\"{(PadActive ? Pad(xbox, ps) : keyboard)}\">";
@@ -51,7 +53,7 @@ namespace OnLinces
             Active = false;
             Aim = Vector2.zero;
             FireHeld = false;
-            PadActive = false;
+            padActive = false;
         }
 
         void Awake()
@@ -65,7 +67,7 @@ namespace OnLinces
             if (pausePanel) pausePanel.SetActive(false);
             SceneManager.sceneLoaded += OnSceneLoaded;
             // en táctil los sticks en pantalla son un mando virtual: no cuenta
-            anyButton = InputSystem.onAnyButtonPress.Call(c => { if (!Active) PadActive = c.device is Gamepad; });
+            anyButton = InputSystem.onAnyButtonPress.Call(c => { if (!Active) padActive = c.device is Gamepad; });
         }
 
         void OnDestroy()
@@ -101,8 +103,8 @@ namespace OnLinces
             if (!Active)
             {
                 // los sticks y el ratón no son botones: se revisan aparte
-                if (pad != null && (pad.leftStick.ReadValue().sqrMagnitude > 0.25f || pad.rightStick.ReadValue().sqrMagnitude > 0.25f)) PadActive = true;
-                else if (Mouse.current != null && Mouse.current.delta.ReadValue().sqrMagnitude > 4f) PadActive = false;
+                if (pad != null && (pad.leftStick.ReadValue().sqrMagnitude > 0.25f || pad.rightStick.ReadValue().sqrMagnitude > 0.25f)) padActive = true;
+                else if (Mouse.current != null && Mouse.current.delta.ReadValue().sqrMagnitude > 4f) padActive = false;
             }
             if (player != null && ((Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) || (pad != null && pad.startButton.wasPressedThisFrame)))
             {

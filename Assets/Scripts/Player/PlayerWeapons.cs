@@ -254,7 +254,7 @@ namespace OnLinces
 
             if (audioSource != null)
             {
-                var clip = GameManager.Instance.Run.Mascot == Mascot.Off ? shootOff : shootOn;
+                var clip = controller.Mascot == Mascot.Off ? shootOff : shootOn;
                 if (clip != null) audioSource.PlayOneShot(clip, 0.6f);
             }
         }
