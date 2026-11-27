@@ -67,6 +67,8 @@ namespace OnLinces
         public int Phase => phase;
         public int NextPhase => nextPhase;
         public bool InTransition => transitionT > 0f;
+        /// Ataque de sala del Kernel: inmune mientras dura.
+        public bool Lighthouse => state == "lighthouse";
 
         BossRoom room;
         Rigidbody2D rb;
@@ -93,8 +95,21 @@ namespace OnLinces
             anchor = transform.position;
         }
 
+        /// El jefe vivo de la sala (la barra de luz del DualSense se tiñe de su color).
+        public static Boss Current { get; private set; }
+        public Color Tint => kind switch
+        {
+            BossKind.Spaghetti => new Color(1f, 0.85f, 0.3f),
+            BossKind.Div => new Color(1f, 0.43f, 0.78f),
+            _ => new Color(1f, 0.3f, 0.4f),
+        };
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetCurrent() => Current = null;
+
         void Awake()
         {
+            Current = this;
             rb = GetComponent<Rigidbody2D>();
             player = FindAnyObjectByType<PlayerHealth>();
             if (shieldFrames is { Length: > 0 })
@@ -183,6 +198,7 @@ namespace OnLinces
                 if (centered) { centered = false; lockT = 1.6f; } // <div> deja de estar centrado sin disparar
                 Css("", 0f);
                 Sfx.Play(transitionClip);
+                Rumble.PlayAll(0.3f, 0.5f, 0.5f);
                 rb.linearVelocity = Vector2.zero;
                 if (room) room.OnBossPhaseChange(this);
                 return;
@@ -200,6 +216,7 @@ namespace OnLinces
         void Announce(string text)
         {
             windupT = Windup;
+            Rumble.PlayAll(0.1f, 0.2f, 0.12f); // aviso de ataque
             if (text != null) Css(text, 1.6f);
         }
 
@@ -213,6 +230,8 @@ namespace OnLinces
             Sfx.Play(phaseClip);
             HUD.Toast("FASE " + phase);
             CameraFollow.Shake(5f);
+            Rumble.PlayAll(0.9f, 0.7f, 0.6f);
+            PadFeedback.FlashAll(new Color(1f, 0.3f, 0.4f), 0.6f);
             FindAnyObjectByType<Blackout>()?.TriggerNow();
             Ring(8 + phase * 2, 90f); // onda al despertar
             state = "move";
@@ -262,7 +281,7 @@ namespace OnLinces
                     {
                         spriteRenderer.transform.localPosition = new Vector3(0, spriteRenderer.transform.localPosition.y, 0);
                         state = "dash"; stateT = 1.5f;
-                        Sfx.Play(dashClip);
+                        Sfx.Play(dashClip); Rumble.PlayAll(0.45f, 0.3f, 0.2f);
                     }
                     return Vector2.zero;
                 case "dash":
@@ -301,6 +320,7 @@ namespace OnLinces
             state = "move";
             stateT = 0.9f * Rest;
             Ring(phase < 3 ? 7 : 9, 100f);
+            Rumble.PlayAll(0.8f, 0.5f, 0.3f); // choque contra la pared
         }
 
         // ---------------- <div> sin centrar ----------------
@@ -418,7 +438,7 @@ namespace OnLinces
             rb.position = Center;
             transform.position = Center;
             intro = 0.6f;
-            Sfx.Play(dashClip);
+            Sfx.Play(dashClip); Rumble.PlayAll(0.45f, 0.3f, 0.2f);
             Css(ringsMode ? "kernel: memory flood" : "systemctl start laser-sala.service", 2.5f);
         }
 
@@ -428,12 +448,16 @@ namespace OnLinces
             beam = null;
         }
 
-        void OnDestroy() => ClearBeam();
+        void OnDestroy()
+        {
+            ClearBeam();
+            if (Current == this) Current = null;
+        }
 
         /// Carga (sonido + aviso que parpadea) y suelta n disparos con sonido, separados RingStep.
         void ChargeAttack(int fires)
         {
-            Sfx.Play(laserChargeClip, 0.8f);
+            Sfx.Play(laserChargeClip, 0.8f); Rumble.PlayAll(0f, 0.25f, 0.5f);
             fireT = RingWarn + 0.3f; // el aviso de Telegraph dura warn + 0.3
             firesLeft = fires;
         }
@@ -476,7 +500,7 @@ namespace OnLinces
                     }
                     if (firesLeft > 0 && (fireT -= dt) <= 0f)
                     {
-                        Sfx.Play(laserFireClip, ringsMode ? 0.4f : 0.7f);
+                        Sfx.Play(laserFireClip, ringsMode ? 0.4f : 0.7f); Rumble.PlayAll(0.5f, 0.6f, 0.3f);
                         firesLeft--;
                         fireT = RingStep;
                     }
@@ -509,7 +533,7 @@ namespace OnLinces
                     {
                         subN = 1;
                         subT = 1.25f; // aviso de Telegraph (0.95 + 0.3)
-                        Sfx.Play(laserChargeClip, 0.8f);
+                        Sfx.Play(laserChargeClip, 0.8f); Rumble.PlayAll(0f, 0.25f, 0.5f);
                         Css("kernel: panic - not syncing", 2f);
                         int n = phase < 2 ? 1 : 3;
                         float spread = phase < 3 ? 0.35f : 0.5f;
@@ -519,7 +543,7 @@ namespace OnLinces
                             Telegraph.Beam(telegraphPrefab, eyes, eyes + d * Units.Px(400), 0.95f, 0.35f, 7f, new Color(1f, 0.3f, 0.4f));
                         }
                     }
-                    if (subN == 1 && subT <= 0f) { subN = 2; Sfx.Play(laserFireClip); }
+                    if (subN == 1 && subT <= 0f) { subN = 2; Sfx.Play(laserFireClip); Rumble.PlayAll(0.5f, 0.6f, 0.3f); }
                     if (stateT <= 0f) { state = "move"; stateT = 1f * Rest; }
                     return Vector2.zero;
                 case "dump":
@@ -545,7 +569,7 @@ namespace OnLinces
                     {
                         subN = 1;
                         Css("sudo reboot now", 1.5f);
-                        Sfx.Play(dashClip);
+                        Sfx.Play(dashClip); Rumble.PlayAll(0.45f, 0.3f, 0.2f);
                         var r = room ? room.PlayRect : new Rect((Vector2)transform.position - Vector2.one * 3f, Vector2.one * 6f);
                         // lejos del jugador
                         for (int i = 0; i < 8; i++)
@@ -587,7 +611,7 @@ namespace OnLinces
             var mv = CssMoves[Random.Range(0, CssMoves.Length)];
             anchor = AnchorFor(mv.dir);
             knockPx = (anchor - (Vector2)transform.position).normalized * 160f;
-            Sfx.Play(dashClip);
+            Sfx.Play(dashClip); Rumble.PlayAll(0.45f, 0.3f, 0.2f);
             Ring(8 + phase * 2, 90f);
             state = "move";
             stateT = 1.4f * Rest;
@@ -616,6 +640,7 @@ namespace OnLinces
         void Ring(int n, float speedPx, float offset = 0f)
         {
             for (int i = 0; i < n; i++) Fire(Dir(Mathf.PI * 2f * i / n + offset), speedPx);
+            Rumble.PlayAll(0.3f, 0.15f, 0.12f);
         }
 
         // ---------------- daño ----------------
@@ -644,6 +669,8 @@ namespace OnLinces
         {
             dying = true;
             Sfx.Play(dieClip);
+            Rumble.PlayAll(1f, 1f, 1f);
+            PadFeedback.FlashAll(PadFeedback.GoldColor, 1.5f, rainbow: true); // barrido de colores
             if (deathFx) Instantiate(deathFx, transform.position + Vector3.up * Units.Px(24), Quaternion.identity);
             if (room) room.OnBossDefeated(this);
             Destroy(gameObject, 0.05f);

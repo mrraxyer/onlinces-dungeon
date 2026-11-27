@@ -27,6 +27,8 @@ namespace OnLinces
         public Vector2 Aim { get; private set; } = Vector2.right;
         public bool IsShooting { get; private set; }
         public bool SwitchWeaponPressed { get; private set; }
+        /// Golpe: Cuadrado / X, clic derecho o F (acción "Melee" del mismo mapa).
+        public bool MeleePressed { get; private set; }
         /// Jugador 2: no guarda nada en la partida y solo usa su mando.
         public bool IsGuest { get; private set; }
         /// Personaje de este jugador (el 2 puede elegir otro).
@@ -104,13 +106,18 @@ namespace OnLinces
             if (!IsGuest) InputSystem.onDeviceChange += OnDeviceChange;
             foreach (var a in new[] { move, look, attack, nextWeapon })
                 if (a != null) a.action.Enable();
+            move?.action.actionMap?.FindAction("Melee")?.Enable();
+            move?.action.actionMap?.FindAction("Previous")?.Enable();
         }
 
         void Update()
         {
             MoveInput = Act(move).ReadValue<Vector2>();
             IsShooting = Act(attack).IsPressed() || (!IsGuest && TouchControls.FireHeld);
-            SwitchWeaponPressed = nextWeapon != null && Act(nextWeapon).WasPressedThisFrame();
+            // R1 = siguiente, L1 = anterior; con 2 armas las dos cambian a la otra
+            SwitchWeaponPressed = (nextWeapon != null && Act(nextWeapon).WasPressedThisFrame())
+                || Act(move)?.actionMap?.FindAction("Previous")?.WasPressedThisFrame() == true;
+            MeleePressed = Act(move)?.actionMap?.FindAction("Melee")?.WasPressedThisFrame() == true;
             UpdateAim();
         }
 

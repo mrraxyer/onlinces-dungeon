@@ -1907,13 +1907,15 @@ MonoBehaviour:
 
     <color=#6B4A2B>Apuntar:</color> <sprite="Buttons" name="rs">
 
-    <color=#6B4A2B>Disparar:</color> <sprite="Buttons" name="ps_r2"> / <sprite="Buttons" name="ps_square">
+    <color=#6B4A2B>Disparar:</color> <sprite="Buttons" name="ps_r2">
 
-    <color=#6B4A2B>Habilidad:</color> <sprite="Buttons" name="ps_r1"> / <sprite="Buttons" name="ps_circle">
+    <color=#6B4A2B>Golpe:</color> <sprite="Buttons" name="ps_square">
 
-    <color=#6B4A2B>Interactuar:</color> <sprite="Buttons" name="ps_cross"> / <sprite="Buttons" name="ps_triangle">
+    <color=#6B4A2B>Habilidad:</color> <sprite="Buttons" name="ps_l2">
 
-    <color=#6B4A2B>Cambiar arma:</color> <sprite="Buttons" name="ps_l1"> / <sprite="Buttons" name="dpad_right">
+    <color=#6B4A2B>Interactuar:</color> <sprite="Buttons" name="ps_cross">
+
+    <color=#6B4A2B>Cambiar arma:</color> <sprite="Buttons" name="ps_l1"> / <sprite="Buttons" name="ps_r1">
 
     <color=#6B4A2B>Pausa:</color> <sprite="Buttons" name="ps_options">'
 --- !u!212 &310468729
@@ -11707,7 +11709,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.Sign
   title: 'Controles: PC'
-  body: "<size=78%><color=#8A5A2B><b><cspace=1>TECLADO Y RAT\xD3N</cspace></b></color></size>\n<color=#6B4A2B>Mover:</color> <sprite=\"Buttons\" name=\"key_wasd\">\n<color=#6B4A2B>Apuntar:</color> <sprite=\"Buttons\" name=\"mouse\">\n<color=#6B4A2B>Disparar:</color> <sprite=\"Buttons\" name=\"mouse_left\"> / <sprite=\"Buttons\" name=\"key_enter\">\n<color=#6B4A2B>Habilidad:</color> <sprite=\"Buttons\" name=\"key_space\"> / <sprite=\"Buttons\" name=\"key_shift\">\n<color=#6B4A2B>Interactuar:</color> <sprite=\"Buttons\" name=\"key_e\">\n<color=#6B4A2B>Cambiar arma:</color> <sprite=\"Buttons\" name=\"key_q\"> / <sprite=\"Buttons\" name=\"key_2\">\n<color=#6B4A2B>Pausa:</color> <sprite=\"Buttons\" name=\"key_esc\">"
+  body: "<size=78%><color=#8A5A2B><b><cspace=1>TECLADO Y RAT\xD3N</cspace></b></color></size>\n<color=#6B4A2B>Mover:</color> <sprite=\"Buttons\" name=\"key_wasd\">\n<color=#6B4A2B>Apuntar:</color> <sprite=\"Buttons\" name=\"mouse\">\n<color=#6B4A2B>Disparar:</color> <sprite=\"Buttons\" name=\"mouse_left\"> / <sprite=\"Buttons\" name=\"key_enter\">\n<color=#6B4A2B>Golpe:</color> F / clic derecho\n<color=#6B4A2B>Habilidad:</color> <sprite=\"Buttons\" name=\"key_space\"> / <sprite=\"Buttons\" name=\"key_shift\">\n<color=#6B4A2B>Interactuar:</color> <sprite=\"Buttons\" name=\"key_e\">\n<color=#6B4A2B>Cambiar arma:</color> <sprite=\"Buttons\" name=\"key_q\"> / <sprite=\"Buttons\" name=\"key_2\">\n<color=#6B4A2B>Pausa:</color> <sprite=\"Buttons\" name=\"key_esc\">"
 --- !u!212 &1598167986
 SpriteRenderer:
   serializedVersion: 3
@@ -14020,13 +14022,15 @@ MonoBehaviour:
 
     <color=#6B4A2B>Apuntar:</color> <sprite="Buttons" name="rs">
 
-    <color=#6B4A2B>Disparar:</color> <sprite="Buttons" name="xb_rt"> / <sprite="Buttons" name="xb_x">
+    <color=#6B4A2B>Disparar:</color> <sprite="Buttons" name="xb_rt">
 
-    <color=#6B4A2B>Habilidad:</color> <sprite="Buttons" name="xb_rb"> / <sprite="Buttons" name="xb_b">
+    <color=#6B4A2B>Golpe:</color> <sprite="Buttons" name="xb_x">
 
-    <color=#6B4A2B>Interactuar:</color> <sprite="Buttons" name="xb_a"> / <sprite="Buttons" name="xb_y">
+    <color=#6B4A2B>Habilidad:</color> <sprite="Buttons" name="xb_lt">
 
-    <color=#6B4A2B>Cambiar arma:</color> <sprite="Buttons" name="xb_lb"> / <sprite="Buttons" name="dpad_right">
+    <color=#6B4A2B>Interactuar:</color> <sprite="Buttons" name="xb_a">
+
+    <color=#6B4A2B>Cambiar arma:</color> <sprite="Buttons" name="xb_lb"> / <sprite="Buttons" name="xb_rb">
 
     <color=#6B4A2B>Pausa:</color> <sprite="Buttons" name="xb_menu">'
 --- !u!212 &1838475578

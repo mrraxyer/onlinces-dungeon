@@ -33,16 +33,14 @@ namespace OnLinces
         [Header("Energía (se llena en cada piso)")]
         [SerializeField] int maxEnergy = 140;
 
-        [Header("Melee (sin energía y con un enemigo encima)")]
+        [Header("Golpe (Cuadrado / X, clic derecho o F)")]
         [Tooltip("Hoja de 3 cuadros en horizontal")]
         [SerializeField] Sprite meleeSheet;
         [SerializeField] AudioClip meleeClip;
         [SerializeField] float meleeDamage = 4f;
-        [Tooltip("px: distancia a la que se activa")]
-        [SerializeField] float meleeTriggerPx = 30f;
         [SerializeField] float meleeRadiusPx = 24f;
         [SerializeField] float meleeDelay = 0.35f;
-        [Tooltip("px/s del impulso hacia el enemigo")]
+        [Tooltip("px/s del impulso hacia donde apuntas")]
         [SerializeField] float meleeLungePx = 260f;
 
         const float ShootAnimTime = 0.14f;
@@ -53,7 +51,7 @@ namespace OnLinces
         // armas rápidas: cobran energía como máximo una vez por ventana
         const float EnergyWindow = 0.5f;
 
-        float cooldown, cooldown2, shootAnim, noEnergyWarn, regenTimer, energyWindow;
+        float cooldown, cooldown2, shootAnim, noEnergyWarn, regenTimer, energyWindow, meleeCooldown;
         Sprite[] meleeFrames;
         PlayerStats stats;
         PlayerSkill skill;
@@ -64,6 +62,12 @@ namespace OnLinces
         public bool JustShot => shootAnim > 0f;
         public int Energy { get; private set; }
         public int MaxEnergy => maxEnergy;
+        /// s que faltan para el siguiente disparo del arma en la mano.
+        public float Cooldown => cooldown;
+        /// Time.time del último disparo.
+        public float LastShotTime { get; private set; } = -99f;
+        /// Como lo revisa el disparo: sin esto no dispara.
+        public bool HasEnergyFor(WeaponData w) => w != null && Energy >= w.energyCost;
 
         public void AddEnergy(int amount) => Energy = Mathf.Min(maxEnergy, Energy + amount);
 
@@ -106,6 +110,7 @@ namespace OnLinces
             shootAnim -= Time.deltaTime;
             noEnergyWarn -= Time.deltaTime;
             energyWindow -= Time.deltaTime;
+            meleeCooldown -= Time.deltaTime;
 
             // recarga lenta mientras no esté al máximo
             if (Energy < maxEnergy)
@@ -140,6 +145,12 @@ namespace OnLinces
                     muzzle.sprite = muzzleFrames[Mathf.Clamp((int)((ShootAnimTime - shootAnim) / 0.025f), 0, muzzleFrames.Length - 1)];
             }
 
+            if (controller.MeleePressed && meleeCooldown <= 0f && controller.enabled && Time.timeScale > 0f)
+            {
+                meleeCooldown = meleeDelay;
+                Melee(aim);
+            }
+
             if (!controller.IsShooting) return;
             float delayMult = stats ? stats.FireDelayMult : 1f;
 
@@ -147,8 +158,6 @@ namespace OnLinces
             {
                 cooldown = Current.fireDelay * delayMult;
                 if (energyWindow > 0f) Fire(Current, aim); // ya pagado en esta ventana
-                // sin energía (aunque el arma sea gratis): melee si hay un enemigo encima
-                else if (Energy < Mathf.Max(1, Current.energyCost) && TryMelee()) cooldown = meleeDelay;
                 else if (Energy >= Current.energyCost)
                 {
                     Energy -= Current.energyCost;
@@ -170,22 +179,10 @@ namespace OnLinces
             }
         }
 
-        bool TryMelee()
+        /// Golpe hacia donde apuntas: pega a todo lo que quede en el arco, sin buscar enemigos.
+        void Melee(Vector2 aim)
         {
-            // enemigo más cercano dentro del rango
-            Component target = null;
-            float best = Units.Px(meleeTriggerPx);
-            foreach (var col in Physics2D.OverlapCircleAll(transform.position, best))
-            {
-                var h = col.GetComponentInParent<IHittable>();
-                if (h is not (Enemy or Boss) || !h.CanBeHit) continue;
-                float d = Vector2.Distance(col.ClosestPoint(transform.position), transform.position);
-                if (d <= best) { best = d; target = (Component)h; }
-            }
-            if (target == null) return false;
-
-            var dir = (Vector2)(target.transform.position - transform.position);
-            dir = dir.sqrMagnitude > 0.0001f ? dir.normalized : controller.Aim;
+            var dir = aim.sqrMagnitude > 0.0001f ? aim.normalized : Vector2.right;
             controller.Knock(dir * meleeLungePx);
             shootAnim = ShootAnimTime;
             Sfx.Play(meleeClip, 0.7f);
@@ -199,7 +196,13 @@ namespace OnLinces
                 if (h != null && h.CanBeHit && hit.Add(h)) h.Hit(damage, dir);
             }
             if (meleeSheet) StartCoroutine(SlashFx(center, dir));
-            return true;
+            // al aire: un toque; si conecta, golpe seco y destello blanco en el DualSense
+            if (hit.Count == 0) Rumble.Play(controller, 0.05f, 0.2f, 0.06f);
+            else
+            {
+                Rumble.Play(controller, 0.6f, 0.3f, 0.1f);
+                PadFeedback.Flash(controller, Color.white, 0.12f, PadFeedback.Priority.Event);
+            }
         }
 
         System.Collections.IEnumerator SlashFx(Vector2 at, Vector2 dir)
@@ -233,7 +236,11 @@ namespace OnLinces
             float damage = w.damage * (stats ? stats.DamageMult : 1f);
             if (skill && skill.IsActive(SkillKind.JuntaGeneral)) damage *= 2f;
             shootAnim = ShootAnimTime;
-            Rumble.Play(controller, 0f, 0.15f, 0.04f); // zumbido corto por disparo
+            LastShotTime = Time.time;
+            // retroceso según el peso del tiro (daño x balas): while(true) apenas zumba, la escopeta y el rifle sacuden
+            float kick = Mathf.Clamp01(w.damage * w.count / 8f);
+            Rumble.Play(controller, kick * 0.6f, 0.15f + kick * 0.3f, 0.04f + kick * 0.08f);
+            PadFeedback.Flash(controller, WeaponData.RarityColor(w.rarity), 0.06f, PadFeedback.Priority.Shot); // chispazo
 
             Vector2 origin = (Vector2)hand.position + aim * Units.Px(muzzleDistancePx);
             float baseAngle = Mathf.Atan2(aim.y, aim.x) * Mathf.Rad2Deg;

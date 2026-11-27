@@ -125,7 +125,7 @@ namespace OnLinces
             if (away.sqrMagnitude > 0.0001f) controller.Knock(away.normalized * knockbackPx);
             HitFeedback.PlayerHit(transform, away.sqrMagnitude > 0.0001f ? away.normalized : Vector2.zero, !HasShield);
             // con escudo, más suave
-            if (HasShield) Rumble.Play(controller, 0.25f, 0.35f, 0.12f);
+            if (HasShield) { Rumble.Play(controller, 0.25f, 0.35f, 0.12f); PadFeedback.Flash(controller, new Color(0.3f, 0.95f, 1f), 0.2f, PadFeedback.Priority.Hit); }
             else Rumble.Play(controller, 0.7f, 0.9f, 0.25f);
 
             if (HasShield)

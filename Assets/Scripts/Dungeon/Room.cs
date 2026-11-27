@@ -117,6 +117,8 @@ namespace OnLinces
             state = State.Cleared;
             foreach (var d in doors) d.SetOpen(true);
             Sfx.Play(doorOpenClip);
+            Rumble.PlayAll(0.2f, 0.35f, 0.2f);
+            PadFeedback.FlashAll(PadFeedback.ClearColor, 0.4f);
             if (player) player.GetComponent<PlayerStats>()?.OnRoomCleared(player.TookDamageThisRoom);
             if (loot && UnityEngine.Random.value < loot.chestChance)
             {

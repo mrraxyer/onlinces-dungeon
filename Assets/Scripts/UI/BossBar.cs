@@ -77,7 +77,11 @@ namespace OnLinces
                 phaseLabel.text = "REINICIANDO...";
                 value.text = "INMUNE";
             }
-            else phaseLabel.text = $"FASE {boss.Phase}/3";
+            else
+            {
+                phaseLabel.text = $"FASE {boss.Phase}/3";
+                if (boss.Lighthouse) value.text = "INMUNE";
+            }
             accent.color = title.color = phaseLabel.color = fillImg.color = c;
         }
 

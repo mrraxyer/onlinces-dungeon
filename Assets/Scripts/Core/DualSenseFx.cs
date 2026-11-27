@@ -15,23 +15,54 @@ namespace OnLinces
     /// Cada envío lleva todo el estado del mando; solo se manda cuando algo cambió.
     public static class DualSenseFx
     {
-        public enum Trigger { Off, Click, Snap, Buzz, Locked }
+        /// Efecto de un gatillo. Zonas 0-9 a lo largo del recorrido, fuerza 1-8, frecuencia en Hz.
+        public readonly struct Trigger : IEquatable<Trigger>
+        {
+            public readonly TriggerProfile.Mode mode;
+            public readonly int start, end, strength, endStrength, frequency;
+
+            public Trigger(TriggerProfile.Mode mode, int start = 0, int end = 9, int strength = 1, int endStrength = 1, int frequency = 0)
+            {
+                this.mode = mode;
+                this.start = Mathf.Clamp(start, 0, 9);
+                this.end = Mathf.Clamp(end, 1, 9);
+                this.strength = Mathf.Clamp(strength, 1, 8);
+                this.endStrength = Mathf.Clamp(endStrength, 1, 8);
+                this.frequency = Mathf.Clamp(frequency, 0, 255);
+            }
+
+            public static Trigger From(TriggerProfile p) => new(p.mode, p.start, p.end, p.strength, p.endStrength, p.frequency);
+            public static readonly Trigger Off = new(TriggerProfile.Mode.Off);
+            /// Trabado en todo el recorrido.
+            public static readonly Trigger Locked = new(TriggerProfile.Mode.Feedback, 0, 9, 8);
+
+            /// Mismo efecto, más duro (energía baja).
+            public Trigger Harder(int extra) => new(mode, start, end, strength + extra, endStrength + extra, frequency);
+
+            public bool Equals(Trigger o) => mode == o.mode && start == o.start && end == o.end && strength == o.strength && endStrength == o.endStrength && frequency == o.frequency;
+            public override bool Equals(object o) => o is Trigger t && Equals(t);
+            public override int GetHashCode() => HashCode.Combine(mode, start, end, strength, endStrength, frequency);
+            public static bool operator ==(Trigger a, Trigger b) => a.Equals(b);
+            public static bool operator !=(Trigger a, Trigger b) => !a.Equals(b);
+        }
 
         sealed class State
         {
             public byte low, high, r, g, b, leds;
-            public Trigger trigger;
+            public Trigger trigger = Trigger.Off, left = Trigger.Off;
             public byte seq;
-            public bool bluetooth, sent;
+            public bool bluetooth, sent, dirty;
             public int reportSize;
         }
 
         static readonly Dictionary<DualSenseGamepadHID, State> pads = new();
+        static Flusher flusher;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics()
         {
             pads.Clear();
+            flusher = null;
             Application.quitting -= ResetAll;
             Application.quitting += ResetAll;
         }
@@ -48,7 +79,10 @@ namespace OnLinces
         public static void SetPlayer(Gamepad pad, int player) =>
             Change(pad, s => s.leds = player switch { 1 => 0x04, 2 => 0x0A, 3 => 0x15, 4 => 0x1B, _ => 0 });
 
+        /// R2.
         public static void SetTrigger(Gamepad pad, Trigger t) => Change(pad, s => s.trigger = t);
+        /// L2.
+        public static void SetLeftTrigger(Gamepad pad, Trigger t) => Change(pad, s => s.left = t);
 
         /// Gatillos sueltos y motores apagados (al salir: si no, R2 se queda duro fuera del juego).
         public static void ResetAll()
@@ -56,7 +90,7 @@ namespace OnLinces
             foreach (var kv in pads)
             {
                 kv.Value.low = kv.Value.high = 0;
-                kv.Value.trigger = Trigger.Off;
+                kv.Value.trigger = kv.Value.left = Trigger.Off;
                 if (kv.Key.added) Send(kv.Key, kv.Value);
             }
         }
@@ -65,10 +99,31 @@ namespace OnLinces
         {
             if (pad is not DualSenseGamepadHID ds || !ds.added) return;
             if (!pads.TryGetValue(ds, out var s)) pads[ds] = s = NewState(ds);
-            var before = (s.low, s.high, s.r, s.g, s.b, s.leds, s.trigger);
+            var before = (s.low, s.high, s.r, s.g, s.b, s.leds, s.trigger, s.left);
             edit(s);
-            if (s.sent && before == (s.low, s.high, s.r, s.g, s.b, s.leds, s.trigger)) return;
-            Send(ds, s);
+            if (s.sent && before == (s.low, s.high, s.r, s.g, s.b, s.leds, s.trigger, s.left)) return;
+            // un solo paquete por frame con todo lo que cambió: por Bluetooth, varios seguidos pueden fallar
+            if (!Application.isPlaying) { Send(ds, s); return; }
+            s.dirty = true;
+            if (flusher == null)
+            {
+                flusher = new GameObject("DualSenseFx").AddComponent<Flusher>();
+                UnityEngine.Object.DontDestroyOnLoad(flusher.gameObject);
+                flusher.gameObject.hideFlags = HideFlags.HideInHierarchy;
+            }
+        }
+
+        // manda al final del frame; si el mando no lo aceptó, reintenta en el siguiente
+        sealed class Flusher : MonoBehaviour
+        {
+            void LateUpdate()
+            {
+                foreach (var kv in pads)
+                    if (kv.Value.dirty && kv.Key.added && Send(kv.Key, kv.Value)) kv.Value.dirty = false;
+            }
+
+            // al salir de Play en el editor (en el juego lo cubre Application.quitting)
+            void OnDestroy() => ResetAll();
         }
 
         static State NewState(InputDevice pad)
@@ -91,7 +146,7 @@ namespace OnLinces
             public FourCC typeStatic => new('H', 'I', 'D', 'O');
         }
 
-        static void Send(DualSenseGamepadHID pad, State s)
+        static bool Send(DualSenseGamepadHID pad, State s)
         {
             var cmd = new OutputCommand { baseCommand = new InputDeviceCommand(new FourCC('H', 'I', 'D', 'O'), InputDeviceCommand.BaseCommandSize + s.reportSize) };
             var report = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref cmd, 1)).Slice(InputDeviceCommand.BaseCommandSize, s.reportSize);
@@ -115,7 +170,7 @@ namespace OnLinces
             report[o + 2] = s.high;                    // motor derecho (chico)
             report[o + 3] = s.low;                     // motor izquierdo (grande)
             WriteTrigger(report.Slice(o + 10, 11), s.trigger);    // R2
-            WriteTrigger(report.Slice(o + 21, 11), Trigger.Off);  // L2: el juego no lo usa
+            WriteTrigger(report.Slice(o + 21, 11), s.left);       // L2 (habilidad)
             // firmware reciente: la vibración clásica también necesita este bit (el viejo lo ignora)
             report[o + 38] = 0x04;
             if (!s.sent)
@@ -136,25 +191,30 @@ namespace OnLinces
                 report[BtLength - 2] = (byte)(crc >> 16);
                 report[BtLength - 1] = (byte)(crc >> 24);
             }
-            s.sent = pad.ExecuteCommand(ref cmd) >= 0;
+            bool ok = pad.ExecuteCommand(ref cmd) >= 0;
+            if (ok) s.sent = true; // hasta el primero aceptado se repite el apagado de la luz azul
+            return ok;
         }
 
-        // efectos de gatillo (modo + 10 parámetros); zonas 0-9 a lo largo del recorrido, fuerza 1-8
-        static void WriteTrigger(Span<byte> t, Trigger effect)
+        // efecto de gatillo: modo + 10 parámetros
+        static void WriteTrigger(Span<byte> t, Trigger e)
         {
             t.Clear();
-            switch (effect)
+            switch (e.mode)
             {
-                case Trigger.Off: t[0] = 0x05; break;
-                case Trigger.Click: Weapon(t, 3, 5, 4); break;        // pistola: un clic ligero
-                case Trigger.Snap: Weapon(t, 2, 7, 8); break;         // escopeta: tope duro que truena
-                case Trigger.Buzz: Vibration(t, 2, 6, 30); break;     // automática: zumba mientras disparas
-                case Trigger.Locked: Feedback(t, 0, 8); break;        // sin energía: trabado
+                case TriggerProfile.Mode.Weapon: Weapon(t, e.start, e.end, e.strength); break;
+                case TriggerProfile.Mode.Feedback: Zones(t, 0x21, e.start, e.end, e.strength, e.strength); break;
+                case TriggerProfile.Mode.Slope: Zones(t, 0x21, e.start, e.end, e.strength, e.endStrength); break;
+                case TriggerProfile.Mode.Vibration: Zones(t, 0x26, e.start, e.end, e.strength, e.strength); t[9] = (byte)Mathf.Max(1, e.frequency); break;
+                default: t[0] = 0x05; break;
             }
         }
 
+        // el modo Weapon del mando solo acepta inicio 2-7 y fin hasta 8
         static void Weapon(Span<byte> t, int start, int end, int strength)
         {
+            start = Mathf.Clamp(start, 2, 7);
+            end = Mathf.Clamp(end, start + 1, 8);
             int zones = (1 << start) | (1 << end);
             t[0] = 0x25;
             t[1] = (byte)zones;
@@ -162,33 +222,22 @@ namespace OnLinces
             t[3] = (byte)(strength - 1);
         }
 
-        static void Feedback(Span<byte> t, int position, int strength)
+        /// Fuerza (o amplitud) por zona desde start: pasa de s0 a s1 hasta end y sigue en s1 hasta el fondo.
+        /// 0x21 = resistencia, 0x26 = vibración; cada zona usa 3 bits.
+        static void Zones(Span<byte> t, byte mode, int start, int end, int s0, int s1)
         {
-            uint active = 0, forces = 0;
-            for (int i = position; i < 10; i++)
+            uint active = 0, values = 0;
+            for (int i = start; i < 10; i++)
             {
+                float k = end > start ? Mathf.Clamp01((i - start) / (float)(end - start)) : 1f;
+                int v = Mathf.RoundToInt(Mathf.Lerp(s0, s1, k));
                 active |= 1u << i;
-                forces |= (uint)(strength - 1) << (3 * i);
+                values |= (uint)(Mathf.Clamp(v, 1, 8) - 1) << (3 * i);
             }
-            t[0] = 0x21;
+            t[0] = mode;
             t[1] = (byte)active;
             t[2] = (byte)(active >> 8);
-            for (int k = 0; k < 4; k++) t[3 + k] = (byte)(forces >> (8 * k));
-        }
-
-        static void Vibration(Span<byte> t, int position, int amplitude, int frequency)
-        {
-            uint active = 0, amps = 0;
-            for (int i = position; i < 10; i++)
-            {
-                active |= 1u << i;
-                amps |= (uint)(amplitude - 1) << (3 * i);
-            }
-            t[0] = 0x26;
-            t[1] = (byte)active;
-            t[2] = (byte)(active >> 8);
-            for (int k = 0; k < 4; k++) t[3 + k] = (byte)(amps >> (8 * k));
-            t[9] = (byte)frequency;
+            for (int k = 0; k < 4; k++) t[3 + k] = (byte)(values >> (8 * k));
         }
 
         static byte Byte(float v) => (byte)Mathf.RoundToInt(Mathf.Clamp01(v) * 255f);

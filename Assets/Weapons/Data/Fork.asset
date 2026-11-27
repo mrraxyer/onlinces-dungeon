@@ -15,7 +15,6 @@ MonoBehaviour:
   displayName: fork()
   description: Cada disparo se bifurca en 2 procesos.
   rarity: 2
-  kind: 0
   icon: {fileID: 264283326, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
   projectileSprites:
   - {fileID: 990589308, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
@@ -27,3 +26,17 @@ MonoBehaviour:
   range: 0.8
   energyCost: 2
   pierce: 0
+  returns: 0
+  chain: 0
+  explosion: {fileID: 0}
+  homingDegPerSec: 0
+  trigger:
+    mode: 4
+    start: 1
+    end: 9
+    strength: 7
+    endStrength: 8
+    frequency: 8
+    lockWhileReloading: 0
+    lockWhileBulletFlies: 0
+    shotPulseSeconds: 0

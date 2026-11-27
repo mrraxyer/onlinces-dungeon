@@ -12,10 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bbd54b4f056d914a880ea032bb15f2d, type: 3}
   m_Name: Ping
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.WeaponData
-  displayName: 'ping'
-  description: 'Al impactar rebota a 2 enemigos cercanos.'
+  displayName: ping
+  description: Al impactar rebota a 2 enemigos cercanos.
   rarity: 2
-  kind: 0
   icon: {fileID: 418580158, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
   projectileSprites:
   - {fileID: -886044901, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
@@ -31,3 +30,13 @@ MonoBehaviour:
   chain: 2
   explosion: {fileID: 0}
   homingDegPerSec: 0
+  trigger:
+    mode: 1
+    start: 3
+    end: 5
+    strength: 5
+    endStrength: 8
+    frequency: 14
+    lockWhileReloading: 0
+    lockWhileBulletFlies: 0
+    shotPulseSeconds: 0.15

@@ -15,7 +15,6 @@ MonoBehaviour:
   displayName: Packet Tracer
   description: "Paquetes r\xE1pidos y precisos de largo alcance."
   rarity: 2
-  kind: 0
   icon: {fileID: -638685190, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
   projectileSprites:
   - {fileID: -886044901, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
@@ -27,3 +26,18 @@ MonoBehaviour:
   count: 1
   range: 0.8
   energyCost: 2
+  pierce: 0
+  returns: 0
+  chain: 0
+  explosion: {fileID: 0}
+  homingDegPerSec: 0
+  trigger:
+    mode: 1
+    start: 2
+    end: 3
+    strength: 5
+    endStrength: 8
+    frequency: 60
+    lockWhileReloading: 0
+    lockWhileBulletFlies: 0
+    shotPulseSeconds: 0.04

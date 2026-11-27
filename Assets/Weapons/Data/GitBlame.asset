@@ -12,10 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bbd54b4f056d914a880ea032bb15f2d, type: 3}
   m_Name: GitBlame
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.WeaponData
-  displayName: 'git blame'
-  description: 'Balas teledirigidas que buscan al culpable.'
+  displayName: git blame
+  description: Balas teledirigidas que buscan al culpable.
   rarity: 4
-  kind: 0
   icon: {fileID: -690327817, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
   projectileSprites:
   - {fileID: 592163628, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
@@ -31,3 +30,13 @@ MonoBehaviour:
   chain: 0
   explosion: {fileID: 0}
   homingDegPerSec: 360
+  trigger:
+    mode: 3
+    start: 1
+    end: 9
+    strength: 1
+    endStrength: 7
+    frequency: 40
+    lockWhileReloading: 0
+    lockWhileBulletFlies: 0
+    shotPulseSeconds: 0.06

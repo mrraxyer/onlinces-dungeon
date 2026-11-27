@@ -15,7 +15,6 @@ MonoBehaviour:
   displayName: sudo rifle
   description: 'Permisos de root: tiro lento que atraviesa 2 enemigos.'
   rarity: 3
-  kind: 0
   icon: {fileID: -515152262, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
   projectileSprites:
   - {fileID: -886044901, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
@@ -28,3 +27,17 @@ MonoBehaviour:
   range: 1.1
   energyCost: 4
   pierce: 2
+  returns: 0
+  chain: 0
+  explosion: {fileID: 0}
+  homingDegPerSec: 0
+  trigger:
+    mode: 1
+    start: 6
+    end: 8
+    strength: 7
+    endStrength: 8
+    frequency: 20
+    lockWhileReloading: 1
+    lockWhileBulletFlies: 0
+    shotPulseSeconds: 0.1

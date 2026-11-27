@@ -32,6 +32,10 @@ namespace OnLinces
         public float CooldownFraction => Role && Role.cooldown > 0f ? Mathf.Clamp01(cooldownLeft / Role.cooldown) : 0f;
         public bool Ready => cooldownLeft <= 0f;
         public bool IsActive(SkillKind k) => activeLeft > 0f && activeKind == k;
+        /// La que está activa ahora (null si ninguna).
+        public SkillKind? ActiveSkill => activeLeft > 0f ? activeKind : null;
+        /// s que le quedan a la habilidad activa.
+        public float ActiveLeft => Mathf.Max(0f, activeLeft);
 
         void OnEnable() { if (skillAction) skillAction.action.Enable(); }
 
@@ -71,6 +75,15 @@ namespace OnLinces
             activeLeft = r.duration;
             Sfx.Play(useClip, 0.7f);
             HUD.Feedback(r.skillName, HUD.Info);
+            var controller = GetComponent<PlayerController>();
+            // cada habilidad se siente distinta al activarla
+            switch (r.skill)
+            {
+                case SkillKind.DeployDoble: Rumble.Play(controller, 0.5f, 0.5f, 0.08f); break; // doble toque (el segundo lo da el disparo doble)
+                case SkillKind.JuntaGeneral: Rumble.Play(controller, 0.9f, 0.6f, 0.35f); break;
+                case SkillKind.Suplencia: Rumble.Play(controller, 1f, 0f, 0.2f); break;          // golpe sordo
+                default: Rumble.Play(controller, 0f, 0.7f, 0.4f); break;                        // Firewall: zumbido
+            }
             var health = GetComponent<PlayerHealth>();
 
             switch (r.skill)

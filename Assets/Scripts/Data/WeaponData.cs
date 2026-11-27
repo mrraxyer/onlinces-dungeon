@@ -44,6 +44,9 @@ namespace OnLinces
         [Tooltip("Grados/s que gira para perseguir enemigos")]
         public float homingDegPerSec;
 
+        [Header("Gatillo R2 (DualSense)")]
+        public TriggerProfile trigger = new();
+
         public static string RarityName(Rarity r) => r switch
         {
             Rarity.Comun => "Común",

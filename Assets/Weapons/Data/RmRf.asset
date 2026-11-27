@@ -12,10 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bbd54b4f056d914a880ea032bb15f2d, type: 3}
   m_Name: RmRf
   m_EditorClassIdentifier: Assembly-CSharp::OnLinces.WeaponData
-  displayName: 'rm -rf'
-  description: 'Lanzacohetes: explota en área al chocar. Borra todo.'
+  displayName: rm -rf
+  description: "Lanzacohetes: explota en \xE1rea al chocar. Borra todo."
   rarity: 3
-  kind: 0
   icon: {fileID: -844970547, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
   projectileSprites:
   - {fileID: 240259399, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
@@ -31,3 +30,13 @@ MonoBehaviour:
   chain: 0
   explosion: {fileID: 1785156190391477666, guid: ff2229cc196b09446a699c2cb452cee1, type: 3}
   homingDegPerSec: 0
+  trigger:
+    mode: 1
+    start: 2
+    end: 8
+    strength: 8
+    endStrength: 8
+    frequency: 15
+    lockWhileReloading: 1
+    lockWhileBulletFlies: 0
+    shotPulseSeconds: 0.18

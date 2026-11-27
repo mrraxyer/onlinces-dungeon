@@ -80,7 +80,7 @@ namespace OnLinces
             counter.enabled = !ready;
             if (!ready) counter.text = Mathf.CeilToInt(skill.CooldownFraction * r.cooldown).ToString();
             if (!owner) owner = skill.GetComponent<PlayerController>();
-            string key = TouchControls.Active && !owner.IsGuest ? "" : "  " + owner.Key("key_space", "xb_rb", "ps_r1");
+            string key = TouchControls.Active && !owner.IsGuest ? "" : "  " + owner.Key("key_space", "xb_lt", "ps_l2");
             nameLabel.text = r.skillName + key;
         }
     }

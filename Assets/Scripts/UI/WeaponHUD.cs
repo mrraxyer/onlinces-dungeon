@@ -81,7 +81,9 @@ namespace OnLinces
 
             otherRow.SetActive(other != null);
             if (other != null) otherIcon.sprite = other.icon;
-            keyLabel.text = touch ? "" : guest ? owner.Key("key_q", "xb_lb", "ps_l1") : TouchControls.Key("key_q", "xb_lb", "ps_l1");
+            // mando: L1 y R1 (anterior / siguiente); teclado: Q
+            bool pad = guest || TouchControls.PadActive;
+            keyLabel.text = touch ? "" : pad ? owner.Key("", "xb_lb", "ps_l1") + owner.Key("", "xb_rb", "ps_r1") : owner.Key("key_q", "", "");
         }
     }
 }

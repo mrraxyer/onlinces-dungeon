@@ -67,6 +67,7 @@ namespace OnLinces
             if (quitButton) quitButton.onClick.AddListener(QuitToTitle);
             if (pausePanel && continueButton && quitButton) BuildGraphicsMenu();
             if (gameplay) gameplay.SetActive(false);
+            BuildMeleeButton();
             if (pausePanel) pausePanel.SetActive(false);
             SceneManager.sceneLoaded += OnSceneLoaded;
             // en táctil los sticks en pantalla son un mando virtual: no cuenta
@@ -197,6 +198,24 @@ namespace OnLinces
             graphics.Build(box.gameObject, continueButton);
             btn.onClick.AddListener(graphics.Open);
             gameObject.AddComponent<PerfStats>().Build(pausePanel.transform.parent, continueButton.GetComponentInChildren<TMP_Text>());
+        }
+
+        // golpe en táctil: copia del botón ARMA que manda Cuadrado / X (acción Melee)
+        void BuildMeleeButton()
+        {
+            if (!gameplay) return;
+            foreach (var t in gameplay.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name != "BtnWeapon") continue;
+                // gameplay está apagado: la copia no se registra con la ruta vieja antes de cambiarla
+                var copy = Instantiate(t.gameObject, t.parent);
+                copy.name = "BtnMelee";
+                if (copy.TryGetComponent<UnityEngine.InputSystem.OnScreen.OnScreenButton>(out var osb)) osb.controlPath = "<Gamepad>/buttonWest";
+                var label = copy.GetComponentInChildren<TMP_Text>(true);
+                if (label) label.text = "GOLPE";
+                ((RectTransform)copy.transform).anchoredPosition = new Vector2(-170f, 150f);
+                return;
+            }
         }
 
         static void Link(Button b, Selectable up, Selectable down) =>

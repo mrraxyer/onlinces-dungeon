@@ -15,7 +15,6 @@ MonoBehaviour:
   displayName: print()
   description: Confiable. Nunca te falla.
   rarity: 0
-  kind: 0
   icon: {fileID: -1989490958, guid: 0b4960a3dd97d6a40bd54564147a6bdf, type: 3}
   projectileSprites:
   - {fileID: 721844313, guid: f2bc062ef606cbe42957b01d85a7113a, type: 3}
@@ -26,3 +25,18 @@ MonoBehaviour:
   count: 1
   range: 0.7
   energyCost: 0
+  pierce: 0
+  returns: 0
+  chain: 0
+  explosion: {fileID: 0}
+  homingDegPerSec: 0
+  trigger:
+    mode: 1
+    start: 4
+    end: 6
+    strength: 3
+    endStrength: 8
+    frequency: 30
+    lockWhileReloading: 0
+    lockWhileBulletFlies: 0
+    shotPulseSeconds: 0.05

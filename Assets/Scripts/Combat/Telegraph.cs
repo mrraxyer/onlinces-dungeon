@@ -80,7 +80,9 @@ namespace OnLinces
 
         void Update()
         {
+            bool wasWarning = t < warn;
             t += Time.deltaTime;
+            if (wasWarning && t >= warn) Rumble.PlayAll(0.35f, 0.3f, 0.15f); // el aviso se vuelve golpe
             Refresh();
             if (t >= warn)
                 foreach (var player in PlayerHealth.All)
