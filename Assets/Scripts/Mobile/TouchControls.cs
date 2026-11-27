@@ -112,7 +112,7 @@ namespace OnLinces
             if (player != null && ((Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) || (pad != null && pad.startButton.wasPressedThisFrame)))
             {
                 if (!paused) Pause();
-                else if (graphics && graphics.IsOpen) graphics.Close();
+                else if (graphics && graphics.IsOpen) graphics.Back();
                 else Resume();
             }
             // mando en menús: si nada está seleccionado, selecciona el botón más alto

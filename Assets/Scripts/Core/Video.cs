@@ -6,7 +6,7 @@ namespace OnLinces
     public static class VideoSettings
     {
         /// -1 = sin límite.
-        public static readonly int[] FpsLimits = { 30, 60, 120, 144, -1 };
+        public static readonly int[] FpsLimits = { 30, 60, 120, 144, 165, 240, 360, -1 };
 
         public static bool VSync { get; private set; }
         public static int FpsLimit { get; private set; }

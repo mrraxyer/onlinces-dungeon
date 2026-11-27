@@ -215,7 +215,8 @@ namespace OnLinces
             bool sel = row == Row.Start;
             string start = CanStart() ? "EMPEZAR" : "EMPEZAR (falta el mando del J1)";
             Line($"<color={(sel ? Hi : CanStart() ? Txt : Dim)}>{(sel ? R + " " : "")}[ {start} ]</color>", Row.Start);
-            Line($"<color={Dim}>Esc / B: volver</color>");
+            // los dos botones de atrás: B en Xbox y círculo en PlayStation
+            Line($"<color={Dim}>Esc / B / </color><sprite=\"Buttons\" name=\"ps_circle\"><color={Dim}>: volver</color>");
             var s = sb.ToString().TrimEnd('\n');
             if (text.text != s) text.text = s;
         }
